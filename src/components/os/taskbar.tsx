@@ -56,13 +56,22 @@ export default function Taskbar() {
         aria-label="منوی شروع"
       >
         <img
-          src="/tux-avatar.png"
+          src="/squirrel-avatar.png"
           alt=""
           aria-hidden
           className="pengo-breathe h-6 w-6 rounded-full border border-white/20 object-cover"
         />
         <span className="hidden sm:inline">شروع</span>
       </button>
+      <a
+        href="https://sunjob.ir"
+        target="_blank"
+        rel="noreferrer"
+        title="اسپانسیر ما: سان‌جاب — sunjob.ir"
+        className="mr-1 hidden h-7 shrink-0 items-center gap-1 rounded-full border border-[#f7931e]/40 bg-gradient-to-l from-[#f7931e]/20 to-[#8b5cf6]/20 px-2.5 text-[10px] font-black text-amber-200 transition hover:from-[#f7931e]/35 hover:to-[#8b5cf6]/35 lg:flex"
+      >
+        ⚡ با اسپانسری سان‌جاب
+      </a>
       <div className="h-6 w-px shrink-0 bg-white/10" aria-hidden />
       <nav
         className="os-scroll flex min-w-0 flex-1 items-center gap-1 overflow-x-auto"

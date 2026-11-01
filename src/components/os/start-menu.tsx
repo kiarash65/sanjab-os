@@ -6,6 +6,7 @@ import { useOS } from '@/lib/os/store'
 import { APPS, launch } from '@/lib/os/apps'
 import { Input } from '@/components/ui/input'
 import { getPlayerName, setPlayerName } from '@/components/os/leaderboard'
+import { BRAND } from '@/lib/os/brand'
 
 export default function StartMenu() {
   const startOpen = useOS((s) => s.startOpen)
@@ -79,10 +80,12 @@ function StartMenuInner() {
                       className="flex flex-col items-center gap-1.5 rounded-xl p-2 transition hover:bg-white/10 active:scale-95"
                     >
                       <span
-                        className="grid h-11 w-11 place-items-center rounded-xl border border-white/10 bg-zinc-800 shadow-inner"
+                        className={`grid h-11 w-11 place-items-center rounded-xl border border-white/15 bg-gradient-to-br shadow-lg shadow-black/30 ${
+                          a.tint ?? 'from-zinc-700 to-zinc-800'
+                        }`}
                         aria-hidden
                       >
-                        <a.icon size={22} strokeWidth={1.8} className="text-zinc-100" />
+                        <a.icon size={22} strokeWidth={2} className="text-white drop-shadow" />
                       </span>
                       <span className="text-center text-[11px] font-medium leading-tight text-zinc-200">
                         {a.name}
@@ -102,12 +105,12 @@ function StartMenuInner() {
             </div>
           )}
         </div>
-        <div className="flex items-center justify-between border-t border-white/10 p-2.5">
+        <div className="flex items-center justify-between gap-2 border-t border-white/10 p-2.5">
           <div className="flex min-w-0 items-center gap-2 px-1">
             <img
-              src="/tux-avatar.png"
-              alt="آواتار پنگوئن"
-              className="h-9 w-9 shrink-0 rounded-full border border-white/15 object-cover"
+              src="/squirrel-avatar.png"
+              alt="آواتار سنجابک"
+              className="h-9 w-9 shrink-0 rounded-full border border-[#f7931e]/40 object-cover"
             />
             <div className="min-w-0 leading-tight">
               <input
@@ -115,7 +118,7 @@ function StartMenuInner() {
                 onBlur={(e) => setPlayerName(e.target.value.trim().slice(0, 24))}
                 maxLength={24}
                 aria-label="اسم بازیکن"
-                placeholder="پنگوئن مهمان"
+                placeholder="سنجابک مهمان"
                 className="w-36 rounded-md bg-transparent px-1.5 py-0.5 text-xs font-bold text-zinc-100 outline-none transition hover:bg-white/10 focus:bg-white/10"
               />
               <div className="px-1.5 text-[10px] text-zinc-500">
@@ -129,7 +132,7 @@ function StartMenuInner() {
                 toggleStart(false)
                 useOS.getState().lockScreen()
               }}
-              className="grid h-9 w-9 place-items-center rounded-lg text-zinc-300 transition hover:bg-white/10 hover:text-sky-300"
+              className="grid h-9 w-9 place-items-center rounded-lg text-zinc-300 transition hover:bg-white/10 hover:text-teal-300"
               title="قفل صفحه"
               aria-label="قفل صفحه"
             >
@@ -153,6 +156,14 @@ function StartMenuInner() {
             </button>
           </div>
         </div>
+        <a
+          href={BRAND.sponsorUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="flex h-9 shrink-0 items-center justify-center gap-1.5 border-t border-white/10 bg-gradient-to-l from-[#f7931e]/20 via-[#8b5cf6]/15 to-[#0ea5a0]/15 text-[11px] font-black text-amber-200 transition hover:from-[#f7931e]/35 hover:via-[#8b5cf6]/25 hover:to-[#0ea5a0]/25"
+        >
+          ⚡ {BRAND.sponsor} — {BRAND.sponsorSite}
+        </a>
       </div>
     </>
   )

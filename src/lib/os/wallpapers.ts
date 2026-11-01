@@ -6,6 +6,36 @@ export interface Wallpaper {
 
 export const WALLPAPERS: Wallpaper[] = [
   {
+    key: 'img:sunjob-squirrel',
+    name: 'سنجابک سان‌جابی',
+    css: 'url(/wallpapers/sunjob-squirrel.png)',
+  },
+  {
+    key: 'img:sunjob-blobs',
+    name: 'لکه‌های رنگی سان‌جاب',
+    css: 'url(/wallpapers/sunjob-blobs.png)',
+  },
+  {
+    key: 'img:sunjob-desk',
+    name: 'میز مطالعه کنکوری',
+    css: 'url(/wallpapers/sunjob-desk.png)',
+  },
+  {
+    key: 'grad:sunjob',
+    name: 'گرادیان رسمی سان‌جاب',
+    css: 'linear-gradient(135deg, #1a2744 0%, #7c3aed 55%, #f7931e 120%)',
+  },
+  {
+    key: 'grad:sunjob-light',
+    name: 'کرم صبحگاهی سان‌جاب',
+    css: 'linear-gradient(135deg, #fffbf5 0%, #fdb56b 55%, #f7931e 110%)',
+  },
+  {
+    key: 'grad:sunjob-teal',
+    name: 'فیروزه سان‌جابی',
+    css: 'linear-gradient(140deg, #0b1120 0%, #0ea5a0 60%, #11b7be 110%)',
+  },
+  {
     key: 'grad:aurora',
     name: 'شفق پنگوئنی',
     css: 'linear-gradient(140deg, #022c22 0%, #065f46 45%, #0d9488 100%)',
@@ -72,10 +102,12 @@ export interface Accent {
 }
 
 export const ACCENTS: Accent[] = [
+  { key: 'orange', value: '#f7931e', name: 'نارنجی سان‌جاب' },
+  { key: 'violet', value: '#8b5cf6', name: 'بنفش سان‌جاب' },
+  { key: 'teal', value: '#0ea5a0', name: 'فیروزه سان‌جاب' },
+  { key: 'rose', value: '#e11d48', name: 'قرمز سان‌جاب' },
   { key: 'green', value: '#22c55e', name: 'سبز پنگوئنی' },
   { key: 'amber', value: '#f59e0b', name: 'زرد عسلی' },
-  { key: 'rose', value: '#fb7185', name: 'صورتی شلغمی' },
-  { key: 'teal', value: '#14b8a6', name: 'فیروزه‌ای' },
-  { key: 'violet', value: '#a78bfa', name: 'بنفش بادمجونی' },
-  { key: 'orange', value: '#fb923c', name: 'نارنجی منقاری' },
+  { key: 'pink', value: '#ec4899', name: 'صورتی بامزه' },
+  { key: 'lime', value: '#84cc16', name: 'لیمویی' },
 ]

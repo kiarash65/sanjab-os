@@ -14,19 +14,24 @@ import {
   CircleDot,
   CloudSun,
   Copy,
+  Dices,
+  FileText,
   FolderOpen,
   Grid3x3,
   Hammer,
   Hash,
   Images,
   Info,
+  KeyRound,
   Lightbulb,
   NotebookPen,
   Palette,
+  Ruler,
   Settings,
   SpellCheck,
   SquareTerminal,
   Worm,
+  Code2,
 } from 'lucide-react'
 import { useOS } from '@/lib/os/store'
 
@@ -43,6 +48,11 @@ import SettingsApp from '@/components/os/apps/settings'
 import IdeaGeneratorApp from '@/components/os/apps/idea-generator'
 import CatTranslatorApp from '@/components/os/apps/cat-translator'
 import PhotosApp from '@/components/os/apps/photos'
+import WriterApp from '@/components/os/apps/writer'
+import CodeStudioApp from '@/components/os/apps/code-studio'
+import UnitConverterApp from '@/components/os/apps/unit-converter'
+import PassgenApp from '@/components/os/apps/passgen'
+import WheelApp from '@/components/os/apps/wheel'
 import AboutApp from '@/components/os/apps/about'
 
 import SnakeGame from '@/components/os/games/snake'
@@ -68,6 +78,24 @@ export interface AppMeta {
   h: number
   desktop?: boolean
   keywords?: string[]
+  /** کلاس گرادیان تیلویند برای آیکن رنگی هر اپ */
+  tint?: string
+}
+
+/* گرادیان‌های رنگی — پالت سان‌جاب */
+const G = {
+  orange: 'from-[#f7931e] to-[#e07b00]',
+  violet: 'from-[#8b5cf6] to-[#7c3aed]',
+  teal: 'from-[#0ea5a0] to-[#0c9488]',
+  rose: 'from-[#f43f5e] to-[#e11d48]',
+  amber: 'from-amber-400 to-orange-500',
+  lime: 'from-lime-400 to-emerald-500',
+  pink: 'from-pink-400 to-fuchsia-500',
+  sand: 'from-[#fdb56b] to-[#f7931e]',
+  grape: 'from-violet-500 to-fuchsia-600',
+  forest: 'from-emerald-400 to-teal-500',
+  berry: 'from-rose-400 to-pink-600',
+  sun: 'from-yellow-300 to-amber-500',
 }
 
 export const APPS: AppMeta[] = [
@@ -81,7 +109,32 @@ export const APPS: AppMeta[] = [
     w: 720,
     h: 480,
     desktop: true,
+    tint: G.teal,
     keywords: ['terminal', 'shell', 'command', 'learn'],
+  },
+  {
+    id: 'writer',
+    name: 'نویسا (ورد)',
+    icon: FileText,
+    category: 'app',
+    component: WriterApp,
+    w: 780,
+    h: 560,
+    desktop: true,
+    tint: G.violet,
+    keywords: ['word', 'docx', 'pdf', 'writer', 'نویسا', 'تایپ', 'متن'],
+  },
+  {
+    id: 'code',
+    name: 'کداستودیو (پایتون)',
+    icon: Code2,
+    category: 'app',
+    component: CodeStudioApp,
+    w: 820,
+    h: 580,
+    desktop: true,
+    tint: G.forest,
+    keywords: ['python', 'code', 'js', 'سنجابی', 'برنامه‌نویسی', 'پایتون'],
   },
   {
     id: 'file-manager',
@@ -91,6 +144,7 @@ export const APPS: AppMeta[] = [
     component: FileManagerApp,
     w: 640,
     h: 440,
+    tint: G.amber,
     keywords: ['files', 'folder'],
   },
   {
@@ -102,6 +156,7 @@ export const APPS: AppMeta[] = [
     w: 620,
     h: 460,
     desktop: true,
+    tint: G.pink,
     keywords: ['photos', 'gallery', 'image'],
   },
   {
@@ -112,6 +167,7 @@ export const APPS: AppMeta[] = [
     component: NotesApp,
     w: 560,
     h: 420,
+    tint: G.sun,
     keywords: ['notes', 'note'],
   },
   {
@@ -122,6 +178,7 @@ export const APPS: AppMeta[] = [
     component: ClockApp,
     w: 460,
     h: 460,
+    tint: G.rose,
     keywords: ['clock', 'timer', 'stopwatch'],
   },
   {
@@ -133,17 +190,52 @@ export const APPS: AppMeta[] = [
     w: 640,
     h: 470,
     desktop: true,
+    tint: G.grape,
     keywords: ['paint', 'draw'],
   },
   {
     id: 'calculator',
-    name: 'ماشین‌حساب',
+    name: 'ماشین‌حساب فول',
     icon: Calculator,
     category: 'app',
     component: CalculatorApp,
-    w: 340,
+    w: 360,
+    h: 560,
+    tint: G.orange,
+    keywords: ['calc', 'calculator', 'علمی'],
+  },
+  {
+    id: 'unit',
+    name: 'مبدل یکاها',
+    icon: Ruler,
+    category: 'app',
+    component: UnitConverterApp,
+    w: 520,
     h: 500,
-    keywords: ['calc', 'calculator'],
+    tint: G.teal,
+    keywords: ['unit', 'convert', 'مبدل', 'واحد', 'دما'],
+  },
+  {
+    id: 'passgen',
+    name: 'رمزساز قوی',
+    icon: KeyRound,
+    category: 'app',
+    component: PassgenApp,
+    w: 480,
+    h: 500,
+    tint: G.berry,
+    keywords: ['password', 'رمز', 'pass'],
+  },
+  {
+    id: 'wheel',
+    name: 'چرخ شانس',
+    icon: Dices,
+    category: 'app',
+    component: WheelApp,
+    w: 480,
+    h: 560,
+    tint: G.pink,
+    keywords: ['wheel', 'شانس', 'قرعه', 'dice'],
   },
   {
     id: 'weather',
@@ -153,6 +245,7 @@ export const APPS: AppMeta[] = [
     component: WeatherApp,
     w: 520,
     h: 460,
+    tint: G.forest,
     keywords: ['weather'],
   },
   {
@@ -163,6 +256,7 @@ export const APPS: AppMeta[] = [
     component: SystemMonitorApp,
     w: 640,
     h: 450,
+    tint: G.lime,
     keywords: ['monitor', 'htop', 'cpu'],
   },
   {
@@ -174,6 +268,7 @@ export const APPS: AppMeta[] = [
     w: 500,
     h: 470,
     desktop: true,
+    tint: G.grape,
     keywords: ['music', 'player', 'audio'],
   },
   {
@@ -184,6 +279,7 @@ export const APPS: AppMeta[] = [
     component: SettingsApp,
     w: 560,
     h: 470,
+    tint: G.sand,
     keywords: ['settings', 'config'],
   },
   {
@@ -195,6 +291,7 @@ export const APPS: AppMeta[] = [
     w: 500,
     h: 460,
     desktop: true,
+    tint: G.sun,
     keywords: ['idea', 'startup'],
   },
   {
@@ -205,6 +302,7 @@ export const APPS: AppMeta[] = [
     component: CatTranslatorApp,
     w: 500,
     h: 470,
+    tint: G.amber,
     keywords: ['cat', 'meow'],
   },
   // ---------- بازی‌ها ----------
@@ -217,6 +315,7 @@ export const APPS: AppMeta[] = [
     w: 480,
     h: 620,
     desktop: true,
+    tint: G.forest,
     keywords: ['snake'],
   },
   {
@@ -227,6 +326,7 @@ export const APPS: AppMeta[] = [
     component: Game2048,
     w: 460,
     h: 600,
+    tint: G.orange,
     keywords: ['2048'],
   },
   {
@@ -237,6 +337,7 @@ export const APPS: AppMeta[] = [
     component: TicTacToeGame,
     w: 460,
     h: 560,
+    tint: G.teal,
     keywords: ['tic tac toe', 'ttt'],
   },
   {
@@ -247,6 +348,7 @@ export const APPS: AppMeta[] = [
     component: MemoryGame,
     w: 480,
     h: 600,
+    tint: G.violet,
     keywords: ['memory', 'cards'],
   },
   {
@@ -258,6 +360,7 @@ export const APPS: AppMeta[] = [
     w: 500,
     h: 600,
     desktop: true,
+    tint: G.sand,
     keywords: ['mines', 'minesweeper'],
   },
   {
@@ -268,6 +371,7 @@ export const APPS: AppMeta[] = [
     component: PongGame,
     w: 580,
     h: 480,
+    tint: G.berry,
     keywords: ['pong'],
   },
   {
@@ -279,6 +383,7 @@ export const APPS: AppMeta[] = [
     w: 460,
     h: 640,
     desktop: true,
+    tint: G.amber,
     keywords: ['flappy', 'bird'],
   },
   {
@@ -290,6 +395,7 @@ export const APPS: AppMeta[] = [
     w: 480,
     h: 600,
     desktop: true,
+    tint: G.berry,
     keywords: ['whack', 'mole'],
   },
   {
@@ -300,6 +406,7 @@ export const APPS: AppMeta[] = [
     component: BreakoutGame,
     w: 580,
     h: 520,
+    tint: G.lime,
     keywords: ['breakout', 'arkanoid'],
   },
   {
@@ -311,6 +418,7 @@ export const APPS: AppMeta[] = [
     w: 460,
     h: 640,
     desktop: true,
+    tint: G.forest,
     keywords: ['wordle', 'word', 'لغت'],
   },
   // ---------- سیستم ----------
@@ -320,9 +428,10 @@ export const APPS: AppMeta[] = [
     icon: Info,
     category: 'system',
     component: AboutApp,
-    w: 430,
-    h: 440,
-    keywords: ['about', 'info'],
+    w: 460,
+    h: 520,
+    tint: G.orange,
+    keywords: ['about', 'info', 'سان‌جاب'],
   },
 ]
 

@@ -92,6 +92,19 @@ export function makeInitialFs(): FsDir {
           'میز_رترو.png': f('img', 'میز کار رترو با مانیتور یونی. عطر نسل‌های گذشته.', '/wallpapers/retro-terminal.png'),
         }),
         'سندها': d({
+          'قرارداد_اسپانسری_سان‌جاب.txt': f(
+            'txt',
+            [
+              'قرارداد اسپانسری رسمی سان‌جاب‌او‌اس',
+              '',
+              'ماده ۱: شرکت سان‌جاب (sunjob.ir) اسپانسیر رسمی این سیستم‌عامل بامزه است.',
+              'ماده ۲: پالت رنگی سیستم از سایت سان‌جاب وام گرفته شده — نارنجی، بنفش، فیروزه‌ای.',
+              'ماده ۳: در ازای اسپانسری، سنجابک حق دارد هر وقت خواست فندق بخورد.',
+              'ماده ۴: این قرارداد تا ابد معتبر است. یا تا ریفرش بعدی مرورگر.',
+              '',
+              'امضا: سنجابکِ سیستم با جای پنجه 🐾',
+            ].join('\n')
+          ),
           'قرارداد_با_گربه.pdf': f(
             'pdf',
             [
@@ -115,6 +128,28 @@ export function makeInitialFs(): FsDir {
         }),
         'پروژه‌ها': d({
           'hello.sh': f('exe', '#!/bin/pengo\necho "سلام! من اولین اسکریپت تو هستم."\necho "برای اجرا بنویس: ./hello.sh"'),
+          'fib.py': f(
+            'txt',
+            [
+              '# فیبوناچی با پایتونِ کوچک سان‌جاب',
+              'a, b = 0, 1',
+              'result = []',
+              'for i in range(12):',
+              '    result.append(a)',
+              '    a, b = b, a + b',
+              '',
+              'print(result)',
+            ].join('\n')
+          ),
+          'سلام.سنج': f(
+            'txt',
+            [
+              '# اولین برنامه سنجابی!',
+              'چاپ("سلام! من زبان سنجابی بلدم")',
+              'برای شماره در بازه(1, 6):',
+              '    چاپ(f"فندق شماره {شماره}")',
+            ].join('\n')
+          ),
           'secret_plan.md': f(
             'txt',
             [
@@ -139,15 +174,16 @@ export function makeInitialFs(): FsDir {
       'os-release': f(
         'txt',
         [
-          'NAME="PenguinOS"',
-          'PRETTY_NAME="پنگوئن‌اواس ۳.۰ «کلوخک»"',
-          'ID=pengo',
-          'KERNEL="6.9.4-pengo-cute"',
-          'HOME_URL="https://pengo.os"',
+          'NAME="SunJobOS"',
+          'PRETTY_NAME="سان‌جاب‌او‌اس ۴.۰ «سنجابک» — با اسپانسری سان‌جاب"',
+          'ID=sanjob',
+          'KERNEL="6.12.4-sanjob-cute"',
+          'SPONSOR="sunjob.ir"',
+          'HOME_URL="https://sunjob.ir"',
         ].join('\n')
       ),
-      'motd': f('txt', 'به پنگوئن‌اواس خوش آمدی. امروز روز خوبی برای learn start است.'),
-      hostname: f('txt', 'pengo-os'),
+      'motd': f('txt', 'به سان‌جاب‌او‌اس خوش آمدی! امروز روز خوبی برای learn start یا اجرای پایتونه. با اسپانسری سان‌جاب'),
+      hostname: f('txt', 'sanjob-os'),
     }),
     usr: d({
       share: d({

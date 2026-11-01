@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { LucideIcon } from 'lucide-react'
+import { DEFAULT_ACCENT } from '@/lib/os/brand'
 
 export interface OSWindow {
   id: string
@@ -91,8 +92,8 @@ export const useOS = create<OSStore>()(
       iconNonce: 0,
       startOpen: false,
       settings: {
-        wallpaper: 'grad:aurora',
-        accent: '#22c55e',
+        wallpaper: 'img:sunjob-squirrel',
+        accent: DEFAULT_ACCENT,
         funMode: true,
         sound: true,
       },
@@ -248,7 +249,7 @@ export const useOS = create<OSStore>()(
         set((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) })),
     }),
     {
-      name: 'pengo-os-v1',
+      name: 'sunjob-os-v1',
       partialize: (s) => ({ settings: s.settings }),
     }
   )

@@ -1,0 +1,830 @@
+     1→'use client'
+     2→
+     3→/* ------------------------------------------------------------------ */
+     4→/* «نویسا» — واژه‌پرداز سان‌جاب‌او‌اس                                    */
+     5→/* ویرایشگر غنی راست‌به‌چپ با خروجی Word (.doc / .docx) و PDF — آفلاین  */
+     6→/* ------------------------------------------------------------------ */
+     7→
+     8→import { useCallback, useEffect, useRef, useState } from 'react'
+     9→import {
+    10→  AlignCenter,
+    11→  AlignLeft,
+    12→  AlignRight,
+    13→  Baseline,
+    14→  Bold,
+    15→  CheckCircle2,
+    16→  Eraser,
+    17→  File,
+    18→  FileDown,
+    19→  FileText,
+    20→  FolderOpen,
+    21→  Heading1,
+    22→  Heading2,
+    23→  Heading3,
+    24→  Highlighter,
+    25→  Italic,
+    26→  List,
+    27→  ListOrdered,
+    28→  Pilcrow,
+    29→  Redo2,
+    30→  Save,
+    31→  Stamp,
+    32→  Strikethrough,
+    33→  Underline as UnderlineIcon,
+    34→  Undo2,
+    35→  XCircle,
+    36→  type LucideIcon,
+    37→} from 'lucide-react'
+    38→import {
+    39→  AlignmentType,
+    40→  Document,
+    41→  HeadingLevel,
+    42→  HighlightColor,
+    43→  LevelFormat,
+    44→  Packer,
+    45→  Paragraph,
+    46→  TextRun,
+    47→} from 'docx'
+    48→import html2canvas from 'html2canvas'
+    49→import { jsPDF } from 'jspdf'
+    50→import { HOME, getNode, useFs } from '@/lib/os/fs'
+    51→import { useOS } from '@/lib/os/store'
+    52→import { SUNJOB_PALETTE } from '@/lib/os/brand'
+    53→
+    54→/* --------------------------- ثابت‌ها --------------------------- */
+    55→
+    56→const DRAFT_KEY = 'pengo-writer-draft'
+    57→const DOCS_DIR = `${HOME}/سندها`
+    58→const DEFAULT_NAME = 'سند_من'
+    59→const NUM_REF = 'nouisa-list'
+    60→const STAMP_TEXT = 'با اسپانسری سان‌جاب | sunjob.ir'
+    61→
+    62→const WELCOME_HTML = `
+    63→<h1>سند اول من</h1>
+    64→<p>این سند نمونه در <b>نویسا</b> — واژه‌پرداز رسمی <b>سان‌جاب‌او‌اس</b> — است. مثل ورد می‌نویسی، قالب‌بندی می‌کنی و آخرش خروجی Word یا PDF می‌گیری؛ همه‌چیز آفلاین و داخل مرورگر خودت.</p>
+    65→<p>چند نکتهٔ سریع برای شروع:</p>
+    66→<ul>
+    67→  <li>نوار ابزار بالا، متن را درشت، کج، زیرخط‌دار و رنگی می‌کند.</li>
+    68→  <li>دکمهٔ «ذخیره در پرونده‌ها» سند را در پوشهٔ سندها نگه می‌دارد.</li>
+    69→  <li>دکمهٔ «مهر سان‌جاب» امضای اسپانسر را پایین سند می‌گذارد.</li>
+    70→  <li>خروجی‌های Word و PDF بدون اینترنت ساخته می‌شوند.</li>
+    71→</ul>
+    72→`.trim()
+    73→
+    74→/** استایل سرصفحه‌ها و فهرست‌ها — چون پیش‌فرض‌های Tailwind آن‌ها را صفر می‌کند */
+    75→const DOC_STYLES = [
+    76→  '[&_h1]:mb-4 [&_h1]:mt-1 [&_h1]:text-2xl [&_h1]:font-extrabold',
+    77→  '[&_h2]:mb-3 [&_h2]:mt-3 [&_h2]:text-xl [&_h2]:font-bold',
+    78→  '[&_h3]:mb-2 [&_h3]:mt-3 [&_h3]:text-lg [&_h3]:font-bold',
+    79→  '[&_p]:mb-3 [&_p]:leading-8',
+    80→  '[&_ul]:mb-3 [&_ul]:list-disc [&_ul]:ps-6',
+    81→  '[&_ol]:mb-3 [&_ol]:list-decimal [&_ol]:ps-6',
+    82→  '[&_li]:leading-7',
+    83→  '[&_b]:font-bold [&_strong]:font-bold',
+    84→  '[&_a]:text-teal-700 [&_a]:underline',
+    85→].join(' ')
+    86→
+    87→const faNum = (n: number): string => n.toLocaleString('fa-IR')
+    88→
+    89→const safeName = (raw: string): string =>
+    90→  raw.trim().replace(/[\\/:*?"<>|]+/g, '_') || DEFAULT_NAME
+    91→
+    92→/** محتوای آغازین سند — پیش‌نویس ذخیره‌شدهٔ خودکار یا سند خوش‌آمد */
+    93→function initialDocHtml(): string {
+    94→  if (typeof window === 'undefined') return WELCOME_HTML
+    95→  try {
+    96→    const draft = window.localStorage.getItem(DRAFT_KEY)
+    97→    if (draft && draft.trim()) return draft
+    98→  } catch {
+    99→    /* حافظهٔ محلی در دسترس نیست */
+   100→  }
+   101→  return WELCOME_HTML
+   102→}
+   103→
+   104→/** شمارش واژه/نویسه از روی HTML — فقط برای مقدار اولیه (بدون دست‌زدن به DOM) */
+   105→function textStats(html: string): { words: number; chars: number } {
+   106→  if (typeof window === 'undefined' || typeof DOMParser === 'undefined') {
+   107→    return { words: 0, chars: 0 }
+   108→  }
+   109→  const text = new DOMParser().parseFromString(html, 'text/html').body.textContent ?? ''
+   110→  const trimmed = text.trim()
+   111→  return { words: trimmed ? trimmed.split(/\s+/).length : 0, chars: text.length }
+   112→}
+   113→
+   114→const escapeHtml = (s: string): string =>
+   115→  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+   116→
+   117→/** «#ff8800» یا «rgb(255,136,0)» → «FF8800» (بدون # برای docx) */
+   118→function cssColorToHex(raw: string): string | null {
+   119→  const v = raw.trim().toLowerCase()
+   120→  if (!v || v === 'transparent' || v.startsWith('rgba(0, 0, 0, 0')) return null
+   121→  if (v.startsWith('#')) {
+   122→    const hex = v.slice(1)
+   123→    if (hex.length === 3) return hex.split('').map((c) => c + c).join('').toUpperCase()
+   124→    if (hex.length >= 6) return hex.slice(0, 6).toUpperCase()
+   125→    return null
+   126→  }
+   127→  const m = v.match(/^rgba?\(\s*(\d+)\s*[,\s]\s*(\d+)\s*[,\s]\s*(\d+)/)
+   128→  if (!m) return null
+   129→  return [m[1], m[2], m[3]]
+   130→    .map((n) => Math.max(0, Math.min(255, Number(n))))
+   131→    .map((n) => n.toString(16).padStart(2, '0'))
+   132→    .join('')
+   133→    .toUpperCase()
+   134→}
+   135→
+   136→type DocxHighlight = (typeof HighlightColor)[keyof typeof HighlightColor]
+   137→
+   138→/** docx فقط نام رنگ‌های استاندارد هایلایت را قبول می‌کند؛ نزدیک‌ترین را پیدا می‌کنیم */
+   139→const HIGHLIGHT_SWATCHES: ReadonlyArray<readonly [string, string]> = [
+   140→  ['yellow', 'FFFF00'], ['green', '00FF00'], ['cyan', '00FFFF'], ['magenta', 'FF00FF'],
+   141→  ['red', 'FF0000'], ['blue', '0000FF'], ['darkYellow', '808000'], ['darkGreen', '008000'],
+   142→  ['darkCyan', '008080'], ['darkMagenta', '800080'], ['darkRed', '800000'],
+   143→  ['darkBlue', '000080'], ['darkGray', '808080'], ['lightGray', 'C0C0C0'],
+   144→  ['black', '000000'], ['white', 'FFFFFF'],
+   145→]
+   146→
+   147→function nearestHighlight(hex: string): DocxHighlight {
+   148→  const r = parseInt(hex.slice(0, 2), 16)
+   149→  const g = parseInt(hex.slice(2, 4), 16)
+   150→  const b = parseInt(hex.slice(4, 6), 16)
+   151→  let best = HIGHLIGHT_SWATCHES[0]
+   152→  let bestDist = Number.POSITIVE_INFINITY
+   153→  for (const sw of HIGHLIGHT_SWATCHES) {
+   154→    const pr = parseInt(sw[1].slice(0, 2), 16)
+   155→    const pg = parseInt(sw[1].slice(2, 4), 16)
+   156→    const pb = parseInt(sw[1].slice(4, 6), 16)
+   157→    const d = (r - pr) ** 2 + (g - pg) ** 2 + (b - pb) ** 2
+   158→    if (d < bestDist) {
+   159→      bestDist = d
+   160→      best = sw
+   161→    }
+   162→  }
+   163→  return best[0] as DocxHighlight
+   164→}
+   165→
+   166→function downloadBlob(blob: Blob, filename: string): void {
+   167→  const url = URL.createObjectURL(blob)
+   168→  const a = document.createElement('a')
+   169→  a.href = url
+   170→  a.download = filename
+   171→  document.body.appendChild(a)
+   172→  a.click()
+   173→  a.remove()
+   174→  window.setTimeout(() => URL.revokeObjectURL(url), 4000)
+   175→}
+   176→
+   177→/* --------------------------- مبدل HTML → docx --------------------------- */
+   178→
+   179→interface RunCtx {
+   180→  bold: boolean
+   181→  italics: boolean
+   182→  underline: boolean
+   183→  strike: boolean
+   184→  color?: string
+   185→  highlight?: DocxHighlight
+   186→}
+   187→
+   188→const BASE_CTX: RunCtx = { bold: false, italics: false, underline: false, strike: false }
+   189→
+   190→/** گره‌های درون‌خطی را به TextRun با ویژگی‌های bold/italic/underline/strike تبدیل می‌کند */
+   191→function collectRuns(node: Node, ctx: RunCtx): TextRun[] {
+   192→  if (node.nodeType === Node.TEXT_NODE) {
+   193→    const text = node.textContent ?? ''
+   194→    if (!text) return []
+   195→    return [
+   196→      new TextRun({
+   197→        text,
+   198→        bold: ctx.bold || undefined,
+   199→        italics: ctx.italics || undefined,
+   200→        underline: ctx.underline ? {} : undefined,
+   201→        strike: ctx.strike || undefined,
+   202→        color: ctx.color,
+   203→        highlight: ctx.highlight,
+   204→        rightToLeft: true,
+   205→      }),
+   206→    ]
+   207→  }
+   208→  if (node.nodeType !== Node.ELEMENT_NODE) return []
+   209→  const el = node as HTMLElement
+   210→  const tag = el.tagName
+   211→  if (tag === 'BR') return [new TextRun({ break: 1, rightToLeft: true })]
+   212→  if (tag === 'SCRIPT' || tag === 'STYLE') return []
+   213→
+   214→  const next: RunCtx = { ...ctx }
+   215→  if (tag === 'B' || tag === 'STRONG') next.bold = true
+   216→  if (tag === 'I' || tag === 'EM') next.italics = true
+   217→  if (tag === 'U' || tag === 'INS') next.underline = true
+   218→  if (tag === 'S' || tag === 'STRIKE' || tag === 'DEL') next.strike = true
+   219→  if (tag === 'FONT') {
+   220→    const c = cssColorToHex(el.getAttribute('color') ?? '')
+   221→    if (c) next.color = c
+   222→  }
+   223→  const st = el.style
+   224→  if (st) {
+   225→    const w = st.fontWeight
+   226→    if (w === 'bold' || w === 'bolder' || w === '700' || w === '800' || w === '900') next.bold = true
+   227→    if (st.fontStyle === 'italic' || st.fontStyle === 'oblique') next.italics = true
+   228→    const deco = st.textDecorationLine || st.textDecoration || ''
+   229→    if (deco.includes('underline')) next.underline = true
+   230→    if (deco.includes('line-through')) next.strike = true
+   231→    const c = cssColorToHex(st.color)
+   232→    if (c) next.color = c
+   233→    const bg = cssColorToHex(st.backgroundColor)
+   234→    if (bg) next.highlight = nearestHighlight(bg)
+   235→  }
+   236→
+   237→  const runs: TextRun[] = []
+   238→  for (const child of Array.from(el.childNodes)) runs.push(...collectRuns(child, next))
+   239→  return runs
+   240→}
+   241→
+   242→/** تراز پاراگراف — پیش‌فرض سند راست‌به‌چپ یعنی راست‌چین */
+   243→function paraAlign(el: HTMLElement): (typeof AlignmentType)[keyof typeof AlignmentType] {
+   244→  const a = (el.style.textAlign || el.getAttribute('align') || '').toLowerCase()
+   245→  if (a === 'center') return AlignmentType.CENTER
+   246→  if (a === 'left') return AlignmentType.LEFT
+   247→  if (a === 'justify') return AlignmentType.JUSTIFIED
+   248→  return AlignmentType.RIGHT
+   249→}
+   250→
+   251→function emptyRun(): TextRun {
+   252→  return new TextRun({ text: '', rightToLeft: true })
+   253→}
+   254→
+   255→function buildDocxBody(root: HTMLElement): Paragraph[] {
+   256→  const out: Paragraph[] = []
+   257→  let olInstance = 0
+   258→
+   259→  const pushBlock = (el: HTMLElement) => {
+   260→    const tag = el.tagName
+   261→    const runs = collectRuns(el, BASE_CTX)
+   262→    out.push(
+   263→      new Paragraph({
+   264→        heading:
+   265→          tag === 'H1'
+   266→            ? HeadingLevel.HEADING_1
+   267→            : tag === 'H2'
+   268→              ? HeadingLevel.HEADING_2
+   269→              : tag === 'H3'
+   270→                ? HeadingLevel.HEADING_3
+   271→                : undefined,
+   272→        bidirectional: true, // راست‌به‌چپ بودن پاراگراف (معادل RTL در docx نسخه ۹)
+   273→        alignment: paraAlign(el),
+   274→        children: runs.length > 0 ? runs : [emptyRun()],
+   275→      })
+   276→    )
+   277→  }
+   278→
+   279→  const addList = (list: HTMLElement, ordered: boolean, level: number) => {
+   280→    const instance = ordered ? ++olInstance : 0
+   281→    for (const li of Array.from(list.children)) {
+   282→      if (li.tagName !== 'LI') continue
+   283→      const liEl = li as HTMLElement
+   284→      // نسخهٔ مسطح از li بدون فهرست‌های تودرتو (آن‌ها جداگانه اضافه می‌شوند)
+   285→      const flat = liEl.cloneNode(true) as HTMLElement
+   286→      flat.querySelectorAll('ul,ol').forEach((n) => n.remove())
+   287→      const runs = collectRuns(flat, BASE_CTX)
+   288→      out.push(
+   289→        new Paragraph({
+   290→          ...(ordered
+   291→            ? {
+   292→                numbering: {
+   293→                  reference: NUM_REF,
+   294→                  level: Math.min(level, 2),
+   295→                  instance,
+   296→                },
+   297→              }
+   298→            : { bullet: { level: Math.min(level, 8) } }),
+   299→          bidirectional: true,
+   300→          alignment: paraAlign(liEl),
+   301→          children: runs.length > 0 ? runs : [emptyRun()],
+   302→        })
+   303→      )
+   304→      for (const sub of Array.from(liEl.children)) {
+   305→        if (sub.tagName === 'UL') addList(sub as HTMLElement, false, level + 1)
+   306→        else if (sub.tagName === 'OL') addList(sub as HTMLElement, true, level + 1)
+   307→      }
+   308→    }
+   309→  }
+   310→
+   311→  const walk = (container: HTMLElement) => {
+   312→    for (const child of Array.from(container.children)) {
+   313→      const el = child as HTMLElement
+   314→      switch (el.tagName) {
+   315→        case 'H1':
+   316→        case 'H2':
+   317→        case 'H3':
+   318→        case 'P':
+   319→        case 'BLOCKQUOTE':
+   320→          pushBlock(el)
+   321→          break
+   322→        case 'UL':
+   323→          addList(el, false, 0)
+   324→          break
+   325→        case 'OL':
+   326→          addList(el, true, 0)
+   327→          break
+   328→        case 'DIV':
+   329→        case 'SECTION':
+   330→        case 'ARTICLE':
+   331→          if (el.querySelector('p,h1,h2,h3,ul,ol,div')) walk(el)
+   332→          else pushBlock(el)
+   333→          break
+   334→        default:
+   335→          pushBlock(el)
+   336→      }
+   337→    }
+   338→  }
+   339→
+   340→  walk(root)
+   341→  return out
+   342→}
+   343→
+   344→/* --------------------------- دکمه‌های نوار ابزار --------------------------- */
+   345→
+   346→interface FmtButtonProps {
+   347→  title: string
+   348→  active?: boolean
+   349→  onAct: () => void
+   350→  children: React.ReactNode
+   351→}
+   352→
+   353→function FmtButton({ title, active = false, onAct, children }: FmtButtonProps) {
+   354→  return (
+   355→    <button
+   356→      type="button"
+   357→      title={title}
+   358→      aria-label={title}
+   359→      aria-pressed={active}
+   360→      onMouseDown={(e) => e.preventDefault()}
+   361→      onClick={onAct}
+   362→      className={`flex h-8 w-8 items-center justify-center rounded-lg text-zinc-300 transition hover:bg-white/10 hover:text-white active:scale-95 ${
+   363→        active ? 'bg-white/15 text-white' : ''
+   364→      }`}
+   365→    >
+   366→      {children}
+   367→    </button>
+   368→  )
+   369→}
+   370→
+   371→function Sep() {
+   372→  return <span aria-hidden className="mx-1 h-5 w-px shrink-0 bg-white/10" />
+   373→}
+   374→
+   375→interface ActButtonProps {
+   376→  title: string
+   377→  hint: string
+   378→  color: string
+   379→  icon: LucideIcon
+   380→  onClick: () => void
+   381→  active?: boolean
+   382→}
+   383→
+   384→function ActButton({ title, hint, color, icon: Icon, onClick, active = false }: ActButtonProps) {
+   385→  return (
+   386→    <button
+   387→      type="button"
+   388→      title={hint}
+   389→      aria-label={hint}
+   390→      aria-pressed={active}
+   391→      onClick={onClick}
+   392→      className="flex h-8 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-bold transition hover:brightness-125 active:scale-[0.97]"
+   393→      style={{
+   394→        color,
+   395→        borderColor: `${color}55`,
+   396→        backgroundColor: active ? `${color}38` : `${color}1f`,
+   397→      }}
+   398→    >
+   399→      <Icon className="size-3.5" />
+   400→      {title}
+   401→    </button>
+   402→  )
+   403→}
+   404→
+   405→/* --------------------------- برنامهٔ اصلی --------------------------- */
+   406→
+   407→export default function WriterApp() {
+   408→  const editorRef = useRef<HTMLDivElement>(null)
+   409→  const wrapRef = useRef<HTMLDivElement>(null)
+   410→  const colorRef = useRef<HTMLInputElement>(null)
+   411→  const hlRef = useRef<HTMLInputElement>(null)
+   412→  const bootedRef = useRef(false)
+   413→  const saveTimerRef = useRef<number | null>(null)
+   414→
+   415→  const [name, setName] = useState(DEFAULT_NAME)
+   416→  const [initialHtml] = useState(initialDocHtml)
+   417→  const [words, setWords] = useState(() => textStats(initialHtml).words)
+   418→  const [chars, setChars] = useState(() => textStats(initialHtml).chars)
+   419→  const [stamp, setStamp] = useState(false)
+   420→  const [autosave, setAutosave] = useState<'idle' | 'saving' | 'saved'>('idle')
+   421→  const [fmt, setFmt] = useState({ bold: false, italic: false, underline: false, strike: false, block: 'p' })
+   422→
+   423→  const updateCounts = useCallback(() => {
+   424→    const el = editorRef.current
+   425→    if (!el) return
+   426→    const text = el.textContent ?? ''
+   427→    const trimmed = text.trim()
+   428→    setWords(trimmed ? trimmed.split(/\s+/).length : 0)
+   429→    setChars(text.length)
+   430→  }, [])
+   431→
+   432→  const refreshFmt = useCallback(() => {
+   433→    try {
+   434→      setFmt({
+   435→        bold: document.queryCommandState('bold'),
+   436→        italic: document.queryCommandState('italic'),
+   437→        underline: document.queryCommandState('underline'),
+   438→        strike: document.queryCommandState('strikeThrough'),
+   439→        block: (document.queryCommandValue('formatBlock') || 'p')
+   440→          .toLowerCase()
+   441→          .replace(/[<>]/g, ''),
+   442→      })
+   443→    } catch {
+   444→      /* بعضی مرورگرها اجازهٔ خواندن وضعیت را نمی‌دهند */
+   445→    }
+   446→  }, [])
+   447→
+   448→  // محتوای اولیه فقط یک‌بار روی DOM ست می‌شود؛ ری‌رندرهای بعدی هرگز HTML را از استیت نمی‌سازند
+   449→  useEffect(() => {
+   450→    if (bootedRef.current) return
+   451→    bootedRef.current = true
+   452→    const el = editorRef.current
+   453→    if (!el) return
+   454→    try {
+   455→      document.execCommand('styleWithCSS', false, 'true')
+   456→    } catch {
+   457→      /* مرورگر قدیمی؛ مهم نیست */
+   458→    }
+   459→    el.innerHTML = initialHtml
+   460→  }, [initialHtml])
+   461→
+   462→  // پاک‌سازی تایمر ذخیرهٔ خودکار هنگام بستن پنجره
+   463→  useEffect(
+   464→    () => () => {
+   465→      if (saveTimerRef.current) window.clearTimeout(saveTimerRef.current)
+   466→    },
+   467→    []
+   468→  )
+   469→
+   470→  const toast = (title: string, body: string, icon?: LucideIcon) =>
+   471→    useOS.getState().pushToast({ title, body, icon })
+   472→
+   473→  const handleInput = () => {
+   474→    updateCounts()
+   475→    setAutosave('saving')
+   476→    if (saveTimerRef.current) window.clearTimeout(saveTimerRef.current)
+   477→    saveTimerRef.current = window.setTimeout(() => {
+   478→      const el = editorRef.current
+   479→      if (!el) return
+   480→      try {
+   481→        window.localStorage.setItem(DRAFT_KEY, el.innerHTML)
+   482→        setAutosave('saved')
+   483→      } catch {
+   484→        setAutosave('idle')
+   485→      }
+   486→    }, 1200)
+   487→  }
+   488→
+   489→  const exec = (cmd: string, value?: string) => {
+   490→    editorRef.current?.focus()
+   491→    try {
+   492→      document.execCommand(cmd, false, value)
+   493→    } catch {
+   494→      /* دستور پشتیبانی نشد */
+   495→    }
+   496→    refreshFmt()
+   497→    updateCounts()
+   498→  }
+   499→
+   500→  /* --------------------------- ذخیره / بازکردن --------------------------- */
+   501→
+   502→  const handleSave = () => {
+   503→    const el = editorRef.current
+   504→    if (!el) return
+   505→    const fileName = safeName(name)
+   506→    const fs = useFs.getState()
+   507→    fs.mkdir(DOCS_DIR)
+   508→    const ok = fs.writeFile(`${DOCS_DIR}/${fileName}.txt`, el.innerHTML)
+   509→    if (ok) {
+   510→      toast(
+   511→        'ذخیره شد ✓',
+   512→        `«${fileName}.txt» در پوشهٔ سندها ذخیره شد. حالا از «پرونده‌ها» در دسترس است.`,
+   513→        CheckCircle2
+   514→      )
+   515→    } else {
+   516→      toast('ذخیره نشد ✗', 'پوشهٔ سندها در فایل‌سیستم مجازی در دسترس نیست.', XCircle)
+   517→    }
+   518→  }
+   519→
+   520→  const handleOpen = () => {
+   521→    const el = editorRef.current
+   522→    if (!el) return
+   523→    const fileName = safeName(name)
+   524→    const node = getNode(useFs.getState().fs, `${DOCS_DIR}/${fileName}.txt`)
+   525→    if (node && node.type === 'file') {
+   526→      el.innerHTML = node.content || WELCOME_HTML
+   527→      updateCounts()
+   528→      refreshFmt()
+   529→      toast('سند باز شد ✓', `«${fileName}.txt» از پوشهٔ سندها بارگذاری شد.`, FolderOpen)
+   530→    } else {
+   531→      toast('پیدا نشد ✗', `فایلی به نام «${fileName}.txt» در پوشهٔ سندها نیست.`, XCircle)
+   532→    }
+   533→  }
+   534→
+   535→  /* --------------------------- خروجی‌ها --------------------------- */
+   536→
+   537→  const exportDoc = () => {
+   538→    const el = editorRef.current
+   539→    if (!el) return
+   540→    const fileName = safeName(name)
+   541→    const stampHtml = stamp
+   542→      ? `<p style="text-align:center;color:#9ca3af;font-size:10pt;margin-top:24pt">${STAMP_TEXT}</p>`
+   543→      : ''
+   544→    const html =
+   545→      `<html xmlns:o="urn:schemas-microsoft-com:office:office" ` +
+   546→      `xmlns:w="urn:schemas-microsoft-com:office:word" ` +
+   547→      `xmlns="http://www.w3.org/TR/REC-html40" dir="rtl" lang="fa">` +
+   548→      `<head><meta charset="utf-8" /><title>${escapeHtml(fileName)}</title></head>` +
+   549→      `<body dir="rtl" style="font-family:Tahoma,'Vazirmatn',sans-serif;">` +
+   550→      `${el.innerHTML}${stampHtml}</body></html>`
+   551→    downloadBlob(new Blob(['\ufeff', html], { type: 'application/msword;charset=utf-8' }), `${fileName}.doc`)
+   552→    toast('Word (.doc) آماده شد ✓', `«${fileName}.doc» دانلود شد.`, CheckCircle2)
+   553→  }
+   554→
+   555→  const exportDocx = async () => {
+   556→    const el = editorRef.current
+   557→    if (!el) return
+   558→    const fileName = safeName(name)
+   559→    try {
+   560→      const parsed = new DOMParser().parseFromString(el.innerHTML, 'text/html')
+   561→      const children = buildDocxBody(parsed.body)
+   562→      if (stamp) {
+   563→        children.push(
+   564→          new Paragraph({
+   565→            alignment: AlignmentType.CENTER,
+   566→            bidirectional: true,
+   567→            spacing: { before: 480 },
+   568→            children: [
+   569→              new TextRun({ text: STAMP_TEXT, size: 16, color: '9CA3AF', rightToLeft: true }),
+   570→            ],
+   571→          })
+   572→        )
+   573→      }
+   574→      const doc = new Document({
+   575→        creator: 'نویسا — سان‌جاب‌او‌اس',
+   576→        title: fileName,
+   577→        numbering: {
+   578→          config: [
+   579→            {
+   580→              reference: NUM_REF,
+   581→              levels: [
+   582→                { level: 0, format: LevelFormat.DECIMAL, text: '%1.' },
+   583→                { level: 1, format: LevelFormat.LOWER_LETTER, text: '%2.' },
+   584→                { level: 2, format: LevelFormat.LOWER_ROMAN, text: '%3.' },
+   585→              ],
+   586→            },
+   587→          ],
+   588→        },
+   589→        sections: [
+   590→          {
+   591→            properties: {
+   592→              page: { margin: { top: 1134, bottom: 1134, left: 1134, right: 1134 } },
+   593→            },
+   594→            children,
+   595→          },
+   596→        ],
+   597→      })
+   598→      const blob = await Packer.toBlob(doc)
+   599→      downloadBlob(blob, `${fileName}.docx`)
+   600→      toast('Word (.docx) آماده شد ✓', `«${fileName}.docx» دانلود شد.`, CheckCircle2)
+   601→    } catch {
+   602→      toast('خروجی docx شکست خورد', 'ساخت فایل Word استاندارد با خطا مواجه شد؛ خروجی .doc را امتحان کن.', XCircle)
+   603→    }
+   604→  }
+   605→
+   606→  const exportPdf = async () => {
+   607→    const target = wrapRef.current
+   608→    if (!target) return
+   609→    const fileName = safeName(name)
+   610→    try {
+   611→      const canvas = await html2canvas(target, {
+   612→        scale: 2,
+   613→        backgroundColor: '#ffffff',
+   614→        useCORS: true,
+   615→      })
+   616→      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+   617→      const pageW = 210 // میلی‌متر — A4
+   618→      const pageH = 297
+   619→      const imgH = (canvas.height * pageW) / canvas.width // ارتفاع کل سند بر حسب میلی‌متر
+   620→      const data = canvas.toDataURL('image/jpeg', 0.95)
+   621→      pdf.addImage(data, 'JPEG', 0, 0, pageW, imgH)
+   622→      let rendered = pageH
+   623→      while (rendered < imgH) {
+   624→        pdf.addPage()
+   625→        pdf.addImage(data, 'JPEG', 0, -rendered, pageW, imgH)
+   626→        rendered += pageH
+   627→      }
+   628→      pdf.save(`${fileName}.pdf`)
+   629→      toast('PDF آماده شد ✓', `«${fileName}.pdf» دانلود شد.`, CheckCircle2)
+   630→    } catch {
+   631→      toast('خروجی PDF شکست خورد', 'ساخت تصویر سند با خطا مواجه شد.', XCircle)
+   632→    }
+   633→  }
+   634→
+   635→  /* --------------------------- رابط کاربری --------------------------- */
+   636→
+   637→  return (
+   638→    <div dir="rtl" className="flex h-full w-full flex-col bg-zinc-950/60 text-zinc-100">
+   639→      {/* نوار ابزار */}
+   640→      <header className="shrink-0 border-b border-white/10 bg-zinc-900/80">
+   641→        <div className="flex flex-wrap items-center gap-0.5 px-2 py-1.5">
+   642→          <FmtButton title="درشت (Ctrl+B)" active={fmt.bold} onAct={() => exec('bold')}>
+   643→            <Bold className="size-4" />
+   644→          </FmtButton>
+   645→          <FmtButton title="کج (Ctrl+I)" active={fmt.italic} onAct={() => exec('italic')}>
+   646→            <Italic className="size-4" />
+   647→          </FmtButton>
+   648→          <FmtButton title="زیرخط (Ctrl+U)" active={fmt.underline} onAct={() => exec('underline')}>
+   649→            <UnderlineIcon className="size-4" />
+   650→          </FmtButton>
+   651→          <FmtButton title="خط‌خورده" active={fmt.strike} onAct={() => exec('strikeThrough')}>
+   652→            <Strikethrough className="size-4" />
+   653→          </FmtButton>
+   654→          <Sep />
+   655→          <FmtButton
+   656→            title="پاراگراف"
+   657→            active={fmt.block === 'p' || fmt.block === 'div'}
+   658→            onAct={() => exec('formatBlock', '<p>')}
+   659→          >
+   660→            <Pilcrow className="size-4" />
+   661→          </FmtButton>
+   662→          <FmtButton title="تیتر ۱" active={fmt.block === 'h1'} onAct={() => exec('formatBlock', '<h1>')}>
+   663→            <Heading1 className="size-4" />
+   664→          </FmtButton>
+   665→          <FmtButton title="تیتر ۲" active={fmt.block === 'h2'} onAct={() => exec('formatBlock', '<h2>')}>
+   666→            <Heading2 className="size-4" />
+   667→          </FmtButton>
+   668→          <FmtButton title="تیتر ۳" active={fmt.block === 'h3'} onAct={() => exec('formatBlock', '<h3>')}>
+   669→            <Heading3 className="size-4" />
+   670→          </FmtButton>
+   671→          <Sep />
+   672→          <FmtButton title="فهرست نقطه‌ای" onAct={() => exec('insertUnorderedList')}>
+   673→            <List className="size-4" />
+   674→          </FmtButton>
+   675→          <FmtButton title="فهرست شماره‌دار" onAct={() => exec('insertOrderedList')}>
+   676→            <ListOrdered className="size-4" />
+   677→          </FmtButton>
+   678→          <Sep />
+   679→          <FmtButton title="تراز از راست" onAct={() => exec('justifyRight')}>
+   680→            <AlignRight className="size-4" />
+   681→          </FmtButton>
+   682→          <FmtButton title="تراز وسط" onAct={() => exec('justifyCenter')}>
+   683→            <AlignCenter className="size-4" />
+   684→          </FmtButton>
+   685→          <FmtButton title="تراز از چپ" onAct={() => exec('justifyLeft')}>
+   686→            <AlignLeft className="size-4" />
+   687→          </FmtButton>
+   688→          <Sep />
+   689→          <FmtButton title="رنگ متن" onAct={() => colorRef.current?.click()}>
+   690→            <Baseline className="size-4" />
+   691→          </FmtButton>
+   692→          <input
+   693→            ref={colorRef}
+   694→            type="color"
+   695→            defaultValue="#111827"
+   696→            tabIndex={-1}
+   697→            aria-hidden
+   698→            className="size-0 opacity-0"
+   699→            onChange={(e) => exec('foreColor', e.target.value)}
+   700→          />
+   701→          <FmtButton title="رنگ هایلایت" onAct={() => hlRef.current?.click()}>
+   702→            <Highlighter className="size-4" />
+   703→          </FmtButton>
+   704→          <input
+   705→            ref={hlRef}
+   706→            type="color"
+   707→            defaultValue="#fde047"
+   708→            tabIndex={-1}
+   709→            aria-hidden
+   710→            className="size-0 opacity-0"
+   711→            onChange={(e) => exec('hiliteColor', e.target.value)}
+   712→          />
+   713→          <Sep />
+   714→          <FmtButton title="واگرد (Ctrl+Z)" onAct={() => exec('undo')}>
+   715→            <Undo2 className="size-4" />
+   716→          </FmtButton>
+   717→          <FmtButton title="ازنو (Ctrl+Y)" onAct={() => exec('redo')}>
+   718→            <Redo2 className="size-4" />
+   719→          </FmtButton>
+   720→          <FmtButton title="پاک‌کردن قالب‌بندی" onAct={() => exec('removeFormat')}>
+   721→            <Eraser className="size-4" />
+   722→          </FmtButton>
+   723→        </div>
+   724→
+   725→        {/* ردیف سند و خروجی‌ها */}
+   726→        <div className="flex flex-wrap items-center gap-1.5 border-t border-white/5 px-2 py-1.5">
+   727→          <input
+   728→            value={name}
+   729→            onChange={(e) => setName(e.target.value)}
+   730→            placeholder="نام سند"
+   731→            aria-label="نام سند"
+   732→            className="h-8 w-32 rounded-lg border border-white/10 bg-white/5 px-2 text-xs text-zinc-100 outline-none placeholder:text-zinc-500 focus:border-white/25 sm:w-40"
+   733→          />
+   734→          <span className="hidden text-[10px] text-zinc-500 sm:inline">.txt</span>
+   735→          <ActButton
+   736→            title="ذخیره در پرونده‌ها"
+   737→            hint="ذخیرهٔ سند در پوشهٔ سندهای فایل‌سیستم مجازی"
+   738→            color={SUNJOB_PALETTE.teal}
+   739→            icon={Save}
+   740→            onClick={handleSave}
+   741→          />
+   742→          <ActButton
+   743→            title="باز کردن آخرین سند"
+   744→            hint="بازخوانی سند ذخیره‌شده از پوشهٔ سندها"
+   745→            color="#a1a1aa"
+   746→            icon={FolderOpen}
+   747→            onClick={handleOpen}
+   748→          />
+   749→          <Sep />
+   750→          <ActButton
+   751→            title="Word (.docx)"
+   752→            hint="خروجی Word استاندارد (docx واقعی)"
+   753→            color={SUNJOB_PALETTE.violet}
+   754→            icon={FileText}
+   755→            onClick={() => void exportDocx()}
+   756→          />
+   757→          <ActButton
+   758→            title="Word (.doc)"
+   759→            hint="خروجی Word سازگار (سند HTML)"
+   760→            color={SUNJOB_PALETTE.orange}
+   761→            icon={File}
+   762→            onClick={exportDoc}
+   763→          />
+   764→          <ActButton
+   765→            title="PDF"
+   766→            hint="خروجی PDF چندصفحه‌ای از سند"
+   767→            color={SUNJOB_PALETTE.rose}
+   768→            icon={FileDown}
+   769→            onClick={() => void exportPdf()}
+   770→          />
+   771→          <ActButton
+   772→            title="مهر سان‌جاب"
+   773→            hint="درج یا حذف امضای اسپانسر پایین سند"
+   774→            color={SUNJOB_PALETTE.tealBright}
+   775→            icon={Stamp}
+   776→            active={stamp}
+   777→            onClick={() => setStamp((s) => !s)}
+   778→          />
+   779→        </div>
+   780→      </header>
+   781→
+   782→      {/* صفحهٔ سند */}
+   783→      <main className="os-scroll min-h-0 flex-1 overflow-y-auto p-3 sm:p-4">
+   784→        <div
+   785→          ref={wrapRef}
+   786→          className="mx-auto w-full max-w-3xl rounded-xl bg-white text-zinc-900 shadow-xl ring-1 ring-black/10"
+   787→        >
+   788→          <div
+   789→            ref={editorRef}
+   790→            contentEditable
+   791→            suppressContentEditableWarning
+   792→            dir="rtl"
+   793→            spellCheck={false}
+   794→            role="textbox"
+   795→            aria-multiline="true"
+   796→            aria-label="متن سند"
+   797→            onInput={handleInput}
+   798→            onKeyUp={refreshFmt}
+   799→            onMouseUp={refreshFmt}
+   800→            onFocus={refreshFmt}
+   801→            className={`os-scroll min-h-[420px] overflow-y-auto rounded-xl px-6 py-6 text-[15px] outline-none ${DOC_STYLES}`}
+   802→            style={{ fontFamily: 'var(--font-vazir), sans-serif' }}
+   803→          />
+   804→          {/* مهر اسپانسر — بیرون از contentEditable ولی داخل ناحیهٔ خروجی PDF */}
+   805→          {stamp && (
+   806→            <div className="select-none pb-5 pt-1 text-center text-[11px] text-zinc-400">
+   807→              {STAMP_TEXT}
+   808→            </div>
+   809→          )}
+   810→        </div>
+   811→      </main>
+   812→
+   813→      {/* نوار وضعیت */}
+   814→      <footer className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-t border-white/10 bg-zinc-900/80 px-3 py-1.5 text-[11px] text-zinc-400">
+   815→        <div className="flex items-center gap-3">
+   816→          <span>واژه‌ها: {faNum(words)}</span>
+   817→          <span>نویسه‌ها: {faNum(chars)}</span>
+   818→        </div>
+   819→        <span className={autosave === 'saved' ? 'text-teal-400' : 'text-zinc-500'}>
+   820→          {autosave === 'saving'
+   821→            ? 'در حال ذخیرهٔ خودکار…'
+   822→            : autosave === 'saved'
+   823→              ? 'ذخیرهٔ خودکار انجام شد ✓'
+   824→              : 'ذخیرهٔ خودکار فعال است'}
+   825→        </span>
+   826→      </footer>
+   827→    </div>
+   828→  )
+   829→}
+   830→

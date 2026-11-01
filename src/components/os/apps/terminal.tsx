@@ -11,7 +11,7 @@ import {
 } from 'react'
 import { CornerDownLeft, GraduationCap, Sparkles, X, Zap } from 'lucide-react'
 import { useOS } from '@/lib/os/store'
-import { APPS, getApp } from '@/lib/os/apps'
+import { APPS, getApp, launch } from '@/lib/os/apps'
 import { WALLPAPERS } from '@/lib/os/wallpapers'
 import {
   HOME,
@@ -305,6 +305,12 @@ const TUX_ART = String.raw`
 \___)=(___/
 `
 
+const SQUIRREL_ART = String.raw`
+   (\_/)
+  ( •ᴥ• )
+  / >🥜   سنجابکِ سان‌جابی
+`
+
 const COW_ART = (text: string) => String.raw`
  _________
 < ${text} >
@@ -573,7 +579,7 @@ export default function TerminalApp() {
           ['آموزش', ['learn', 'ask', 'man', 'help']],
           ['فایل‌ها', ['ls', 'cd', 'pwd', 'cat', 'mkdir', 'touch', 'echo', 'rm', 'cp', 'mv', 'tree', 'find', 'grep', 'head', 'tail', 'wc']],
           ['سیستم', ['whoami', 'uname', 'date', 'uptime', 'ps', 'kill', 'df', 'free', 'env', 'history', 'clear', 'exit']],
-          ['سرگرمی', ['neofetch', 'cowsay', 'fortune', 'banner', 'matrix', 'sl', 'coffee', 'tux', 'ping', 'curl', 'wallpaper', 'lock']],
+          ['سرگرمی', ['neofetch', 'cowsay', 'fortune', 'banner', 'matrix', 'sl', 'coffee', 'tux', 'sunjob', 'python', 'ping', 'curl', 'wallpaper', 'lock']],
           ['گراف', ['open', 'apps', 'sudo', 'apt']],
         ]
         for (const [g, cmds] of groups) {
@@ -960,7 +966,7 @@ export default function TerminalApp() {
         push('ok', 'pengo — مدیر ارشد بامزگی (سطح دسترسی: همه‌چیز، چون خانه خودت است)')
         break
       case 'hostname':
-        push('out', 'pengo-os')
+        push('out', 'sanjob-os')
         break
       case 'date':
         push(
@@ -979,7 +985,7 @@ export default function TerminalApp() {
         push(
           'out',
           args.includes('-a')
-            ? 'Linux pengo-os 6.9.4-pengo-cute #1 SMP PREEMPT x86_64 GNU/Linux-ولی-بامزه'
+            ? 'Linux sanjob-os 6.12.4-sanjob-cute #1 SMP PREEMPT x86_64 GNU/Linux-ولی-بامزه'
             : 'PenguinOS'
         )
         break
@@ -1099,18 +1105,31 @@ export default function TerminalApp() {
         push('sys', TUX_ART)
         const mins = os.bootAt ? Math.max(1, Math.round((Date.now() - os.bootAt) / 60000)) : 0
         const info: string[] = [
-          `pengo@pengo-os`,
-          `----------------`,
-          `OS:      پنگوئن‌اواس ۳.۰ «کلوخک»`,
-          `Kernel:  6.9.4-pengo-cute`,
-          `Shell:   pengo-sh 3.0`,
+          `sanjab@sanjob-os`,
+          `-----------------`,
+          `OS:      سان‌جاب‌او‌اس ۴.۰ «سنجابک»`,
+          `Kernel:  6.12.4-sanjob-cute`,
+          `Shell:   sanjob-sh 4.0`,
           `Uptime:  ${mins} دقیقه`,
           `Windows: ${os.windows.length} پنجره باز`,
-          `Theme:   ${os.settings.accent}`,
+          `Theme:   ${os.settings.accent} (پالت سان‌جاب)`,
+          `Sponsor: sunjob.ir — با اسپانسری سان‌جاب`,
           `XP:      ${tutor.xp} (${levelOf(tutor.xp)})`,
+          `Sponsor: sunjob.ir — با اسپانسری سان‌جاب`,
           `Memory:  12MiB / 64MiB (عمدتاً میم)`,
         ]
         info.forEach((l) => push('out', l))
+        break
+      }
+      case 'sunjob': {
+        push('sys', SQUIRREL_ART)
+        push('ok', '⚡ سان‌جاب (sunjob.ir) اسپانسیر رسمی این سیستم‌عامله!')
+        push('out', 'مشاوره انتخاب رشته و کنکور رو ازشون بگیرید — پالت رنگی سیستم هم هدیهٔ اونهاست.')
+        break
+      }
+      case 'python': {
+        push('ok', 'پایتونِ کوچک سان‌جاب توی کداستودیو نصبه! دارم برات بازش می‌کنم…')
+        launch('code')
         break
       }
       case 'cowsay': {
@@ -1202,6 +1221,11 @@ export default function TerminalApp() {
       case 'apt-get': {
         if (args[0] === 'install' || args[0] === 'update') {
           const pkg = args[1] ?? 'bizarreness'
+          if (['python', 'python3', 'node', 'nodejs', 'js', 'javascript', 'html'].includes(pkg.toLowerCase())) {
+            push('ok', `«${pkg}» از قبل نصبه! توی کداستودیو منتظرته — دارم بازش می‌کنم…`)
+            setTimeout(() => launch('code'), 600)
+            break
+          }
           setBusy(true)
           push('out', 'در حال خواندن لیست بسته‌ها… انجام شد')
           setTimeout(() => push('out', `نصب ${pkg} … ▕░░░░░░▏ ۱۲٪`), 350)
@@ -1345,7 +1369,7 @@ export default function TerminalApp() {
     dim: 'text-zinc-500',
   }
 
-  const prompt = `pengo@pengo-os:${prettyPath(cwd)}$`
+  const prompt = `sanjab@sanjob-os:${prettyPath(cwd)}$`
 
   return (
     <div

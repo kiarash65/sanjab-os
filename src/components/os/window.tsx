@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from 'react'
 import { useOS, type OSWindow } from '@/lib/os/store'
+import { getApp } from '@/lib/os/apps'
 
 const TASKBAR = 48
 
@@ -25,6 +26,8 @@ export default function WindowFrame({
   const moveWindow = useOS((s) => s.moveWindow)
   const resizeWindow = useOS((s) => s.resizeWindow)
   const accent = useOS((s) => s.settings.accent)
+  const app = getApp(win.appId)
+  const tint = app?.tint
 
   const focused = focusedId === win.id
   const drag = useRef<{ dx: number; dy: number } | null>(null)
@@ -113,8 +116,18 @@ export default function WindowFrame({
       aria-label={win.title}
     >
       <div
-        className="pengo-noselect flex h-10 shrink-0 cursor-grab items-center gap-2 bg-zinc-900/95 px-3 backdrop-blur active:cursor-grabbing"
-        style={focused ? { boxShadow: `inset 0 -2px 0 0 ${accent}` } : undefined}
+        className={`pengo-noselect flex h-10 shrink-0 cursor-grab items-center gap-2 px-3 backdrop-blur active:cursor-grabbing ${
+          focused && tint
+            ? `bg-gradient-to-l ${tint}`
+            : 'bg-zinc-900/95'
+        }`}
+        style={
+          focused && tint
+            ? undefined
+            : focused
+              ? { boxShadow: `inset 0 -2px 0 0 ${accent}` }
+              : undefined
+        }
         onPointerDown={onTitleDown}
         onPointerMove={onTitleMove}
         onPointerUp={endDrag}
@@ -138,7 +151,15 @@ export default function WindowFrame({
             className="h-3.5 w-3.5 rounded-full bg-emerald-500 transition hover:brightness-125"
           />
         </div>
-        <div className="pointer-events-none min-w-0 flex-1 px-1 text-center text-xs font-bold text-zinc-200 sm:text-[13px]">
+        {app && (
+          <span
+            className="grid h-5 w-5 shrink-0 place-items-center rounded-md bg-black/25"
+            aria-hidden
+          >
+            <app.icon size={12} strokeWidth={2.2} className="text-white" />
+          </span>
+        )}
+        <div className="pointer-events-none min-w-0 flex-1 px-1 text-center text-xs font-bold text-white drop-shadow-sm sm:text-[13px]">
           <span className="block truncate">{win.title}</span>
         </div>
         <div className="w-14 shrink-0" aria-hidden />

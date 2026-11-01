@@ -51,7 +51,12 @@ const NOTIFS: { icon: LucideIcon; title: string; body: string }[] = [
   {
     icon: Lightbulb,
     title: 'راهنما',
-    body: 'ترمینال را باز کن، بنویس learn start تا ترمینال را بازی‌کنان یاد بگیری.',
+    body: 'ترمینال را باز کن، بنویس learn start تا ترمینال را بازی‌کنان یاد بگیری. یا کداستودیو را امتحان کن — پایتون داریم!',
+  },
+  {
+    icon: Package,
+    title: 'خبر داغ',
+    body: 'نویسا آمد! مثل ورد می‌نویسی و خروجی Word و PDF می‌گیری. با اسپانسری سان‌جاب',
   },
   {
     icon: Trash2,
@@ -119,7 +124,7 @@ function ContextMenu({
         pushToast(n)
       },
     },
-    { label: 'درباره پنگوئن‌اواس', action: () => launch('about') },
+    { label: 'درباره سان‌جاب‌او‌اس', action: () => launch('about') },
   ]
 
   const x = Math.min(at.x, (typeof window !== 'undefined' ? window.innerWidth : 400) - 230)
