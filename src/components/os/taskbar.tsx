@@ -55,9 +55,12 @@ export default function Taskbar() {
         style={{ color: accent }}
         aria-label="منوی شروع"
       >
-        <span className="text-xl" aria-hidden>
-          🐧
-        </span>
+        <img
+          src="/tux-avatar.png"
+          alt=""
+          aria-hidden
+          className="pengo-breathe h-6 w-6 rounded-full border border-white/20 object-cover"
+        />
         <span className="hidden sm:inline">شروع</span>
       </button>
       <div className="h-6 w-px shrink-0 bg-white/10" aria-hidden />
@@ -81,7 +84,7 @@ export default function Taskbar() {
               }`}
               title={win.title}
             >
-              <span aria-hidden>{app?.emoji ?? '🪟'}</span>
+              {app ? <app.icon size={15} aria-hidden /> : null}
               <span className="hidden max-w-24 truncate md:inline">
                 {win.title}
               </span>

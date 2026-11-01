@@ -1,6 +1,33 @@
 'use client'
 
 import type { ComponentType } from 'react'
+import type { LucideIcon } from 'lucide-react'
+import {
+  Activity,
+  AlarmClock,
+  AudioLines,
+  Bird,
+  Bomb,
+  BrickWall,
+  Calculator,
+  Cat,
+  CircleDot,
+  CloudSun,
+  Copy,
+  FolderOpen,
+  Grid3x3,
+  Hammer,
+  Hash,
+  Images,
+  Info,
+  Lightbulb,
+  NotebookPen,
+  Palette,
+  Settings,
+  SpellCheck,
+  SquareTerminal,
+  Worm,
+} from 'lucide-react'
 import { useOS } from '@/lib/os/store'
 
 import TerminalApp from '@/components/os/apps/terminal'
@@ -15,6 +42,7 @@ import MusicApp from '@/components/os/apps/music'
 import SettingsApp from '@/components/os/apps/settings'
 import IdeaGeneratorApp from '@/components/os/apps/idea-generator'
 import CatTranslatorApp from '@/components/os/apps/cat-translator'
+import PhotosApp from '@/components/os/apps/photos'
 import AboutApp from '@/components/os/apps/about'
 
 import SnakeGame from '@/components/os/games/snake'
@@ -26,13 +54,14 @@ import PongGame from '@/components/os/games/pong'
 import FlappyGame from '@/components/os/games/flappy'
 import WhackamoleGame from '@/components/os/games/whackamole'
 import BreakoutGame from '@/components/os/games/breakout'
+import WordleGame from '@/components/os/games/wordle-fa'
 
 export type AppCategory = 'app' | 'game' | 'system'
 
 export interface AppMeta {
   id: string
   name: string
-  emoji: string
+  icon: LucideIcon
   category: AppCategory
   component: ComponentType
   w: number
@@ -45,19 +74,19 @@ export const APPS: AppMeta[] = [
   // ---------- اپ‌ها ----------
   {
     id: 'terminal',
-    name: 'ترمینال',
-    emoji: '🖥️',
+    name: 'ترمینال آموزشی',
+    icon: SquareTerminal,
     category: 'app',
     component: TerminalApp,
-    w: 640,
-    h: 430,
+    w: 720,
+    h: 480,
     desktop: true,
-    keywords: ['terminal', 'shell', 'command'],
+    keywords: ['terminal', 'shell', 'command', 'learn'],
   },
   {
     id: 'file-manager',
     name: 'پرونده‌ها',
-    emoji: '🗂️',
+    icon: FolderOpen,
     category: 'app',
     component: FileManagerApp,
     w: 640,
@@ -65,9 +94,20 @@ export const APPS: AppMeta[] = [
     keywords: ['files', 'folder'],
   },
   {
+    id: 'photos',
+    name: 'گالری عکس',
+    icon: Images,
+    category: 'app',
+    component: PhotosApp,
+    w: 620,
+    h: 460,
+    desktop: true,
+    keywords: ['photos', 'gallery', 'image'],
+  },
+  {
     id: 'notes',
     name: 'دفترچه یادداشت',
-    emoji: '📝',
+    icon: NotebookPen,
     category: 'app',
     component: NotesApp,
     w: 560,
@@ -77,7 +117,7 @@ export const APPS: AppMeta[] = [
   {
     id: 'clock',
     name: 'ساعت و تایمر',
-    emoji: '⏰',
+    icon: AlarmClock,
     category: 'app',
     component: ClockApp,
     w: 460,
@@ -87,7 +127,7 @@ export const APPS: AppMeta[] = [
   {
     id: 'paint',
     name: 'نقاشی',
-    emoji: '🎨',
+    icon: Palette,
     category: 'app',
     component: PaintApp,
     w: 640,
@@ -98,7 +138,7 @@ export const APPS: AppMeta[] = [
   {
     id: 'calculator',
     name: 'ماشین‌حساب',
-    emoji: '🧮',
+    icon: Calculator,
     category: 'app',
     component: CalculatorApp,
     w: 340,
@@ -108,7 +148,7 @@ export const APPS: AppMeta[] = [
   {
     id: 'weather',
     name: 'آب‌وهوای خیالی',
-    emoji: '⛅',
+    icon: CloudSun,
     category: 'app',
     component: WeatherApp,
     w: 520,
@@ -118,7 +158,7 @@ export const APPS: AppMeta[] = [
   {
     id: 'system-monitor',
     name: 'مانیتور سیستم',
-    emoji: '📊',
+    icon: Activity,
     category: 'app',
     component: SystemMonitorApp,
     w: 640,
@@ -128,7 +168,7 @@ export const APPS: AppMeta[] = [
   {
     id: 'music',
     name: 'پخش‌کننده چیپ‌تیون',
-    emoji: '🎵',
+    icon: AudioLines,
     category: 'app',
     component: MusicApp,
     w: 500,
@@ -139,7 +179,7 @@ export const APPS: AppMeta[] = [
   {
     id: 'settings',
     name: 'تنظیمات',
-    emoji: '⚙️',
+    icon: Settings,
     category: 'app',
     component: SettingsApp,
     w: 560,
@@ -149,7 +189,7 @@ export const APPS: AppMeta[] = [
   {
     id: 'ideas',
     name: 'مولد ایده عجیب',
-    emoji: '💡',
+    icon: Lightbulb,
     category: 'app',
     component: IdeaGeneratorApp,
     w: 500,
@@ -160,7 +200,7 @@ export const APPS: AppMeta[] = [
   {
     id: 'cat-translator',
     name: 'مترجم گربه‌ای',
-    emoji: '🐱',
+    icon: Cat,
     category: 'app',
     component: CatTranslatorApp,
     w: 500,
@@ -171,7 +211,7 @@ export const APPS: AppMeta[] = [
   {
     id: 'snake',
     name: 'مار',
-    emoji: '🐍',
+    icon: Worm,
     category: 'game',
     component: SnakeGame,
     w: 480,
@@ -182,7 +222,7 @@ export const APPS: AppMeta[] = [
   {
     id: 'g2048',
     name: '۲۰۴۸',
-    emoji: '🔢',
+    icon: Hash,
     category: 'game',
     component: Game2048,
     w: 460,
@@ -192,7 +232,7 @@ export const APPS: AppMeta[] = [
   {
     id: 'tictactoe',
     name: 'دوز',
-    emoji: '⭕',
+    icon: Grid3x3,
     category: 'game',
     component: TicTacToeGame,
     w: 460,
@@ -202,7 +242,7 @@ export const APPS: AppMeta[] = [
   {
     id: 'memory',
     name: 'حافظه خفن',
-    emoji: '🃏',
+    icon: Copy,
     category: 'game',
     component: MemoryGame,
     w: 480,
@@ -212,7 +252,7 @@ export const APPS: AppMeta[] = [
   {
     id: 'minesweeper',
     name: 'مین‌یاب',
-    emoji: '💣',
+    icon: Bomb,
     category: 'game',
     component: MinesweeperGame,
     w: 500,
@@ -223,7 +263,7 @@ export const APPS: AppMeta[] = [
   {
     id: 'pong',
     name: 'پینگ‌پنگ',
-    emoji: '🏓',
+    icon: CircleDot,
     category: 'game',
     component: PongGame,
     w: 580,
@@ -233,7 +273,7 @@ export const APPS: AppMeta[] = [
   {
     id: 'flappy',
     name: 'پنگوئن پرنده',
-    emoji: '🐤',
+    icon: Bird,
     category: 'game',
     component: FlappyGame,
     w: 460,
@@ -244,7 +284,7 @@ export const APPS: AppMeta[] = [
   {
     id: 'whackamole',
     name: 'موش‌کوبی',
-    emoji: '🔨',
+    icon: Hammer,
     category: 'game',
     component: WhackamoleGame,
     w: 480,
@@ -255,18 +295,29 @@ export const APPS: AppMeta[] = [
   {
     id: 'breakout',
     name: 'آجرشکن',
-    emoji: '🧱',
+    icon: BrickWall,
     category: 'game',
     component: BreakoutGame,
     w: 580,
     h: 520,
     keywords: ['breakout', 'arkanoid'],
   },
+  {
+    id: 'wordle',
+    name: 'حدس‌لغت',
+    icon: SpellCheck,
+    category: 'game',
+    component: WordleGame,
+    w: 460,
+    h: 640,
+    desktop: true,
+    keywords: ['wordle', 'word', 'لغت'],
+  },
   // ---------- سیستم ----------
   {
     id: 'about',
     name: 'درباره سیستم',
-    emoji: 'ℹ️',
+    icon: Info,
     category: 'system',
     component: AboutApp,
     w: 430,

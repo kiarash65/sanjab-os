@@ -45,10 +45,24 @@ export const WALLPAPERS: Wallpaper[] = [
     name: 'گربه فضانورد',
     css: 'url(/wallpapers/cat-space.png)',
   },
+  {
+    key: 'img:aurora',
+    name: 'شفق قطبی',
+    css: 'url(/wallpapers/aurora-night.png)',
+  },
+  {
+    key: 'img:retro',
+    name: 'اتاق رترو',
+    css: 'url(/wallpapers/retro-terminal.png)',
+  },
 ]
 
 export function wallpaperCss(key: string): string {
-  return WALLPAPERS.find((w) => w.key === key)?.css ?? WALLPAPERS[0].css
+  const found = WALLPAPERS.find((w) => w.key === key)
+  if (found) return found.css
+  // عکس دلخواه (مثلاً از گالری): کلید «custom:/photos/x.png»
+  if (key.startsWith('custom:')) return `url("${key.slice(7)}")`
+  return WALLPAPERS[0].css
 }
 
 export interface Accent {

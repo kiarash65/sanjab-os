@@ -188,3 +188,121 @@ body {
   user-select: none;
   -webkit-user-select: none;
 }
+
+/* ---------- انیمیشن‌های میزکار ---------- */
+
+/* تکان خوردن پت پنگوئن هنگام قدم زدن */
+@keyframes pengo-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-2px) rotate(-3deg);
+  }
+  75% {
+    transform: translateY(-2px) rotate(3deg);
+  }
+}
+.pengo-bob {
+  animation: pengo-bob 0.5s ease-in-out infinite;
+}
+
+/* بال زدن */
+@keyframes pengo-flip-l {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(18deg);
+  }
+}
+@keyframes pengo-flip-r {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-18deg);
+  }
+}
+.pengo-flip-left {
+  transform-origin: 7px 26px;
+  animation: pengo-flip-l 0.5s ease-in-out infinite;
+}
+.pengo-flip-right {
+  transform-origin: 39px 26px;
+  animation: pengo-flip-r 0.5s ease-in-out infinite;
+}
+
+/* نفس کشیدن آیکن شروع */
+@keyframes pengo-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+.pengo-breathe {
+  animation: pengo-breathe 3.2s ease-in-out infinite;
+}
+
+/* شناور بودن (قفل صفحه) */
+@keyframes pengo-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+.pengo-float {
+  animation: pengo-float 4s ease-in-out infinite;
+}
+
+/* چشمک زدن خط بوت */
+@keyframes pengo-fadein {
+  from {
+    opacity: 0;
+    transform: translateX(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.pengo-fadein {
+  animation: pengo-fadein 0.22s ease-out both;
+}
+
+/* موج خوردن اعلان پیشنهاد اصلاح غلط تایپی */
+@keyframes pengo-wiggle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  30% {
+    transform: rotate(-2deg);
+  }
+  70% {
+    transform: rotate(2deg);
+  }
+}
+.pengo-wiggle {
+  animation: pengo-wiggle 0.6s ease-in-out infinite;
+}
+
+/* اسکن‌لاین بوت */
+.boot-scanlines {
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.03) 0px,
+    rgba(255, 255, 255, 0.03) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}

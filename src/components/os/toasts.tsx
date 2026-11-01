@@ -2,6 +2,8 @@
 
 import { useEffect } from 'react'
 import { X } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
+import { Bell } from 'lucide-react'
 import { useOS, type OSToast } from '@/lib/os/store'
 
 function ToastCard({ t }: { t: OSToast }) {
@@ -10,10 +12,18 @@ function ToastCard({ t }: { t: OSToast }) {
     const to = setTimeout(() => dismiss(t.id), 6000)
     return () => clearTimeout(to)
   }, [t.id, dismiss])
+  const Icon: LucideIcon | string | undefined = t.icon ?? Bell
   return (
     <div className="toast-in pointer-events-auto flex items-start gap-2.5 rounded-xl border border-white/15 bg-zinc-900/95 p-3 shadow-2xl shadow-black/50 backdrop-blur">
-      <span className="text-2xl leading-none" aria-hidden>
-        {t.icon ?? '🐧'}
+      <span
+        className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-white/10 bg-white/5"
+        aria-hidden
+      >
+        {typeof Icon === 'string' ? (
+          <span className="text-base leading-none">{Icon}</span>
+        ) : (
+          <Icon size={16} className="text-zinc-200" />
+        )}
       </span>
       <div className="min-w-0 flex-1">
         <div className="text-xs font-black text-zinc-100">{t.title}</div>

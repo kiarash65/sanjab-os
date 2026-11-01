@@ -36,10 +36,14 @@ export default function DesktopIcons() {
           title={a.name}
         >
           <span
-            className="grid h-12 w-12 place-items-center rounded-xl border border-white/15 bg-black/25 text-2xl shadow-lg backdrop-blur transition group-hover:scale-105"
+            className="grid h-12 w-12 place-items-center rounded-xl border border-white/15 bg-black/25 shadow-lg backdrop-blur transition group-hover:scale-105"
             aria-hidden
           >
-            {a.emoji}
+            <a.icon
+              size={24}
+              strokeWidth={1.8}
+              className="text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
+            />
           </span>
           <span className="text-center text-[11px] font-bold leading-tight text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
             {a.name}

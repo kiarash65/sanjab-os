@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import type { LucideIcon } from 'lucide-react'
 
 export interface OSWindow {
   id: string
@@ -25,7 +26,8 @@ export interface OSToast {
   id: string
   title: string
   body: string
-  icon?: string
+  /** آیکن lucide یا یک ایموجی/متن کوتاه */
+  icon?: LucideIcon | string
 }
 
 interface OpenAppArgs {
@@ -38,6 +40,7 @@ interface OpenAppArgs {
 interface OSStore {
   booted: boolean
   poweredOff: boolean
+  locked: boolean
   bootAt: number
   windows: OSWindow[]
   focusedId: string | null
@@ -50,6 +53,8 @@ interface OSStore {
   setBooted: (v: boolean) => void
   restartOS: () => void
   shutdownOS: () => void
+  lockScreen: () => void
+  unlockScreen: () => void
   openApp: (args: OpenAppArgs) => void
   closeWindow: (id: string) => void
   focusWindow: (id: string) => void
@@ -62,7 +67,11 @@ interface OSStore {
   toggleStart: (open?: boolean) => void
   shuffleIcons: () => void
   setSetting: <K extends keyof OSSettings>(key: K, value: OSSettings[K]) => void
-  pushToast: (t: { title: string; body: string; icon?: string }) => void
+  pushToast: (t: {
+    title: string
+    body: string
+    icon?: LucideIcon | string
+  }) => void
   dismissToast: (id: string) => void
 }
 
@@ -73,6 +82,7 @@ export const useOS = create<OSStore>()(
     (set, get) => ({
       booted: false,
       poweredOff: false,
+      locked: false,
       bootAt: 0,
       windows: [],
       focusedId: null,
@@ -88,10 +98,13 @@ export const useOS = create<OSStore>()(
       },
       toasts: [],
       setBooted: (v) => set({ booted: v, bootAt: v ? Date.now() : 0 }),
+      lockScreen: () => set({ locked: true }),
+      unlockScreen: () => set({ locked: false }),
       restartOS: () =>
         set({
           booted: false,
           poweredOff: false,
+          locked: false,
           windows: [],
           focusedId: null,
           startOpen: false,
@@ -101,6 +114,7 @@ export const useOS = create<OSStore>()(
         set({
           poweredOff: true,
           booted: false,
+          locked: false,
           windows: [],
           focusedId: null,
           startOpen: false,

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { PartyPopper, RotateCcw } from 'lucide-react'
+import { Cat, PartyPopper, RotateCcw, ShieldCheck } from 'lucide-react'
 import { useOS } from '@/lib/os/store'
 import { Button } from '@/components/ui/button'
 
@@ -22,23 +22,26 @@ export default function AboutApp() {
 
   const specs: [string, string][] = [
     ['هسته', 'لینوکس ۶.۹.۴-پنگویی'],
-    ['محیط دسکتاپ', 'PengoShell ۲.۰'],
+    ['محیط دسکتاپ', 'PengoShell ۳.۰'],
+    ['شل', 'pengo-sh 3.0 (آموزشی)'],
     ['پردازنده', 'مغز شما (اختیاری)'],
     ['حافظه', 'همان‌قدر که لازم داری'],
-    ['امنیت', 'یک گربه نگهبان 🐱'],
+    ['امنیت', 'یک گربه نگهبان'],
     ['آپتایم', up],
   ]
 
   return (
     <div className="os-scroll flex h-full flex-col items-center overflow-y-auto bg-zinc-950 p-5 text-zinc-100">
-      <div className="pengo-pop grid h-20 w-20 place-items-center rounded-3xl bg-gradient-to-br from-emerald-600 to-teal-500 text-5xl shadow-lg" aria-hidden>
-        🐧
-      </div>
-      <h2 className="mt-3 text-lg font-black">پنگوئن‌اواس ۲.۰ «کلوخک»</h2>
+      <img
+        src="/tux-avatar.png"
+        alt="لوگوی پنگوئن‌اواس"
+        className="pengo-float h-20 w-20 rounded-3xl border border-white/15 object-cover shadow-lg"
+      />
+      <h2 className="mt-3 text-lg font-black">پنگوئن‌اواس ۳.۰ «کلوخک»</h2>
       <p className="mt-1 text-center text-xs leading-5 text-zinc-400">
         یک سیستم‌عامل خیالی بر پایه لینوکس که فقط در مرورگر شما زندگی می‌کند.
         <br />
-        ساخته‌شده با ❤️ و کمی شلوغ‌کاری.
+        با ترمینال آموزشی، تصحیح غلط تایپی و ۱۰ بازی.
       </p>
 
       <div className="mt-4 w-full max-w-xs overflow-hidden rounded-xl border border-white/10">
@@ -55,13 +58,18 @@ export default function AboutApp() {
         ))}
       </div>
 
+      <p className="mt-3 max-w-xs text-center text-[11px] leading-5 text-zinc-500">
+        طراحی الهام‌گرفته از پروژه‌های Puter، OS.js، daedalOS و win11React —
+        و تصحیح دستورها به سبک thefuck و fish-shell.
+      </p>
+
       <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
         <Button
           size="sm"
           variant="secondary"
           onClick={() =>
             pushToast({
-              icon: '🎉',
+              icon: PartyPopper,
               title: 'اعلان تستی',
               body: 'اگر این را می‌بینی، یعنی سیستم اعلان کار می‌کند. آفرین به ما!',
             })
@@ -73,6 +81,20 @@ export default function AboutApp() {
         <Button size="sm" variant="outline" onClick={restartOS}>
           <RotateCcw className="size-4" />
           ری‌استارت سیستم
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={() =>
+            pushToast({
+              icon: Cat,
+              title: 'گربه نگهبان',
+              body: 'گزارش وضعیت: همه‌چیز امن است. غذای گربه هم امن است.',
+            })
+          }
+        >
+          <ShieldCheck className="size-4" />
+          وضعیت امنیت
         </Button>
       </div>
     </div>

@@ -1,10 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { Power, RotateCcw, Search } from 'lucide-react'
+import { Lock, Power, RotateCcw, Search } from 'lucide-react'
 import { useOS } from '@/lib/os/store'
 import { APPS, launch } from '@/lib/os/apps'
 import { Input } from '@/components/ui/input'
+import { getPlayerName, setPlayerName } from '@/components/os/leaderboard'
 
 export default function StartMenu() {
   const startOpen = useOS((s) => s.startOpen)
@@ -78,10 +79,10 @@ function StartMenuInner() {
                       className="flex flex-col items-center gap-1.5 rounded-xl p-2 transition hover:bg-white/10 active:scale-95"
                     >
                       <span
-                        className="grid h-11 w-11 place-items-center rounded-xl border border-white/10 bg-zinc-800 text-2xl shadow-inner"
+                        className="grid h-11 w-11 place-items-center rounded-xl border border-white/10 bg-zinc-800 shadow-inner"
                         aria-hidden
                       >
-                        {a.emoji}
+                        <a.icon size={22} strokeWidth={1.8} className="text-zinc-100" />
                       </span>
                       <span className="text-center text-[11px] font-medium leading-tight text-zinc-200">
                         {a.name}
@@ -94,9 +95,7 @@ function StartMenuInner() {
           )}
           {filtered.length === 0 && (
             <div className="grid place-items-center gap-2 py-10 text-center">
-              <span className="text-4xl" aria-hidden>
-                🕵️
-              </span>
+              <Search size={36} className="text-zinc-600" aria-hidden />
               <p className="text-sm text-zinc-400">
                 چیزی پیدا نشد! حتی گربه سیستمی هم نمی‌دونه «{q}» چیه.
               </p>
@@ -104,23 +103,38 @@ function StartMenuInner() {
           )}
         </div>
         <div className="flex items-center justify-between border-t border-white/10 p-2.5">
-          <div className="flex items-center gap-2 px-1">
-            <span
-              className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-emerald-700 to-teal-500 text-base"
-              aria-hidden
-            >
-              🐧
-            </span>
-            <div className="leading-tight">
-              <div className="text-xs font-bold text-zinc-100">
-                پنگوئن مهمان
-              </div>
-              <div className="text-[10px] text-zinc-500">
+          <div className="flex min-w-0 items-center gap-2 px-1">
+            <img
+              src="/tux-avatar.png"
+              alt="آواتار پنگوئن"
+              className="h-9 w-9 shrink-0 rounded-full border border-white/15 object-cover"
+            />
+            <div className="min-w-0 leading-tight">
+              <input
+                defaultValue={getPlayerName()}
+                onBlur={(e) => setPlayerName(e.target.value.trim().slice(0, 24))}
+                maxLength={24}
+                aria-label="اسم بازیکن"
+                placeholder="پنگوئن مهمان"
+                className="w-36 rounded-md bg-transparent px-1.5 py-0.5 text-xs font-bold text-zinc-100 outline-none transition hover:bg-white/10 focus:bg-white/10"
+              />
+              <div className="px-1.5 text-[10px] text-zinc-500">
                 مدیر ارشد بامزگی
               </div>
             </div>
           </div>
           <div className="flex gap-1">
+            <button
+              onClick={() => {
+                toggleStart(false)
+                useOS.getState().lockScreen()
+              }}
+              className="grid h-9 w-9 place-items-center rounded-lg text-zinc-300 transition hover:bg-white/10 hover:text-sky-300"
+              title="قفل صفحه"
+              aria-label="قفل صفحه"
+            >
+              <Lock size={16} />
+            </button>
             <button
               onClick={restartOS}
               className="grid h-9 w-9 place-items-center rounded-lg text-zinc-300 transition hover:bg-white/10 hover:text-amber-300"
