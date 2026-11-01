@@ -1,0 +1,134 @@
+'use client'
+
+import { useCallback, useState, type ReactNode } from 'react'
+import { RotateCcw } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+
+export interface GameStat {
+  label: string
+  value: ReactNode
+}
+
+export function GameShell({
+  emoji,
+  title,
+  howTo,
+  stats = [],
+  controls,
+  onRestart,
+  children,
+}: {
+  emoji: string
+  title: string
+  howTo?: string
+  stats?: GameStat[]
+  controls?: ReactNode
+  onRestart?: () => void
+  children: ReactNode
+}) {
+  return (
+    <div className="flex h-full flex-col bg-zinc-950 text-zinc-100">
+      <div className="flex flex-wrap items-center gap-1.5 border-b border-white/10 bg-zinc-900/70 px-3 py-2">
+        <span className="text-lg leading-none" aria-hidden>
+          {emoji}
+        </span>
+        <span className="ml-1 text-sm font-black">{title}</span>
+        <div className="mx-1 h-5 w-px bg-white/10" aria-hidden />
+        {stats.map((s) => (
+          <span
+            key={s.label}
+            className="rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-[11px]"
+          >
+            <span className="text-zinc-400">{s.label}: </span>
+            <span className="font-bold">{s.value}</span>
+          </span>
+        ))}
+        <div className="flex-1" />
+        {controls}
+        {onRestart && (
+          <Button
+            size="sm"
+            variant="secondary"
+            className="h-7 gap-1 px-2.5 text-xs"
+            onClick={onRestart}
+          >
+            <RotateCcw className="size-3.5" />
+            دوباره
+          </Button>
+        )}
+      </div>
+      {howTo && (
+        <div className="border-b border-white/5 bg-zinc-900/40 px-3 py-1.5 text-[11px] text-zinc-400">
+          💡 {howTo}
+        </div>
+      )}
+      <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden p-3">
+        {children}
+      </div>
+    </div>
+  )
+}
+
+export function Overlay({
+  show,
+  emoji = '🎮',
+  title,
+  subtitle,
+  actionLabel,
+  onAction,
+}: {
+  show: boolean
+  emoji?: string
+  title: string
+  subtitle?: string
+  actionLabel?: string
+  onAction: () => void
+}) {
+  if (!show) return null
+  return (
+    <div className="absolute inset-0 z-20 grid place-items-center rounded-xl bg-black/70 backdrop-blur-sm">
+      <div className="pengo-pop flex flex-col items-center gap-2 p-6 text-center">
+        <div className="text-5xl" aria-hidden>
+          {emoji}
+        </div>
+        <div className="text-xl font-black">{title}</div>
+        {subtitle && <div className="text-sm text-zinc-300">{subtitle}</div>}
+        <Button className="mt-2" onClick={onAction}>
+          {actionLabel ?? 'شروع دوباره'}
+        </Button>
+      </div>
+    </div>
+  )
+}
+
+export function useBestScore(
+  key: string
+): readonly [number, (v: number) => void] {
+  const [best, setBestState] = useState<number>(() => {
+    if (typeof window === 'undefined') return 0
+    try {
+      const v = Number(
+        window.localStorage.getItem(`pengo-best-${key}`) ?? '0'
+      )
+      return Number.isFinite(v) && v > 0 ? v : 0
+    } catch {
+      /* ignore */
+      return 0
+    }
+  })
+  const setBest = useCallback(
+    (v: number) => {
+      setBestState((b) => {
+        const nb = Math.max(b, Math.floor(v))
+        try {
+          window.localStorage.setItem(`pengo-best-${key}`, String(nb))
+        } catch {
+          /* ignore */
+        }
+        return nb
+      })
+    },
+    [key]
+  )
+  return [best, setBest] as const
+}
