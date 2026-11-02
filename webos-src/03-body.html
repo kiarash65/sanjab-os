@@ -1,0 +1,106 @@
+<body>
+
+<!-- ═════════ صفحه بوت ═════════ -->
+<div id="boot" role="status" aria-label="در حال بارگذاری سیستم">
+  <div class="boot-logo">
+    <img src="__LOGO_DATA__" alt="لوگو سانجاب">
+    <div class="boot-title">SanjabOS</div>
+    <div class="boot-sub">وب‌سیستم‌عامل بامزه فارسی</div>
+    <div class="boot-sponsor">✦ با اسپانسری سانجاب ✦</div>
+  </div>
+  <div class="boot-bar"><i id="bootBar"></i></div>
+  <div class="boot-steps" id="bootSteps">booting sanjab-kernel 6.6-squirrel…</div>
+  <div class="boot-ver">SanjabOS v1.0 «سنجاب» — single file • html/css/js • با اسپانسری سانجاب (sunjob.ir)</div>
+</div>
+
+<!-- نقشه نئونی ایران — فقط موقع لود -->
+<div class="iran-neon" id="iranNeon" aria-hidden="true">
+<svg viewBox="0 0 100 86" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="iranGlow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="2.2" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <linearGradient id="iranGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#22d3ee"/><stop offset=".5" stop-color="#a78bfa"/><stop offset="1" stop-color="#f7931e"/>
+    </linearGradient>
+  </defs>
+  <path filter="url(#iranGlow)" fill="rgba(34,211,238,.07)" stroke="url(#iranGrad)" stroke-width="2" stroke-linejoin="round"
+    d="M10 20 L18 14 L26 17 L31 12 L37 15 L42 10 L49 13 L54 9 L60 12 L66 8 L72 11 L77 7 L80 14 L84 20 L89 27 L85 34 L91 42 L87 51 L91 58 L84 63 L78 70 L70 74 L61 79 L53 76 L47 70 L41 73 L35 67 L29 61 L23 55 L18 47 L13 39 L8 31 L7 25 Z"/>
+  <circle cx="46" cy="40" r="2.4" fill="#22d3ee" filter="url(#iranGlow)"/>
+  <circle cx="30" cy="30" r="1.6" fill="#f7931e" filter="url(#iranGlow)"/>
+  <circle cx="62" cy="52" r="1.6" fill="#a78bfa" filter="url(#iranGlow)"/>
+</svg>
+</div>
+
+<!-- ═════════ دسکتاپ ═════════ -->
+<div id="os">
+  <div class="wp" id="wallA" aria-hidden="true"></div>
+  <div class="wp" id="wallB" aria-hidden="true"></div>
+
+  <main id="desk">
+    <div class="desk-icons" id="deskIcons"></div>
+    <!-- پنجره‌ها اینجا تزریق می‌شوند -->
+  </main>
+
+  <!-- سنجاب خانگی -->
+  <div id="pet" title="سنجاب خانگی — برای غذا خوردن کلیک کن">
+    <div class="pet-meter"><i id="petHunger"></i></div>
+    <div class="pet-bubble" id="petBubble">سلام! من سنجاب سانجابم 🐿️</div>
+    <span id="petSvg"></span>
+  </div>
+
+  <!-- ═════════ تسک‌بار ═════════ -->
+  <nav id="taskbar" aria-label="نوار وظیفه">
+    <button class="tb-start" id="btnStart" aria-label="منوی استارت">
+      <img src="__LOGO_DATA__" alt="">
+      <span>استارت</span>
+    </button>
+    <div class="tb-apps" id="tbApps"></div>
+    <div class="tb-tray">
+      <button class="tb-ico" id="tbSticky" title="یادداشت چسبان جدید" aria-label="یادداشت چسبان"></button>
+      <button class="tb-ico" id="tbShuffle" title="والپیپر بعدی (هر ۳۰ ثانیه خودکار عوض می‌شود)" aria-label="والپیپر بعدی"></button>
+      <div class="tb-clock" id="tbClock" role="timer" title="ساعت"></div>
+    </div>
+  </nav>
+
+  <!-- ═════════ استارت‌منو ═════════ -->
+  <div id="startmenu" role="menu">
+    <div class="sm-head">
+      <img src="__LOGO_DATA__" alt="لوگو">
+      <div style="flex:1">
+        <div class="t1">SanjabOS</div>
+        <div class="t2">نسخه ۱.۰ «سنجاب» — با اسپانسری سانجاب</div>
+      </div>
+    </div>
+    <div class="sm-search"><input class="inp" id="smSearch" placeholder="جستجوی برنامه… (مثلاً ترمینال)" aria-label="جستجوی برنامه"></div>
+    <div class="sm-body" id="smBody"></div>
+    <div class="sm-foot">
+      <span class="sm-sponsor">با اسپانسری سانجاب ✦ sunjob.ir</span>
+      <div class="sm-power">
+        <button class="btn sm" id="btnReboot" title="راه‌اندازی مجدد">⟳ راه‌اندازی مجدد</button>
+        <button class="btn sm danger" id="btnShutdown" title="خاموش کردن">⏻ خاموش</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- اعلان‌ها -->
+<div id="toasts" aria-live="polite"></div>
+
+<!-- محافظ صفحه -->
+<div id="screensaver">
+  <span id="ss-logo"></span>
+  <div class="t">SanjabOS — برای برگشت، هر کلیدی را بزن یا حرکت بده</div>
+</div>
+
+<!-- صفحه خاموشی -->
+<div id="poweroff" style="position:fixed;inset:0;z-index:99999;background:var(--dark);display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px">
+  <div style="font-size:52px">🌙</div>
+  <div style="font-size:19px;font-weight:700">سیستم خاموش شد</div>
+  <div class="hint">SanjabOS خوابید… سنجاب‌ها هم باید بخوابند!</div>
+  <button class="btn primary" id="btnPowerOn" style="font-size:15px;padding:12px 26px">⏻ روشن کردن دوباره</button>
+  <div class="boot-sponsor">با اسپانسری سانجاب</div>
+</div>
+
+<script>
