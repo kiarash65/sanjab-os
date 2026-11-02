@@ -306,3 +306,20 @@ body {
     transparent 3px
   );
 }
+
+/* نقشه نئونی ایران — فقط در صفحه لودینگ */
+@keyframes iran-draw {
+  from { stroke-dashoffset: 320; opacity: 0; }
+  to { stroke-dashoffset: 0; opacity: 1; }
+}
+@keyframes iran-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.8); transform-origin: 56px 38px; }
+  50% { opacity: 1; transform: scale(1.5); transform-origin: 56px 38px; }
+}
+.boot-iran-draw {
+  stroke-dasharray: 320;
+  animation: iran-draw 1.4s ease-out forwards;
+}
+.boot-iran-pulse {
+  animation: iran-pulse 1.8s ease-in-out infinite;
+}

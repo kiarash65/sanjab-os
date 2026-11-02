@@ -66,6 +66,14 @@ export const AI_PRESETS: AIPreset[] = [
     model: 'claude-3-5-haiku-latest',
     note: 'کلید از console.anthropic.com',
   },
+  {
+    id: 'glm',
+    label: 'GLM (چی‌پو)',
+    kind: 'openai',
+    baseUrl: 'https://open.bigmodel.cn/api/paas/v4',
+    model: 'glm-4-flash',
+    note: 'کلید از open.bigmodel.cn — مدل‌های چینی قوی و اقتصادی',
+  },
 ]
 
 const AI_STORAGE = 'pengo-ai-cfg-v1'

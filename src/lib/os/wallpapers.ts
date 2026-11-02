@@ -100,6 +100,51 @@ export const WALLPAPERS: Wallpaper[] = [
     name: 'اتاق رترو',
     css: 'url(/wallpapers/retro-terminal.png)',
   },
+  {
+    key: 'grad:cyber',
+    name: 'سایبرپانک نئون',
+    css: 'linear-gradient(135deg, #0f0524 0%, #2d0b5e 35%, #e91e63 75%, #ff6f00 100%)',
+  },
+  {
+    key: 'grad:deepsea',
+    name: 'اقیانوس عمیق',
+    css: 'linear-gradient(145deg, #021024 0%, #052859 45%, #0466c8 85%, #48cae4 100%)',
+  },
+  {
+    key: 'grad:gold',
+    name: 'طلایی پادشاهی',
+    css: 'linear-gradient(135deg, #1a0f02 0%, #5c3a0e 40%, #d4a017 80%, #ffe066 100%)',
+  },
+  {
+    key: 'grad:emerald',
+    name: 'زمرد جنگل',
+    css: 'linear-gradient(145deg, #022c22 0%, #064e3b 40%, #10b981 80%, #6ee7b7 100%)',
+  },
+  {
+    key: 'grad:lavender',
+    name: 'اسطوخودوس',
+    css: 'linear-gradient(135deg, #2e1065 0%, #6d28d9 45%, #c4b5fd 90%, #f5d0fe 100%)',
+  },
+  {
+    key: 'grad:lava',
+    name: 'گدازه آتشفشانی',
+    css: 'linear-gradient(145deg, #1c0a00 0%, #7c2d12 35%, #dc2626 70%, #fbbf24 100%)',
+  },
+  {
+    key: 'grad:icecream',
+    name: 'بستنی نعنایی',
+    css: 'linear-gradient(135deg, #fdf2f8 0%, #fbcfe8 35%, #a7f3d0 75%, #bae6fd 100%)',
+  },
+  {
+    key: 'grad:galaxy',
+    name: 'کهکشان دور',
+    css: 'radial-gradient(ellipse at 30% 20%, #1e1b4b 0%, transparent 50%), radial-gradient(ellipse at 70% 70%, #831843 0%, transparent 50%), linear-gradient(135deg, #030712 0%, #1e1b4b 100%)',
+  },
+  {
+    key: 'grad:cotton',
+    name: 'پنبه رنگی',
+    css: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 25%, #fca5a5 55%, #c4b5fd 85%, #a5f3fc 100%)',
+  },
 ]
 
 export function wallpaperCss(key: string): string {

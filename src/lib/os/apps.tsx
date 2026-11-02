@@ -44,6 +44,7 @@ import {
   Timer,
   Worm,
   Code2,
+  ScanFace,
 } from 'lucide-react'
 import { useOS } from '@/lib/os/store'
 
@@ -78,6 +79,7 @@ import MarkdownApp from '@/components/os/apps/markdown'
 import RegexLabApp from '@/components/os/apps/regex-lab'
 import ColorStudioApp from '@/components/os/apps/color-studio'
 import FlashcardsApp from '@/components/os/apps/flashcards'
+import FaceDetectApp from '@/components/os/apps/face-detect'
 
 import SnakeGame from '@/components/os/games/snake'
 import Game2048 from '@/components/os/games/g2048'
@@ -462,6 +464,18 @@ export const APPS: AppMeta[] = [
     h: 580,
     tint: G.sun,
     keywords: ['flashcard', 'leitner', 'مرور', 'حافظه', 'یادگیری', 'لینوکس'],
+  },
+  {
+    id: 'face-detect',
+    name: 'تشخیص چهره',
+    icon: ScanFace,
+    category: 'app',
+    component: FaceDetectApp,
+    w: 620,
+    h: 580,
+    desktop: true,
+    tint: G.grape,
+    keywords: ['face', 'camera', 'gender', 'age', 'دوربین', 'چهره', 'سن', 'جنسیت', 'تشخیص'],
   },
   // ---------- بازی‌ها ----------
   {

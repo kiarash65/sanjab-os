@@ -1,9 +1,11 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Copy, Star, X } from 'lucide-react'
+import { Bot, Copy, Loader2, Sparkles, Star, X } from 'lucide-react'
 import { useOS } from '@/lib/os/store'
+import { launch } from '@/lib/os/apps'
 import { Button } from '@/components/ui/button'
+import { aiComplete, loadAICfg, type ChatMsg } from '@/lib/os/integrations'
 
 const SUBJECTS = [
   'گربه‌ها',
@@ -69,6 +71,8 @@ export default function IdeaGeneratorApp() {
 
   const [idea, setIdea] = useState<string | null>(null)
   const [popKey, setPopKey] = useState(0)
+  const [aiAnalysis, setAiAnalysis] = useState<string | null>(null)
+  const [analyzing, setAnalyzing] = useState(false)
   const [favorites, setFavorites] = useState<string[]>(() => {
     try {
       const raw = localStorage.getItem(IDEAS_KEY)
@@ -98,6 +102,46 @@ export default function IdeaGeneratorApp() {
     const template = pick(TEMPLATES)
     setIdea(template(pick(SUBJECTS), pick(TECHS), pick(OUTCOMES)))
     setPopKey((k) => k + 1)
+    setAiAnalysis(null)
+  }
+
+  const analyzeWithAI = async () => {
+    if (!idea) return
+    const cfg = loadAICfg()
+    if (!cfg) {
+      pushToast({
+        icon: '🤖',
+        title: 'هوش‌یار وصل نیست',
+        body: 'اول در «هوش‌یار» کلید API بزن، بعد ایده را تحلیل کن!',
+      })
+      launch('ai-chat')
+      return
+    }
+    setAnalyzing(true)
+    setAiAnalysis(null)
+    try {
+      const messages: ChatMsg[] = [
+        {
+          role: 'system',
+          content:
+            'تو یک تحلیل‌گر استارتاپ بامزه و خوش‌بین هستی. کاربر یک ایده عجیب می‌دهد و تو باید در ۳-۴ جمله کوتاه فارسی، آن را طوری تحلیل کنی که هم خنده‌دار باشد و هم کمی جدی. نقاط قوت، چالش‌ها و یک پیشنهاد خنده‌دار بده. از ایموجی استفاده کن.',
+        },
+        {
+          role: 'user',
+          content: `این ایده را تحلیل کن:\n«${idea}»`,
+        },
+      ]
+      const text = await aiComplete(messages, cfg)
+      setAiAnalysis(text)
+    } catch (err) {
+      pushToast({
+        icon: '😬',
+        title: 'تحلیل نشد',
+        body: err instanceof Error ? err.message : 'خطای هوش مصنوعی',
+      })
+    } finally {
+      setAnalyzing(false)
+    }
   }
 
   const takeSeriously = () => {
@@ -178,6 +222,20 @@ export default function IdeaGeneratorApp() {
             </Button>
             {idea && (
               <>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => void analyzeWithAI()}
+                  disabled={analyzing}
+                  className="gap-1.5 bg-gradient-to-l from-[#8b5cf6] to-[#7c3aed] text-white hover:brightness-110"
+                >
+                  {analyzing ? (
+                    <Loader2 className="size-3.5 animate-spin" />
+                  ) : (
+                    <Bot className="size-3.5" />
+                  )}
+                  تحلیل با هوش‌یار
+                </Button>
                 <Button variant="secondary" size="sm" onClick={takeSeriously}>
                   جدی‌ش بگیر 🧐
                 </Button>
@@ -188,6 +246,26 @@ export default function IdeaGeneratorApp() {
               </>
             )}
           </div>
+
+          {/* تحلیل هوش مصنوعی */}
+          {(analyzing || aiAnalysis) && (
+            <div className="rounded-2xl border border-violet-500/30 bg-violet-500/10 p-3">
+              <h3 className="mb-2 flex items-center gap-1.5 text-xs font-bold text-violet-300">
+                <Sparkles className="size-3.5" />
+                تحلیل هوش‌یار
+              </h3>
+              {analyzing ? (
+                <div className="flex items-center gap-2 text-[11px] text-violet-300/70">
+                  <Loader2 className="size-3.5 animate-spin" />
+                  هوش‌یار داره به ایده نگاه می‌کنه…
+                </div>
+              ) : (
+                <p className="whitespace-pre-wrap text-[11px] leading-6 text-violet-100/90">
+                  {aiAnalysis}
+                </p>
+              )}
+            </div>
+          )}
 
           <div className="rounded-2xl border border-white/10 bg-zinc-900/50 p-3">
             <h3 className="mb-2 text-xs font-bold text-zinc-500">⭐ ایده‌های ذخیره‌شده</h3>

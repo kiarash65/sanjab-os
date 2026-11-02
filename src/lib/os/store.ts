@@ -21,6 +21,7 @@ export interface OSSettings {
   accent: string
   funMode: boolean
   sound: boolean
+  wallpaperRotate: boolean
 }
 
 export interface OSToast {
@@ -96,6 +97,7 @@ export const useOS = create<OSStore>()(
         accent: DEFAULT_ACCENT,
         funMode: true,
         sound: true,
+        wallpaperRotate: false,
       },
       toasts: [],
       setBooted: (v) => set({ booted: v, bootAt: v ? Date.now() : 0 }),

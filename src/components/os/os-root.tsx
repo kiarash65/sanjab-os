@@ -225,6 +225,17 @@ export default function OSRoot() {
     return () => window.removeEventListener('keydown', h)
   }, [])
 
+  // چرخش خودکار کاغذدیواری هر ۳۰ ثانیه
+  useEffect(() => {
+    if (!settings.wallpaperRotate) return
+    const iv = setInterval(() => {
+      const idx = WALLPAPERS.findIndex((w) => w.key === settings.wallpaper)
+      const next = WALLPAPERS[(idx + 1 + WALLPAPERS.length) % WALLPAPERS.length]
+      useOS.getState().setSetting('wallpaper', next.key)
+    }, 30000)
+    return () => clearInterval(iv)
+  }, [settings.wallpaperRotate, settings.wallpaper])
+
   if (poweredOff) return <PowerOffScreen />
   if (!booted) return <BootScreen onDone={() => setBooted(true)} />
 

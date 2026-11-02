@@ -294,11 +294,15 @@ function Onboarding({ onConnected }: { onConnected: (cfg: AICfg) => void }) {
         </div>
         <p className="mb-2 text-xs leading-6 text-zinc-400">
           می‌توانی «هوش‌یار» را به <strong className="text-zinc-200">هر سرویس هوش مصنوعی‌ای</strong> که خودت کلیدش را داری وصل کنی:
-          OpenAI، OpenRouter، Groq، DeepSeek یا Claude — فقط کلید و نام مدل را بده.
+          OpenAI، OpenRouter، Groq، DeepSeek، Claude یا GLM (چی‌پو) — فقط کلید و نام مدل را بده.
         </p>
         <p className="mb-3 flex items-start gap-1.5 rounded-lg border border-teal-500/25 bg-teal-500/10 p-2 text-[11px] leading-5 text-teal-300">
           <ShieldCheck className="mt-0.5 size-3.5 shrink-0" />
           کلید فقط در مرورگر خودت ذخیره می‌شود و درخواست مستقیم به سرویس می‌رود.
+        </p>
+        <p className="mb-3 flex items-start gap-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 p-2 text-[11px] leading-5 text-amber-300">
+          <ShieldCheck className="mt-0.5 size-3.5 shrink-0" />
+          این در نسخه نصبی روی سیستم فعال نیست و باید در «هوش‌یار» API key بزنی.
         </p>
         <ConfigForm onConnected={onConnected} />
       </div>

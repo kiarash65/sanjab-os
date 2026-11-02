@@ -32,6 +32,7 @@ export default function SettingsApp() {
     setSetting('accent', '#22c55e')
     setSetting('funMode', true)
     setSetting('sound', true)
+    setSetting('wallpaperRotate', false)
     pushToast({ icon: '♻️', title: 'تنظیمات برگشت', body: 'همه‌چیز مثل روز اول شد، حتی سس' })
   }
 
@@ -40,6 +41,19 @@ export default function SettingsApp() {
       <div className="os-scroll h-full space-y-5 overflow-y-auto p-4">
         <section>
           <h3 className="mb-2 text-xs font-bold text-zinc-500">کاغذدیواری</h3>
+          <div className="mb-2 flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-zinc-900/60 px-3 py-2.5">
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-zinc-100">چرخش خودکار</p>
+              <p className="text-[11px] leading-5 text-zinc-500">
+                هر ۳۰ ثانیه کاغذدیواری عوض می‌شود
+              </p>
+            </div>
+            <Switch
+              checked={settings.wallpaperRotate}
+              onCheckedChange={(v) => setSetting('wallpaperRotate', v)}
+              aria-label="چرخش خودکار کاغذدیواری"
+            />
+          </div>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {WALLPAPERS.map((w) => {
               const active = settings.wallpaper === w.key

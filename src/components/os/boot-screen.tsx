@@ -85,6 +85,40 @@ export default function BootScreen({ onDone }: { onDone: () => void }) {
       className="boot-scanlines fixed inset-0 z-[9999] block cursor-pointer bg-[#0b1120] text-left"
       aria-label="پرش از بوت"
     >
+      {/* نقشه نئونی ایران — گوشه پایین چپ، خیلی کوچک، فقط هنگام لود */}
+      <svg
+        viewBox="0 0 120 100"
+        className="boot-iran-neon pointer-events-none absolute bottom-3 left-3 z-10 h-10 w-12 opacity-90"
+        aria-label="نقشه ایران"
+        role="img"
+      >
+        <defs>
+          <filter id="iranGlow" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur stdDeviation="1.4" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          <linearGradient id="iranStroke" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#22d3ee" />
+            <stop offset="55%" stopColor="#a855f7" />
+            <stop offset="100%" stopColor="#f7931e" />
+          </linearGradient>
+        </defs>
+        {/* پیکسل‌نمای ساده‌شده از پیکره مرز ایران */}
+        <path
+          d="M30 18 L36 14 L44 12 L52 14 L60 12 L68 16 L74 14 L80 18 L84 24 L88 28 L90 34 L86 38 L82 36 L78 40 L74 38 L72 44 L68 48 L64 46 L60 52 L56 50 L54 56 L50 62 L48 68 L44 66 L40 60 L38 54 L34 50 L30 46 L28 40 L26 34 L28 28 Z"
+          fill="none"
+          stroke="url(#iranStroke)"
+          strokeWidth="1.1"
+          strokeLinejoin="round"
+          filter="url(#iranGlow)"
+          className="boot-iran-draw"
+        />
+        {/* قلب ایران */}
+        <circle cx="56" cy="38" r="1.3" fill="#22d3ee" filter="url(#iranGlow)" className="boot-iran-pulse" />
+      </svg>
       <div className="flex h-full w-full flex-col items-center justify-center gap-4 p-6 font-mono">
         <div className="flex items-center gap-4">
           <img

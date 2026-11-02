@@ -102,6 +102,34 @@ const EXAMPLES: Record<Lang, Example[]> = {
       title: 'لیست و دیکشنری',
       code: `# نمره‌های کلاس\nscores = {"علی": 18, "سارا": 20, "پنگوئن": 19.5}\n\nfor name, score in scores.items():\n    print(f"{name}: {score}")\n\nnums = [12, 5, 8, 20, 3]\nprint("بیشترین:", max(nums))\nprint("میانگین:", sum(nums) / len(nums))\nprint("مرتب:", sorted(nums))\n`,
     },
+    {
+      title: 'جدول ضرب',
+      code: `# جدول ضرب ۱۰×۱۰\nfor i in range(1, 11):\n    row = ""\n    for j in range(1, 11):\n        row += str(i * j) + "\\t"\n    print(row)\n`,
+    },
+    {
+      title: 'تابع و پارامتر',
+      code: `# تابع محاسبه مساحت و محیط مستطیل\ndef مستطیل(طول, عرض):\n    مساحت = طول * عرض\n    محیط = 2 * (طول + عرض)\n    return مساحت, محیط\n\nm, p = مستطیل(5, 3)\nprint(f"مساحت: {m}")\nprint(f"محیط: {p}")\n`,
+    },
+    {
+      title: 'while و break',
+      code: `# شمارش معکوس با while\ncount = 5\nwhile count > 0:\n    print(f"تا کم‌شدن: {count}")\n    count = count - 1\n\nprint("صفر! بوم! 🎉")\n`,
+    },
+    {
+      title: 'رشته‌ها و حلقه',
+      code: `# شمارش حروف یک کلمه\nکلمه = "سنجابک"\nfor حرف in کلمه:\n    print(f"حرف: {حرف}")\nprint(f"طول: {len(کلمه)}")\n`,
+    },
+    {
+      title: 'اعداد تصادفی',
+      code: `# پرتاب تاس ۵ بار\nfor i in range(5):\n    r = random()\n    tas = int(r * 6) + 1\n    print(f"پرتاب {i+1}: {tas}")\n`,
+    },
+    {
+      title: 'اعداد اول',
+      code: `# یافتن اعداد اول کوچکتر از ۳۰\nfor n in range(2, 30):\n    is_prime = True\n    for i in range(2, n):\n        if n % i == 0:\n            is_prime = False\n            break\n    if is_prime:\n        print(n, "اول است")\n`,
+    },
+    {
+      title: 'ریاضیات',
+      code: `# توابع ریاضی\nprint("جذر ۱۶:", sqrt(16))\nprint("۲ به توان ۱۰:", pow(2, 10))\nprint("گرد کردن ۳.۱۴۱۵۹:", round(3.14159, 2))\nprint("کف ۳.۹:", floor(3.9))\nprint("سقف ۳.۱:", ceil(3.1))\nprint("قدر مطلق -۷:", abs(-7))\n`,
+    },
   ],
   squirrel: [
     {
@@ -149,6 +177,40 @@ const EXAMPLES: Record<Lang, Example[]> = {
 
 const SAVE_DIR = `${HOME}/پروژه‌ها`
 
+/** راهنمای سریع توابع هر زبان */
+const CHEAT_SHEETS: Record<Lang, { title: string; items: string[] }[]> = {
+  python: [
+    { title: 'چاپ و ورودی', items: ['print("متن")', 'print(f"سلام {name}")'] },
+    { title: 'متغیر و نوع', items: ['x = 10', 'name = "علی"', 'n = int("42")', 's = str(42)'] },
+    { title: 'شرط', items: ['if x > 0:', 'elif x == 0:', 'else:'] },
+    { title: 'حلقه', items: ['for i in range(10):', 'for x in list:', 'while x > 0:', 'break / continue'] },
+    { title: 'تابع', items: ['def add(a, b):', '    return a + b'] },
+    { title: 'لیست', items: ['nums = [1, 2, 3]', 'nums.append(4)', 'len(nums)', 'sorted(nums)', 'sum(nums)', 'max(nums)'] },
+    { title: 'دیکشنری', items: ['d = {"a": 1}', 'd["b"] = 2', 'for k, v in d.items():'] },
+    { title: 'ریاضی', items: ['sqrt(16)', 'pow(2, 10)', 'round(3.14, 2)', 'abs(-7)', 'floor(3.9)', 'ceil(3.1)'] },
+    { title: 'رشته', items: ['len("سلام")', 'str(42)', '"a" + "b"'] },
+  ],
+  squirrel: [
+    { title: 'چاپ', items: ['چاپ("متن")', 'چاپ(f"سلام {نام}")'] },
+    { title: 'شرط', items: ['اگه x > 0:', 'وگرنه x == 0:', 'پس:'] },
+    { title: 'حلقه', items: ['برای i در بازه(10):', 'تاوقتی x > 0:', 'بس‌کن / ادامه‌بده'] },
+    { title: 'تابع', items: ['تابع جمع(آ, ب):', '    برگردون آ + ب'] },
+    { title: 'توابع', items: ['طول(...)', 'بیشترین(...)', 'کمترین(...)', 'جمع(...)', 'مرتب(...)'] },
+  ],
+  js: [
+    { title: 'چاپ', items: ['console.log("متن")', 'console.log(`سلام ${name}`)'] },
+    { title: 'متغیر', items: ['let x = 10', 'const name = "علی"', 'var y = 5'] },
+    { title: 'تابع', items: ['function add(a, b) {', '  return a + b;', '}'] },
+    { title: 'آرایه', items: ['arr.map(x => x*2)', 'arr.filter(x => x>0)', 'arr.forEach(fn)'] },
+    { title: 'کلاس', items: ['class Cat {', '  constructor(n) { this.n = n }', '}'] },
+  ],
+  html: [
+    { title: 'ساختار', items: ['<html>', '<body>', '<h1>', '<p>', '<div>'] },
+    { title: 'استایل', items: ['style="color:red"', 'style="background:#f7931e"'] },
+    { title: 'تعاملی', items: ['onclick="..."', '<button>'] },
+  ],
+}
+
 export default function CodeStudioApp() {
   const [lang, setLang] = useState<Lang>('python')
   const [code, setCode] = useState(EXAMPLES.python[0].code)
@@ -158,6 +220,7 @@ export default function CodeStudioApp() {
   const [running, setRunning] = useState(false)
   const [lastMs, setLastMs] = useState<number | null>(null)
   const [fileName, setFileName] = useState('برنامه_من')
+  const [showCheat, setShowCheat] = useState(false)
 
   const editorRef = useRef<HTMLTextAreaElement>(null)
   const gutterRef = useRef<HTMLDivElement>(null)
@@ -373,6 +436,17 @@ export default function CodeStudioApp() {
             {ex.title}
           </button>
         ))}
+        <button
+          onClick={() => setShowCheat((s) => !s)}
+          className={`flex h-6 items-center gap-1 rounded-md border px-2 text-[10px] font-bold transition active:scale-95 ${
+            showCheat
+              ? 'border-[#f7931e]/60 bg-[#f7931e]/15 text-[#f7931e]'
+              : 'border-white/10 bg-zinc-800/70 text-zinc-400 hover:bg-zinc-700'
+          }`}
+        >
+          <Bug size={11} />
+          راهنمای توابع
+        </button>
         <div className="mr-auto flex items-center gap-1">
           <input
             value={fileName}
@@ -404,6 +478,35 @@ export default function CodeStudioApp() {
           </button>
         </div>
       </div>
+
+      {/* پنل راهنمای سریع */}
+      {showCheat && (
+        <div className="os-scroll max-h-44 shrink-0 overflow-y-auto border-b border-white/10 bg-zinc-900/50 p-2" dir="rtl">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+            {CHEAT_SHEETS[lang].map((cat) => (
+              <div key={cat.title} className="rounded-lg border border-white/5 bg-zinc-950/50 p-2">
+                <p className="mb-1 text-[10px] font-bold text-[#f7931e]">{cat.title}</p>
+                <ul className="space-y-0.5">
+                  {cat.items.map((it, i) => (
+                    <li
+                      key={i}
+                      dir="ltr"
+                      className="cursor-pointer truncate rounded px-1 py-0.5 font-mono text-[9px] text-zinc-400 transition hover:bg-white/5 hover:text-teal-300"
+                      title="کلیک برای درج در ویرایشگر"
+                      onClick={() => {
+                        setCode((c) => c + (c.endsWith('\n') ? '' : '\n') + it + (lang === 'python' || lang === 'squirrel' ? '\n' : ''))
+                        setShowCheat(false)
+                      }}
+                    >
+                      {it}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ویرایشگر */}
       <div className="relative flex min-h-0 flex-1 flex-row-reverse">
