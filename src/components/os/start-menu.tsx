@@ -162,7 +162,13 @@ function StartMenuInner() {
           rel="noreferrer"
           className="flex h-9 shrink-0 items-center justify-center gap-1.5 border-t border-white/10 bg-gradient-to-l from-[#f7931e]/20 via-[#8b5cf6]/15 to-[#0ea5a0]/15 text-[11px] font-black text-amber-200 transition hover:from-[#f7931e]/35 hover:via-[#8b5cf6]/25 hover:to-[#0ea5a0]/25"
         >
-          ⚡ {BRAND.sponsor} — {BRAND.sponsorSite}
+          <img
+            src="/brand/sunjob-logo.webp"
+            alt="لوگوی سان‌جاب"
+            className="h-4 w-4 rounded-sm bg-white object-contain"
+            aria-hidden
+          />
+          {BRAND.sponsor} — {BRAND.sponsorSite}
         </a>
       </div>
     </>

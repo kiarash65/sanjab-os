@@ -6,6 +6,21 @@ export interface Wallpaper {
 
 export const WALLPAPERS: Wallpaper[] = [
   {
+    key: 'img:sunjob-sunrise',
+    name: 'طلوع سان‌جاب (لوگو)',
+    css: 'url(/wallpapers/sanjob-sunrise.png)',
+  },
+  {
+    key: 'img:linux-classroom',
+    name: 'کلاس درس لینوکس',
+    css: 'url(/wallpapers/linux-classroom.png)',
+  },
+  {
+    key: 'img:sunjob-flow',
+    name: 'موج‌های سان‌جابی',
+    css: 'url(/wallpapers/sunjob-flow.png)',
+  },
+  {
     key: 'img:sunjob-squirrel',
     name: 'سنجابک سان‌جابی',
     css: 'url(/wallpapers/sunjob-squirrel.png)',

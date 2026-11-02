@@ -68,9 +68,9 @@ export default function AboutApp() {
         className="mt-4 flex w-full max-w-xs items-center gap-3 overflow-hidden rounded-2xl border border-[#f7931e]/40 bg-gradient-to-l from-[#f7931e]/15 via-[#8b5cf6]/15 to-[#0ea5a0]/15 p-3 text-right transition hover:border-[#f7931e]/70 hover:shadow-lg hover:shadow-[#f7931e]/10"
       >
         <img
-          src="/squirrel-avatar.png"
-          alt="لوگو سان‌جاب"
-          className="h-12 w-12 shrink-0 rounded-xl border border-white/20 object-cover"
+          src="/brand/sunjob-logo.webp"
+          alt="لوگوی رسمی سان‌جاب (sunjob.ir)"
+          className="h-12 w-12 shrink-0 rounded-xl border border-white/20 bg-white object-contain p-0.5"
         />
         <span className="min-w-0 flex-1">
           <span className="flex items-center gap-1 text-sm font-black text-amber-200">
@@ -78,7 +78,7 @@ export default function AboutApp() {
             {BRAND.sponsor}
           </span>
           <span className="mt-0.5 block text-[11px] leading-4 text-zinc-400">
-            پالت رنگی این سیستم هدیهٔ {BRAND.sponsorSite} است — انتخاب رشته و مشاورهٔ تخصصی
+            لوگوی رسمی از {BRAND.sponsorSite} — انتخاب رشته و مشاورهٔ تخصصی
           </span>
         </span>
         <ExternalLink size={14} className="shrink-0 text-zinc-500" aria-hidden />

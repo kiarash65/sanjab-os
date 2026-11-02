@@ -68,9 +68,14 @@ export default function Taskbar() {
         target="_blank"
         rel="noreferrer"
         title="اسپانسیر ما: سان‌جاب — sunjob.ir"
-        className="mr-1 hidden h-7 shrink-0 items-center gap-1 rounded-full border border-[#f7931e]/40 bg-gradient-to-l from-[#f7931e]/20 to-[#8b5cf6]/20 px-2.5 text-[10px] font-black text-amber-200 transition hover:from-[#f7931e]/35 hover:to-[#8b5cf6]/35 lg:flex"
+        className="mr-1 hidden h-7 shrink-0 items-center gap-1.5 rounded-full border border-[#f7931e]/40 bg-gradient-to-l from-[#f7931e]/20 to-[#8b5cf6]/20 px-2.5 text-[10px] font-black text-amber-200 transition hover:from-[#f7931e]/35 hover:to-[#8b5cf6]/35 lg:flex"
       >
-        ⚡ با اسپانسری سان‌جاب
+        <img
+          src="/brand/sunjob-logo.webp"
+          alt="لوگوی سان‌جاب"
+          className="h-4 w-4 rounded-sm bg-white object-contain"
+        />
+        با اسپانسری سان‌جاب
       </a>
       <div className="h-6 w-px shrink-0 bg-white/10" aria-hidden />
       <nav

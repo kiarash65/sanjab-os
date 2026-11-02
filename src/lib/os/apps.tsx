@@ -11,29 +11,37 @@ import {
   Bomb,
   BrickWall,
   Calculator,
+  CalendarDays,
   Cat,
   CircleDot,
   CloudSun,
   Copy,
   Dices,
+  FileCode2,
   FileText,
   FolderOpen,
   Github,
+  GraduationCap,
   Grid3x3,
   Hammer,
   Hash,
   Images,
   Info,
   KeyRound,
+  Layers,
   Lightbulb,
   NotebookPen,
   Palette,
   Presentation,
+  Regex,
   Ruler,
   Settings,
   Sheet,
+  SquareKanban,
   SpellCheck,
   SquareTerminal,
+  SwatchBook,
+  Timer,
   Worm,
   Code2,
 } from 'lucide-react'
@@ -62,6 +70,14 @@ import UnitConverterApp from '@/components/os/apps/unit-converter'
 import PassgenApp from '@/components/os/apps/passgen'
 import WheelApp from '@/components/os/apps/wheel'
 import AboutApp from '@/components/os/apps/about'
+import LinuxAcademyApp from '@/components/os/apps/linux-academy'
+import CalendarApp from '@/components/os/apps/calendar'
+import KanbanApp from '@/components/os/apps/kanban'
+import PomodoroApp from '@/components/os/apps/pomodoro'
+import MarkdownApp from '@/components/os/apps/markdown'
+import RegexLabApp from '@/components/os/apps/regex-lab'
+import ColorStudioApp from '@/components/os/apps/color-studio'
+import FlashcardsApp from '@/components/os/apps/flashcards'
 
 import SnakeGame from '@/components/os/games/snake'
 import Game2048 from '@/components/os/games/g2048'
@@ -108,6 +124,18 @@ const G = {
 
 export const APPS: AppMeta[] = [
   // ---------- اپ‌ها ----------
+  {
+    id: 'linux-academy',
+    name: 'آکادمی لینوکس',
+    icon: GraduationCap,
+    category: 'app',
+    component: LinuxAcademyApp,
+    w: 880,
+    h: 620,
+    desktop: true,
+    tint: G.orange,
+    keywords: ['linux', 'learn', 'آموزش', 'لینوکس', 'آکادمی', 'توزیع', 'نصب', 'آزمون', 'گواهی'],
+  },
   {
     id: 'terminal',
     name: 'ترمینال آموزشی',
@@ -357,6 +385,83 @@ export const APPS: AppMeta[] = [
     h: 470,
     tint: G.amber,
     keywords: ['cat', 'meow'],
+  },
+  {
+    id: 'calendar',
+    name: 'تقویم جلالی',
+    icon: CalendarDays,
+    category: 'app',
+    component: CalendarApp,
+    w: 680,
+    h: 540,
+    tint: G.teal,
+    keywords: ['calendar', 'تقویم', 'جلالی', 'شمسی', 'رویداد', 'نوروز'],
+  },
+  {
+    id: 'kanban',
+    name: 'برد کارها',
+    icon: SquareKanban,
+    category: 'app',
+    component: KanbanApp,
+    w: 680,
+    h: 500,
+    tint: G.violet,
+    keywords: ['kanban', 'task', 'کار', 'تسک', 'برنامه‌ریزی'],
+  },
+  {
+    id: 'pomodoro',
+    name: 'گوشهٔ تمرکز',
+    icon: Timer,
+    category: 'app',
+    component: PomodoroApp,
+    w: 500,
+    h: 560,
+    tint: G.rose,
+    keywords: ['pomodoro', 'focus', 'timer', 'تمرکز', 'پومودورو', 'مطالعه'],
+  },
+  {
+    id: 'markdown',
+    name: 'استودیو مارک‌داون',
+    icon: FileCode2,
+    category: 'app',
+    component: MarkdownApp,
+    w: 800,
+    h: 560,
+    tint: G.forest,
+    keywords: ['markdown', 'md', 'مارک‌داون', 'مستند'],
+  },
+  {
+    id: 'regex-lab',
+    name: 'آزمایشگاه Regex',
+    icon: Regex,
+    category: 'app',
+    component: RegexLabApp,
+    w: 660,
+    h: 540,
+    tint: G.berry,
+    keywords: ['regex', 'pattern', 'الگو', 'عبارت باقاعده'],
+  },
+  {
+    id: 'color-studio',
+    name: 'کارگاه رنگ',
+    icon: SwatchBook,
+    category: 'app',
+    component: ColorStudioApp,
+    w: 580,
+    h: 540,
+    tint: G.pink,
+    keywords: ['color', 'palette', 'رنگ', 'پالت', 'کنتراست'],
+  },
+  {
+    id: 'flashcards',
+    name: 'فلش‌کارت لایتنر',
+    icon: Layers,
+    category: 'app',
+    component: FlashcardsApp,
+    w: 580,
+    h: 580,
+    tint: G.sun,
+    keywords: ['flashcard', 'leitner', 'مرور', 'حافظه', 'یادگیری', 'لینوکس'],
   },
   // ---------- بازی‌ها ----------
   {

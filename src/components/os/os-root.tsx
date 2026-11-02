@@ -245,6 +245,23 @@ export default function OSRoot() {
       <div className="absolute inset-0 bg-black/10" aria-hidden />
       <DesktopIcons />
       <TuxPet />
+      {/* واترمارک اسپانسری — لوگوی رسمی سان‌جاب */}
+      <a
+        href="https://sunjob.ir"
+        target="_blank"
+        rel="noreferrer"
+        className="pengo-fadein pointer-events-auto fixed bottom-14 left-3 z-[100] hidden items-center gap-2 rounded-full border border-white/10 bg-black/35 px-2.5 py-1.5 backdrop-blur-md transition hover:border-[#f7931e]/50 sm:flex"
+        title="اسپانسیر سیستم: سان‌جاب — sunjob.ir"
+      >
+        <img
+          src="/brand/sunjob-logo.webp"
+          alt="لوگوی سان‌جاب"
+          className="h-5 w-5 rounded-sm bg-white object-contain"
+        />
+        <span className="text-[10px] font-bold text-white/70">
+          با اسپانسری سان‌جاب
+        </span>
+      </a>
       {windows.map((w) => {
         const app = getApp(w.appId)
         if (!app) return null

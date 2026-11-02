@@ -25,6 +25,8 @@ const LINES: BootLine[] = [
   { t: 'tutor: terminal lesson engine ready — 14 missions queued', tag: 'ok' },
   { t: 'python-runtime: mini-python 3.11 «سنجابی» loaded (0 MB, جادویی)', tag: 'ok' },
   { t: 'word-processor: نویسا آمادهٔ خروجی Word و PDF', tag: 'ok' },
+  { t: 'linux-academy: آکادمی لینوکس بوت شد — ۸ فصل، ترمینال تعاملی، توزیع‌ها و نصب', tag: 'ok' },
+  { t: 'sanjob-logo: لوگوی رسمی سان‌جاب از sunjob.ir بارگذاری شد', tag: 'ok' },
   { t: 'Random crontab joke scheduled for later', tag: 'ok' },
   { t: 'systemd[1]: Reached target Colorful Cute Interface.', tag: 'ok' },
   { t: `Welcome to ${BRAND.nameEn} ${BRAND.versionEn} — کلیک برای ورود`, tag: 'ok' },
@@ -85,15 +87,20 @@ export default function BootScreen({ onDone }: { onDone: () => void }) {
     >
       <div className="flex h-full w-full flex-col items-center justify-center gap-4 p-6 font-mono">
         <div className="flex items-center gap-4">
+          <img
+            src="/brand/sunjob-logo.webp"
+            alt="لوگوی رسمی سان‌جاب"
+            className="pengo-float h-16 w-16 rounded-2xl border border-white/15 bg-white/95 object-contain p-1 shadow-lg shadow-[#f7931e]/25 sm:h-20 sm:w-20"
+          />
           <pre
-            className="hidden text-[10px] leading-4 text-amber-400/90 sm:block"
+            className="hidden text-[10px] leading-4 text-amber-400/90 lg:block"
             dir="ltr"
             aria-hidden
           >
             {MASCOT}
           </pre>
           <div>
-            <h1 className="text-lg font-black sm:text-xl">
+            <h1 className="text-lg font-black sm:text-xl" dir="ltr">
               <span className="bg-gradient-to-l from-[#f7931e] via-[#fdb56b] to-[#8b5cf6] bg-clip-text text-transparent">
                 {BRAND.nameEn} {BRAND.versionEn}
               </span>
@@ -102,7 +109,13 @@ export default function BootScreen({ onDone }: { onDone: () => void }) {
               {BRAND.name} — وب‌سیستم‌عامل بامزهٔ رنگی
             </p>
             <p className="mt-0.5 inline-flex items-center gap-1 rounded-full border border-[#f7931e]/40 bg-[#f7931e]/10 px-2 py-0.5 text-[10px] font-bold text-amber-300">
-              ⚡ {BRAND.sponsor}
+              <img
+                src="/brand/sunjob-logo.webp"
+                alt=""
+                aria-hidden
+                className="h-3.5 w-3.5 rounded-sm bg-white object-contain"
+              />
+              {BRAND.sponsor}
             </p>
           </div>
         </div>

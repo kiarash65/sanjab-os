@@ -92,7 +92,7 @@ export const useOS = create<OSStore>()(
       iconNonce: 0,
       startOpen: false,
       settings: {
-        wallpaper: 'img:sunjob-squirrel',
+        wallpaper: 'img:sunjob-sunrise',
         accent: DEFAULT_ACCENT,
         funMode: true,
         sound: true,

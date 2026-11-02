@@ -60,6 +60,17 @@ export default function LockScreen() {
       <p className="absolute bottom-6 text-[11px] text-white/40">
         نکته: رمز این قفل، بامزگی توست. که همیشه درست است.
       </p>
+      <div className="absolute bottom-5 left-5 flex items-center gap-2 rounded-full border border-white/10 bg-black/40 px-3 py-1.5">
+        <img
+          src="/brand/sunjob-logo.webp"
+          alt="لوگوی سان‌جاب"
+          className="h-5 w-5 rounded-sm bg-white object-contain"
+          aria-hidden
+        />
+        <span className="text-[10px] font-bold text-white/60">
+          با اسپانسری سان‌جاب
+        </span>
+      </div>
     </div>
   )
 }
