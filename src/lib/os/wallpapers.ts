@@ -90,6 +90,15 @@ export const WALLPAPERS: Wallpaper[] = [
 export function wallpaperCss(key: string): string {
   const found = WALLPAPERS.find((w) => w.key === key)
   if (found) return found.css
+  // نقاشی خود کاربر از اپ نقاشی: کلید «custom» + dataURL در localStorage
+  if (key === 'custom' && typeof window !== 'undefined') {
+    try {
+      const data = window.localStorage.getItem('pengo-custom-wallpaper')
+      if (data) return `url("${data}")`
+    } catch {
+      /* ignore */
+    }
+  }
   // عکس دلخواه (مثلاً از گالری): کلید «custom:/photos/x.png»
   if (key.startsWith('custom:')) return `url("${key.slice(7)}")`
   return WALLPAPERS[0].css

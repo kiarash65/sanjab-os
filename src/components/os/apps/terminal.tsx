@@ -9,7 +9,7 @@ import {
   type FormEvent,
   type KeyboardEvent as ReactKeyboardEvent,
 } from 'react'
-import { CornerDownLeft, GraduationCap, Sparkles, X, Zap } from 'lucide-react'
+import { CornerDownLeft, GraduationCap, History, List, Sparkles, X, Zap } from 'lucide-react'
 import { useOS } from '@/lib/os/store'
 import { APPS, getApp, launch } from '@/lib/os/apps'
 import { WALLPAPERS } from '@/lib/os/wallpapers'
@@ -24,9 +24,10 @@ import {
   type FsDir,
   type FsNode,
 } from '@/lib/os/fs'
+import { aiComplete, hasAICfg, loadAICfg } from '@/lib/os/integrations'
 
 /* ------------------------------------------------------------------ */
-/* پنگوئن‌شل ۳.۰ — ترمینال آموزشی با تصحیح غلط تایپی                  */
+/* پنگوئن‌شل ۴.۰ — پایپ، زنجیره، متغیرها، فیلترها و ۲۸ ماموریت آموزشی  */
 /* ------------------------------------------------------------------ */
 
 type LineType = 'in' | 'out' | 'ok' | 'err' | 'warn' | 'sys' | 'dim'
@@ -81,6 +82,45 @@ const MAN: Record<string, { u: string; d: string }> = {
   kill: { u: 'kill شمارهPID', d: 'یک پروسه را می‌بندد. اول با ps شماره‌اش را پیدا کن.' },
   sudo: { u: 'sudo دستور', d: 'اجرا با دسترسی مدیر. (superuser do) با پنگوئن‌ها مهربان باش.' },
   apt: { u: 'apt install بسته', d: 'نصب بسته (خیالی). خب یه چیزی که نباشه!' },
+  /* ---------- نسخه ۴.۰: متن و فیلتر ---------- */
+  sort: { u: 'sort فایل', d: 'خط‌ها را مرتب می‌کند. با پایپ هم کار می‌کند: ls | sort' },
+  uniq: { u: 'uniq فایل', d: 'خط‌های تکراری کنار هم را حذف می‌کند. معمولاً بعد از sort می‌آید.' },
+  diff: { u: 'diff فایل۱ فایل۲', d: 'تفاوت دو فایل را با < و > نشان می‌دهد.' },
+  cut: { u: 'cut -d، -f۲ فایل', d: 'ستون مشخصی از هر خط را با جداکننده برمی‌دارد.' },
+  tr: { u: 'tr قدیم جدید', d: 'حرف‌ها را در ورودیِ پایپ جایگزین می‌کند: cat فایل | tr ا ی' },
+  sed: { u: 'sed s/قدیم/جدید/ [فایل]', d: 'جایگزینی متن. با پایپ هم کار می‌کند: cat فایل | sed s/سلام/درود/' },
+  rev: { u: 'rev فایل', d: 'هر خط را برعکس می‌کند. برای پیام‌های رمزی عالی است!' },
+  bc: { u: 'bc عبارت', d: 'ماشین‌حساب ترمینال: bc (2+3)*4' },
+  expr: { u: 'expr 2 + 2', d: 'محاسبه سبک قدیمی با فاصله بین عملگرها.' },
+  seq: { u: 'seq 1 10', d: 'دنباله عدد چاپ می‌کند.' },
+  cal: { u: 'cal [ماه سال]', d: 'تقویم ماه را رسم می‌کند. مثل سال نو، ولی خشک و بی‌مزه.' },
+  /* ---------- نسخه ۴.۰: سیستم ---------- */
+  chmod: { u: 'chmod +x فایل | chmod 755 فایل', d: 'دسترسی اجرا می‌دهد. بعدش با ./فایل اجرایش کن!' },
+  id: { u: 'id', d: 'کاربر و گروه‌های تو با شماره‌های UID/GID.' },
+  ln: { u: 'ln -s هدف نام‌پیوند', d: 'یک پیوند نمادین به فایل یا پوشه می‌سازد.' },
+  du: { u: 'du [مسیر]', d: 'حجم اشغالی مسیر را تخمین می‌زند.' },
+  which: { u: 'which دستور', d: 'می‌گوید دستور کجای سیستم ساکن است — یا alias است.' },
+  file: { u: 'file فایل', d: 'نوع واقعی فایل را حدس می‌زند. جادویی ولی خوانا.' },
+  stat: { u: 'stat فایل', d: 'مشخصات کامل فایل: نوع، حجم، دسترسی.' },
+  less: { u: 'less فایل', d: 'مثل cat ولی با ادعای صفحه‌بندی. اینجا همه‌چیز جا می‌شود.' },
+  alias: { u: 'alias اسم="دستور"', d: 'میان‌بر شخصی می‌سازد و برای همیشه یادش می‌ماند. مثال: alias ماهی="echo یومی!"' },
+  unalias: { u: 'unalias اسم', d: 'اسم مستعار را فراموش می‌کند.' },
+  export: { u: 'export NAME=value', d: 'متغیر محیطی می‌سازد. بعداً با echo $NAME صدایش کن.' },
+  top: { u: 'top', d: 'پروسه‌های فعال با مصرف CPU. مثل htop ولی ثابت و بی‌استرس.' },
+  jobs: { u: 'jobs', d: 'کارهای معلق در پس‌زمینه.' },
+  systemctl: { u: 'systemctl status سرویس', d: 'وضعیت سرویس‌های (خیالی) سیستم را می‌گوید.' },
+  journalctl: { u: 'journalctl', d: 'لاگ‌های اخیر هسته را نشان می‌دهد.' },
+  crontab: { u: 'crontab', d: 'برنامه زمانی کارها. ما همSchedule داریم!' },
+  tar: { u: 'tar czf بسته.tar.gz فایل‌ها', d: 'بسته‌بندی (خیالی). سرعتش بی‌نظیره چون هیچی منتقل نمی‌شود.' },
+  zip: { u: 'zip بسته.zip فایل', d: 'زیپ کردن (خیالی).' },
+  wget: { u: 'wget آدرس', d: 'دانلود با نوار پیشرفت. فایل‌ها به بُعد خیالی منتقل می‌شوند.' },
+  ssh: { u: 'ssh user@host', d: 'اتصال به ماشین دیگر… البته اینجا مرورگریم، ولی تلاش‌مان را می‌کنیم.' },
+  ip: { u: 'ip a', d: 'کارت‌های شبکه و آدرس‌ها. آدرس‌مان خیلی بامزه است.' },
+  nano: { u: 'nano فایل', d: 'ویرایشگر ساده. اینجا به «نویسا» راهنمایی‌ات می‌کند.' },
+  vim: { u: 'vim فایل', d: 'ویرایشگر افسانه‌ای. برای خروج: :q! — موفق باشی.' },
+  sleep: { u: 'sleep ثانیه', d: 'مکث. حداکثر ۵ ثانیه، چون بیشترش بی‌ادبیه.' },
+  env: { u: 'env', d: 'متغیرهای محیطی فعلی.' },
+  ai: { u: 'ai', d: 'اپ «هوش‌یار» را باز می‌کند تا کلید API خودت را وصل کنی.' },
 }
 
 const MAN_KEYS = Object.keys(MAN)
@@ -110,6 +150,23 @@ const MISSIONS: Mission[] = [
   { id: 'm12', title: 'جاروبرقی', brief: 'مار_کوچولو.txt را با rm پاک کن.', hint: 'بنویس: rm مزرعه/مار_کوچولو.txt', match: /^\s*rm\s+(['"]?)(~\/)?مزرعه\/مار_کوچولو\.txt\1\s*$/ },
   { id: 'm13', title: 'جنگل‌نگار', brief: 'کل درخت خانه‌ات را با tree ببین.', hint: 'بنویس: tree', match: /^\s*tree(\s+(~|\/home\/pengo))?\s*$/ },
   { id: 'm14', title: 'مدرک‌خوان', brief: 'راهنمای دستور ls را با man بخوان — همیشه راهنما بخوان!', hint: 'بنویس: man ls', match: /^\s*man\s+ls\s*$/ },
+  /* ---------- فصل ۳: جستجو و متن ---------- */
+  { id: 'm15', title: 'جستجوگر', brief: 'دنبال هر چیزی که اسمش «راز» است بگرد: find راز', hint: 'بنویس: find راز', match: /^\s*find\s+(['"]?)راز\1\s*$/ },
+  { id: 'm16', title: 'شکارچی کلمه', brief: 'توی «رازها.txt» دنبال کلمه «رمز» بگرد: grep رمز رازها.txt', hint: 'grep الگو فایل', match: /^\s*grep\s+(['"]?)رمز\1\s+(['"]?)رازها\.txt\2\s*$/ },
+  { id: 'm17', title: 'لوله‌کش', brief: 'اولین پایپ زندگی‌ات: cat رازها.txt | grep رمز', hint: 'خروجی cat می‌رود داخل grep — با |', match: /^\s*cat\s+\S+\s*\|\s*grep\s+\S+\s*$/ },
+  { id: 'm18', title: 'شمارنده', brief: 'بنویس: ls | wc — ببین چند چیز در خانه داری.', hint: 'پایپ به wc', match: /^\s*ls(\s+-[a-zA-Z]+)?\s*\|\s*wc\s*$/ },
+  { id: 'm19', title: 'مرتب‌ساز', brief: 'برنامه امروزت را مرتب کن: sort برنامه_امروز.txt', hint: 'بنویس: sort برنامه_امروز.txt', match: /^\s*sort\s+(['"]?)برنامه_امروز\.txt\1\s*$/ },
+  { id: 'm20', title: 'یکتاساز', brief: 'تکراری‌ها را حذف کن: sort رازها.txt | uniq', hint: 'ترکیب کلاسیک: sort بعد uniq', match: /^\s*sort\s+\S+\s*\|\s*uniq\s*$/ },
+  /* ---------- فصل ۴: پوستهٔ حرفه‌ای ---------- */
+  { id: 'm21', title: 'میان‌برساز', brief: 'یک اسم مستعار بساز: alias fish="echo یومی!"', hint: 'alias اسم="دستور" — اسم لاتین', match: /^\s*alias\s+\w+\s*=/ },
+  { id: 'm22', title: 'متغیرساز', brief: 'متغیر بساز و چاپ کن: export NAME=Pengo بعد echo $NAME', hint: 'اول export، بعد echo $NAME', match: /^\s*echo\s+\$[A-Za-z_]/ },
+  { id: 'm23', title: 'کلیدساز', brief: 'به اسکریپت اجازه اجرا بده: chmod +x پروژه‌ها/hello.sh', hint: '+x یعنی executable', match: /^\s*chmod\s+(\+x|[1-7]{3})\s+(['"]?)(~\/)?پروژه‌ها\/hello\.sh\2\s*$/ },
+  { id: 'm24', title: 'پروسه‌یاب', brief: 'ببین چه پروسه‌هایی باز است: ps', hint: 'هر پنجره یک پروسه', match: /^\s*ps\s*$/ },
+  { id: 'm25', title: 'خوابانندهٔ مهربان', brief: 'یکی از پروسه‌ها را با kill و PIDاش ببند (اول ps بزن).', hint: 'kill شماره', match: /^\s*kill\s+\d+\s*$/ },
+  /* ---------- فصل ۵: سیستم و دستیار ---------- */
+  { id: 'm26', title: 'نصاب', brief: 'یک بسته بامزه نصب کن: apt install فندق', hint: 'apt install نام', match: /^\s*apt(-get)?\s+install\s+\S+\s*$/ },
+  { id: 'm27', title: 'تاریخ‌نگار', brief: 'تاریخچه دستورهایت را ببین: history', hint: 'همه‌چیز ثبت شده...', match: /^\s*history\s*$/ },
+  { id: 'm28', title: 'پرسشگر نهایی', brief: 'از دستیار هوشمند بپرس: ask بهترین دستور لینوکس چیست؟', hint: 'ask سوال', match: /^\s*ask\s+.+\s*$/ },
 ]
 
 const LEVELS: [number, string][] = [
@@ -117,7 +174,9 @@ const LEVELS: [number, string][] = [
   [40, 'گشت‌گذر ترمینال'],
   [80, 'شکارچی مسیرها'],
   [120, 'افسر شل'],
-  [140, 'استاد ترمینال'],
+  [160, 'سردار پایپ'],
+  [200, 'استاد ترمینال'],
+  [240, 'افسانهٔ ترمینال'],
 ]
 
 const levelOf = (xp: number): string => {
@@ -125,6 +184,27 @@ const levelOf = (xp: number): string => {
   for (const [thr, n] of LEVELS) if (xp >= thr) name = n
   return name
 }
+
+/* فصل‌های دورهٔ آموزش ترمینال */
+const CHAPTERS: { title: string; ids: string[] }[] = [
+  { title: 'فصل ۱ — قدم‌های اول', ids: ['m1', 'm2', 'm3', 'm4', 'm5'] },
+  {
+    title: 'فصل ۲ — فایل‌بازی',
+    ids: ['m6', 'm7', 'm8', 'm9', 'm10', 'm11', 'm12', 'm13', 'm14'],
+  },
+  {
+    title: 'فصل ۳ — جستجو و متن',
+    ids: ['m15', 'm16', 'm17', 'm18', 'm19', 'm20'],
+  },
+  {
+    title: 'فصل ۴ — پوستهٔ حرفه‌ای',
+    ids: ['m21', 'm22', 'm23', 'm24', 'm25'],
+  },
+  {
+    title: 'فصل ۵ — سیستم و دستیار',
+    ids: ['m26', 'm27', 'm28'],
+  },
+]
 
 interface TutorState {
   xp: number
@@ -183,6 +263,54 @@ const saveFixMap = (m: Record<string, string>) => {
     /* ignore */
   }
 }
+
+const loadMap = (key: string): Record<string, string> => {
+  try {
+    return JSON.parse(localStorage.getItem(key) ?? '{}') as Record<string, string>
+  } catch {
+    return {}
+  }
+}
+
+const saveMap = (key: string, m: Record<string, string>) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(m))
+  } catch {
+    /* ignore */
+  }
+}
+
+const ENV_DEFAULTS: Record<string, string> = {
+  USER: 'pengo',
+  HOME: '/home/pengo',
+  SHELL: '/bin/pengo-sh',
+  MOOD: 'happy',
+  AUTOCORRECT: 'enabled',
+  SPONSOR: 'sunjob.ir',
+}
+
+/* حالت پایپ — وقتی silent است خروجی به‌جای صفحه در بافر می‌رود */
+const PIPE: { stdin: string[] | null; out: string[]; silent: boolean } = {
+  stdin: null,
+  out: [],
+  silent: false,
+}
+
+/* چیپ‌های دستور سریع زیر خروجی */
+const QUICK_CMDS: { cmd: string; label: string }[] = [
+  { cmd: 'learn start', label: 'درس بعدی' },
+  { cmd: 'ls -la', label: 'لیست کامل' },
+  { cmd: 'tree', label: 'درخت' },
+  { cmd: 'cat خوش‌آمد.txt', label: 'بخوان' },
+  { cmd: 'cat رازها.txt | grep رمز', label: 'پایپ!' },
+  { cmd: 'ls | wc', label: 'بشمار' },
+  { cmd: 'export NAME=Pengo', label: 'متغیر' },
+  { cmd: 'echo $NAME', label: 'چاپش' },
+  { cmd: 'chmod +x پروژه‌ها/hello.sh', label: 'اجراکی' },
+  { cmd: 'cal', label: 'تقویم' },
+  { cmd: 'neofetch', label: 'مشخصات' },
+  { cmd: 'ai', label: 'هوش‌یار' },
+]
 
 /* ---------------------- فاصله لاونشتاین ---------------------- */
 
@@ -293,6 +421,35 @@ function banner(text: string): string {
   return rows.join('\n')
 }
 
+/* --------------------------- تقویم --------------------------- */
+
+function calGrid(month?: number, year?: number): string {
+  const now = new Date()
+  const m = month && month >= 1 && month <= 12 ? month - 1 : now.getMonth()
+  const y = year && year > 1900 ? year : now.getFullYear()
+  const first = new Date(y, m, 1)
+  const days = new Date(y, m + 1, 0).getDate()
+  const names = [
+    'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE',
+    'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER',
+  ]
+  const head = `${names[m] ?? 'MONTH'} ${y}`
+  const lines: string[] = [
+    head.padStart(Math.floor((20 + head.length) / 2)).padEnd(20),
+    'Su Mo Tu We Th Fr Sa',
+  ]
+  let row = '   '.repeat(first.getDay())
+  for (let d = 1; d <= days; d++) {
+    row += String(d).padStart(2) + ' '
+    if ((first.getDay() + d) % 7 === 0) {
+      lines.push(row.trimEnd())
+      row = ''
+    }
+  }
+  if (row.trim()) lines.push(row.trimEnd())
+  return lines.join('\n')
+}
+
 /* --------------------------- هنر --------------------------- */
 
 const TUX_ART = String.raw`
@@ -356,9 +513,9 @@ interface PendingFix {
 
 export default function TerminalApp() {
   const [lines, setLines] = useState<Line[]>(() => [
-    mkLine('sys', 'پنگوئن‌شل ۳.۰ — ترمینال آموزشی. به باشگاه خوش اومدی!'),
-    mkLine('dim', 'راهنمای سریع: help | learn start | ask سوال | man ls'),
-    mkLine('dim', 'نکته: غلط تایپی بزنی، خودش اصلاحش پیشنهاد می‌دهد. امتحان کن: lss'),
+    mkLine('sys', 'پنگوئن‌شل ۴.۰ — حالا با پایپ | ، زنجیره && و ; ، متغیرها و ۲۸ ماموریت!'),
+    mkLine('dim', 'شروع: learn start  |  سوالی؟: ask سوال  |  راهنما: help'),
+    mkLine('dim', 'غلط تایپی بزنی اصلاحش می‌کنم. امتحان کن: lss — و Ctrl+R برای جستجو در تاریخچه'),
   ])
   const [cwd, setCwd] = useState<string>(HOME)
   const [input, setInput] = useState('')
@@ -371,6 +528,16 @@ export default function TerminalApp() {
     typeof window === 'undefined' ? { xp: 0, done: [], active: null } : loadTutor()
   )
   const fixMapRef = useRef<Record<string, string>>(loadFixMap())
+  const aliasRef = useRef<Record<string, string>>({
+    ...ALIASES,
+    ...loadMap('pengo-alias-v1'),
+  })
+  const envRef = useRef<Record<string, string>>({
+    ...ENV_DEFAULTS,
+    ...loadMap('pengo-env-v1'),
+  })
+  const [revSearch, setRevSearch] = useState<string | null>(null)
+  const [showChips, setShowChips] = useState(false)
   const tutorRef = useRef<TutorState>(tutor)
   const scrollRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -386,12 +553,31 @@ export default function TerminalApp() {
   }, [lines, pendingFix])
 
   const push = useCallback((type: LineType, text: string) => {
+    if (PIPE.silent) {
+      PIPE.out.push(...text.split('\n'))
+      return
+    }
     setLines((ls) => [...ls, mkLine(type, text)])
   }, [])
 
   const pushMany = useCallback((type: LineType, text: string) => {
+    if (PIPE.silent) {
+      PIPE.out.push(...text.split('\n'))
+      return
+    }
     setLines((ls) => [...ls, ...text.split('\n').map((t) => mkLine(type, t))])
   }, [])
+
+  /* توسعهٔ متغیرهای محیطی: $NAME */
+  const expandEnv = (s: string): string =>
+    s.replace(/\$([A-Za-z_]\w*)/g, (_all, n: string) => envRef.current[n] ?? '')
+
+  /* جستجوی معکوس تاریخچه (Ctrl+R) */
+  const revMatch = useMemo<string | null>(() => {
+    if (revSearch === null) return null
+    const q = revSearch.toLowerCase()
+    return history.find((h) => h.toLowerCase().includes(q)) ?? null
+  }, [revSearch, history])
 
   /* ----------------------- ماتریکس ----------------------- */
   useEffect(() => {
@@ -500,12 +686,12 @@ export default function TerminalApp() {
       )
       push(
         'ok',
-        'آفرین استاد! هر ۱۴ ماموریت را کامل کردی. از این به بعد ترمینال، خانه دومت است.'
+        'آفرین استاد! هر ۲۸ ماموریت را کامل کردی. از این به بعد ترمینال، خانه دومت است.'
       )
       useOS.getState().pushToast({
         icon: GraduationCap,
         title: 'استاد ترمینال شدی!',
-        body: 'هر ۱۴ ماموریت کامل شد. هسته به تو افتخار می‌کند.',
+        body: 'هر ۲۸ ماموریت کامل شد. هسته به تو افتخار می‌کند.',
       })
     } else {
       push('dim', `ماموریت بعدی: «${next.title}» — ${next.brief}`)
@@ -513,24 +699,81 @@ export default function TerminalApp() {
   }
 
   /* ------------------- موتور دستورات ------------------- */
-  const execute = (rawInput: string) => {
+
+  /** خط‌های ورودی را از فایل یا پایپ می‌خواند */
+  const readInputLines = (
+    fileArg: string | undefined
+  ): { lines: string[]; label: string } | null => {
+    if (fileArg) {
+      const node = getNode(useFs.getState().fs, normalizePath(cwd, fileArg))
+      if (!node || node.type !== 'file') {
+        push('err', `فایل «${fileArg}» پیدا نشد`)
+        return null
+      }
+      return { lines: node.content.split('\n'), label: fileArg }
+    }
+    if (PIPE.stdin) return { lines: PIPE.stdin, label: '(پایپ)' }
+    push('err', 'ورودی ندارم! یا اسم فایل بده یا با پایپ بفرست: cat فایل | دستور')
+    return null
+  }
+
+  /** اجرای زنجیرهٔ پایپ: خروجی هر حلقه ورودی بعدی می‌شود */
+  const runPipeline = (raw: string) => {
+    const segs = raw
+      .split('|')
+      .map((s) => s.trim())
+      .filter(Boolean)
+    if (segs.length < 2) {
+      push('err', 'پایپ ناقص — بین دو دستور | بگذار: ls | wc')
+      return
+    }
+    let stdin: string[] | null = null
+    for (let i = 0; i < segs.length; i++) {
+      PIPE.stdin = stdin
+      PIPE.silent = i < segs.length - 1
+      PIPE.out = []
+      execute(segs[i], true)
+      stdin = PIPE.out.slice()
+    }
+    PIPE.silent = false
+    PIPE.stdin = null
+    PIPE.out = []
+  }
+
+  const execute = (rawInput: string, nested = false) => {
     const raw = rawInput.trim()
-    setPendingFix(null)
     if (!raw) return
-    commitHistory(raw)
+    if (!nested) {
+      setPendingFix(null)
+      commitHistory(raw)
+
+      // prompt echo
+      setLines((ls) => [...ls, mkLine('in', raw)])
+
+      // زنجیرهٔ پایپ
+      if (raw.includes('|')) {
+        runPipeline(raw)
+        checkMission(raw)
+        return
+      }
+      // زنجیرهٔ && و ;
+      if (raw.includes('&&') || raw.includes(';')) {
+        raw
+          .split(/&&|;/)
+          .map((p) => p.trim())
+          .filter(Boolean)
+          .forEach((p) => execute(p, true))
+        checkMission(raw)
+        return
+      }
+    }
 
     const fs = useFs.getState()
     const os = useOS.getState()
 
-    // prompt echo
-    setLines((ls) => [
-      ...ls,
-      mkLine('in', raw),
-    ])
-
     // alias
     const firstWord = raw.split(/\s+/)[0]
-    const aliased = ALIASES[firstWord]
+    const aliased = aliasRef.current[firstWord]
     const cmdline = aliased ? aliased + raw.slice(firstWord.length) : raw
 
     const parts = cmdline.split(/\s+/)
@@ -550,13 +793,15 @@ export default function TerminalApp() {
       return
     }
 
-    // echo با ریدایرکت
+    // echo با ریدایرکت و توسعهٔ متغیرها
     if (base === 'echo') {
       const gtIdx = args.findIndex((a) => a === '>' || a === '>>')
       if (gtIdx === -1) {
-        push('out', argStr.replace(/^["']|["']$/g, ''))
+        push('out', expandEnv(argStr.replace(/^["']|["']$/g, '')))
       } else {
-        const text = args.slice(0, gtIdx).join(' ').replace(/^["']|["']$/g, '')
+        const text = expandEnv(
+          args.slice(0, gtIdx).join(' ').replace(/^["']|["']$/g, '')
+        )
         const target = normalizePath(cwd, args[gtIdx + 1] ?? '')
         const append = args[gtIdx] === '>>'
         if (!target || target === '/') {
@@ -576,17 +821,19 @@ export default function TerminalApp() {
       case 'help': {
         push('sys', 'دستورها — با «man دستور» جزئیات بگیر:')
         const groups: [string, string[]][] = [
-          ['آموزش', ['learn', 'ask', 'man', 'help']],
-          ['فایل‌ها', ['ls', 'cd', 'pwd', 'cat', 'mkdir', 'touch', 'echo', 'rm', 'cp', 'mv', 'tree', 'find', 'grep', 'head', 'tail', 'wc']],
-          ['سیستم', ['whoami', 'uname', 'date', 'uptime', 'ps', 'kill', 'df', 'free', 'env', 'history', 'clear', 'exit']],
-          ['سرگرمی', ['neofetch', 'cowsay', 'fortune', 'banner', 'matrix', 'sl', 'coffee', 'tux', 'sunjob', 'python', 'ping', 'curl', 'wallpaper', 'lock']],
+          ['آموزش', ['learn', 'ask', 'ai', 'man', 'help']],
+          ['فایل‌ها', ['ls', 'cd', 'pwd', 'cat', 'mkdir', 'touch', 'echo', 'rm', 'cp', 'mv', 'tree', 'find', 'ln', 'du', 'stat', 'file']],
+          ['متن و فیلتر', ['grep', 'sort', 'uniq', 'diff', 'cut', 'tr', 'sed', 'rev', 'wc', 'head', 'tail', 'bc', 'expr', 'seq', 'cal']],
+          ['سیستم', ['chmod', 'id', 'whoami', 'uname', 'date', 'uptime', 'ps', 'top', 'kill', 'jobs', 'df', 'free', 'env', 'export', 'alias', 'unalias', 'which', 'systemctl', 'journalctl', 'crontab', 'history', 'clear', 'exit']],
+          ['سرگرمی', ['neofetch', 'cowsay', 'fortune', 'banner', 'matrix', 'sl', 'coffee', 'tux', 'sunjob', 'python', 'ping', 'curl', 'wget', 'ssh', 'ip', 'tar', 'zip', 'nano', 'vim', 'sleep', 'less', 'wallpaper', 'lock']],
           ['گراف', ['open', 'apps', 'sudo', 'apt']],
         ]
         for (const [g, cmds] of groups) {
           push('dim', `— ${g}:`)
           push('out', '  ' + cmds.map((c) => (MAN[c] ? c : c)).join('  '))
         }
-        push('dim', 'نکته: Tab تکمیل می‌کند، فلش بالا تاریخچه، Ctrl+L پاک می‌کند.')
+        push('dim', 'پایپ | و زنجیره && و ; هم کار می‌کنند! مثال: cat رازها.txt | grep رمز')
+        push('dim', 'نکته: Tab تکمیل می‌کند، فلش بالا تاریخچه، Ctrl+R جستجو، Ctrl+L پاک می‌کند.')
         break
       }
       case 'learn': {
@@ -608,13 +855,24 @@ export default function TerminalApp() {
               'dim',
               `امتیاز: ${tutor.xp} — سطح: ${levelOf(tutor.xp)}`
             )
+        } else if (sub === 'list') {
+          push('sys', `نقشهٔ ماموریت‌ها — ${tutor.done.length}/${MISSIONS.length} کامل شده:`)
+          for (const ch of CHAPTERS) {
+            push('warn', `📚 ${ch.title}`)
+            for (const id of ch.ids) {
+              const m = MISSIONS.find((x) => x.id === id)
+              if (!m) continue
+              const ok = tutor.done.includes(id)
+              push(ok ? 'ok' : 'dim', `  ${ok ? '✔' : '▫'} ${m.title} — ${m.brief}`)
+            }
+          }
         } else if (sub === 'reset') {
           const nt: TutorState = { xp: 0, done: [], active: null }
           setTutor(nt)
           saveTutor(nt)
           push('warn', 'پیشرفت آموزش ریست شد. دوباره از m1 شروع کن: learn start')
         } else {
-          push('err', 'کاربردها: learn start | learn status | learn reset')
+          push('err', 'کاربردها: learn start | learn list | learn status | learn reset')
         }
         break
       }
@@ -642,6 +900,32 @@ export default function TerminalApp() {
         }
         setBusy(true)
         push('dim', 'پنگوئن‌بات دارد فکر می‌کند…')
+        // نسخه محلی: با کلید هوش مصنوعی خود کاربر (وقتی سرور در دسترس نیست)
+        const localBrain = async (): Promise<void> => {
+          const cfg = loadAICfg()
+          if (!cfg) {
+            push('err', 'سرور مغز در دسترس نیست و تو هم کلید هوش‌یار نداری.')
+            push('dim', 'دو راه: بعداً دوباره بپرس، یا در اپ «هوش‌یار» کلید API خودت را وصل کن (open ai).')
+            return
+          }
+          try {
+            const answer = await aiComplete(
+              [
+                {
+                  role: 'system',
+                  content:
+                    'تو پنگوئن‌بات هستی، دستیار آموزش ترمینال در سیستم‌عامل بامزه سان‌جاب‌او‌اس. فارسی، صمیمی و کوتاه (حداکثر ۹۰ کلمه) جواب بده؛ دستورها را در خط جدا با مثال بده و فقط دستورهای ساده لینوکس را آموزش بده. خانه کاربر /home/pengo است و پوشه‌های عکس‌ها، سندها، موسیقی و پروژه‌ها دارد. بدون ایموجی.',
+                },
+                { role: 'user', content: q },
+              ],
+              cfg
+            )
+            pushMany('out', answer.trim())
+            push('dim', '(با کلید هوش مصنوعی خودت جواب گرفتی — چه حرفه‌ای!)')
+          } catch (e) {
+            push('err', e instanceof Error ? e.message : 'کلید هوش‌یار جواب نداد')
+          }
+        }
         fetch('/api/tutor', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -653,9 +937,7 @@ export default function TerminalApp() {
             if (!data.answer) throw new Error('empty')
             pushMany('out', data.answer.trim())
           })
-          .catch(() => {
-            push('err', 'ارتباط با سرور مغز قطع شد. بعداً دوباره بپرس.')
-          })
+          .catch(() => localBrain())
           .finally(() => setBusy(false))
         break
       }
@@ -905,19 +1187,14 @@ export default function TerminalApp() {
         break
       }
       case 'grep': {
-        if (args.length < 2) {
-          push('err', 'کاربرد: grep الگو فایل')
+        const pattern = (args[0] ?? '').replace(/^["']|["']$/g, '')
+        if (!pattern) {
+          push('err', 'کاربرد: grep الگو [فایل] — یا: cat فایل | grep الگو')
           break
         }
-        const pattern = args[0].replace(/^["']|["']$/g, '')
-        const p = normalizePath(cwd, args[1])
-        const node = getNode(fs.fs, p)
-        if (!node || node.type !== 'file') {
-          push('err', `فایل «${args[1]}» پیدا نشد`)
-          break
-        }
-        const matches = node.content
-          .split('\n')
+        const src = readInputLines(args[1])
+        if (!src) break
+        const matches = src.lines
           .map((l, i) => ({ l, i }))
           .filter(({ l }) => l.toLowerCase().includes(pattern.toLowerCase()))
         if (!matches.length) push('dim', 'هیچ خطی جور نشد')
@@ -927,18 +1204,14 @@ export default function TerminalApp() {
       case 'head':
       case 'tail': {
         const nIdx = args.indexOf('-n')
-        const count = nIdx !== -1 ? parseInt(args[nIdx + 1] ?? '10', 10) : 10
-        const file = args.filter((a, i) => a !== '-n' && i !== nIdx + 1 && !a.startsWith('-'))[0]
-        if (!file) {
-          push('err', `کاربرد: ${base} [-n تعداد] فایل`)
-          break
-        }
-        const node = getNode(fs.fs, normalizePath(cwd, file))
-        if (!node || node.type !== 'file') {
-          push('err', `فایل «${file}» پیدا نشد`)
-          break
-        }
-        const all = node.content.split('\n')
+        const count =
+          nIdx !== -1 ? parseInt(args[nIdx + 1] ?? '10', 10) || 10 : 10
+        const file = args.filter(
+          (a, i) => a !== '-n' && i !== nIdx + 1 && !a.startsWith('-')
+        )[0]
+        const src = readInputLines(file)
+        if (!src) break
+        const all = src.lines
         const slice =
           base === 'head' ? all.slice(0, count) : all.slice(-count)
         slice.forEach((l) => push('out', l))
@@ -946,18 +1219,11 @@ export default function TerminalApp() {
       }
       case 'wc': {
         const file = args.filter((a) => !a.startsWith('-'))[0]
-        if (!file) {
-          push('err', 'کاربرد: wc فایل')
-          break
-        }
-        const node = getNode(fs.fs, normalizePath(cwd, file))
-        if (!node || node.type !== 'file') {
-          push('err', `فایل «${file}» پیدا نشد`)
-          break
-        }
-        const l = node.content.split('\n').length
-        const w = node.content.split(/\s+/).filter(Boolean).length
-        push('out', `${l} خط، ${w} کلمه، ${node.content.length} حرف`)
+        const src = readInputLines(file)
+        if (!src) break
+        const text = src.lines.join('\n')
+        const w = text.split(/\s+/).filter(Boolean).length
+        push('out', `${src.lines.length} خط، ${w} کلمه، ${text.length} حرف`)
         break
       }
 
@@ -1008,15 +1274,13 @@ export default function TerminalApp() {
           'بافر بامزگی: 8Mi        7Mi        1Mi',
         ].join('\n'))
         break
-      case 'env':
-        pushMany('out', [
-          'SHELL=/bin/pengo-sh',
-          'USER=pengo',
-          'HOME=/home/pengo',
-          'MOOD=happy',
-          'AUTOCORRECT=enabled',
-        ].join('\n'))
+      case 'env': {
+        Object.entries(envRef.current).forEach(([k, v]) =>
+          push('out', `${k}=${v}`)
+        )
+        push('dim', 'متغیر بساز: export NAME=value — بعد echo $NAME')
         break
+      }
       case 'history':
         history.forEach((h, i) => push('out', `${String(i + 1).padStart(3)}  ${h}`))
         break
@@ -1113,8 +1377,9 @@ export default function TerminalApp() {
           `Uptime:  ${mins} دقیقه`,
           `Windows: ${os.windows.length} پنجره باز`,
           `Theme:   ${os.settings.accent} (پالت سان‌جاب)`,
+          `AI:      ${hasAICfg() ? 'هوش‌یار وصل است (کلید خودت)' : 'هوش‌یار بی‌کلید — با open ai وصلش کن'}`,
           `Sponsor: sunjob.ir — با اسپانسری سان‌جاب`,
-          `XP:      ${tutor.xp} (${levelOf(tutor.xp)})`,
+          `XP:      ${tutor.xp} (${levelOf(tutor.xp)}) — ${tutor.done.length}/${MISSIONS.length} ماموریت`,
           `Sponsor: sunjob.ir — با اسپانسری سان‌جاب`,
           `Memory:  12MiB / 64MiB (عمدتاً میم)`,
         ]
@@ -1240,6 +1505,439 @@ export default function TerminalApp() {
         break
       }
 
+      /* ---------------- متن و فیلتر (۴.۰) ---------------- */
+      case 'sort': {
+        const src = readInputLines(args.filter((a) => !a.startsWith('-'))[0])
+        if (!src) break
+        const sorted = [...src.lines].sort((a, b) => a.localeCompare(b, 'fa'))
+        sorted.forEach((l) => push('out', l))
+        break
+      }
+      case 'uniq': {
+        const src = readInputLines(args[0])
+        if (!src) break
+        let prev: string | null = null
+        for (const l of src.lines) {
+          if (l !== prev) push('out', l)
+          prev = l
+        }
+        break
+      }
+      case 'diff': {
+        if (args.length < 2) {
+          push('err', 'کاربرد: diff فایل۱ فایل۲')
+          break
+        }
+        const a = getNode(fs.fs, normalizePath(cwd, args[0]))
+        const b = getNode(fs.fs, normalizePath(cwd, args[1]))
+        if (!a || !b || a.type !== 'file' || b.type !== 'file') {
+          push('err', 'دو فایل معتبر بده')
+          break
+        }
+        const la = a.content.split('\n')
+        const lb = b.content.split('\n')
+        const n = Math.max(la.length, lb.length)
+        let changes = 0
+        for (let i = 0; i < n; i++) {
+          const x = la[i] ?? ''
+          const y = lb[i] ?? ''
+          if (x !== y) {
+            changes++
+            if (x) push('err', `< ${x}`)
+            if (y) push('ok', `> ${y}`)
+          }
+        }
+        push('dim', changes === 0 ? 'دو فایل یکسان‌اند — دوقلو!' : `${changes} تفاوت پیدا شد`)
+        break
+      }
+      case 'cut': {
+        const dIdx = args.indexOf('-d')
+        const fIdx = args.indexOf('-f')
+        const delim = dIdx !== -1 ? (args[dIdx + 1] ?? ',') : ','
+        const field = fIdx !== -1 ? parseInt(args[fIdx + 1] ?? '1', 10) || 1 : 1
+        const file = args.filter(
+          (a, i) => !a.startsWith('-') && i !== dIdx + 1 && i !== fIdx + 1
+        )[0]
+        const src = readInputLines(file)
+        if (!src) break
+        src.lines.forEach((l) => push('out', l.split(delim)[field - 1] ?? ''))
+        break
+      }
+      case 'tr': {
+        if (args.length < 2) {
+          push('err', 'کاربرد: tr قدیم جدید (با پایپ): cat فایل | tr ا ی')
+          break
+        }
+        const src = readInputLines(undefined)
+        if (!src) break
+        const from = [...args[0]]
+        const to = [...args[1]]
+        src.lines.forEach((l) => {
+          let out = ''
+          for (const ch of l) {
+            const idx = from.indexOf(ch)
+            out += idx !== -1 ? (to[Math.min(idx, to.length - 1)] ?? ch) : ch
+          }
+          push('out', out)
+        })
+        break
+      }
+      case 'sed': {
+        const m = (args[0] ?? '').match(/^s(.)(.+?)\1(.*?)\1([gi]*)$/)
+        if (!m) {
+          push('err', 'کاربرد: sed s/قدیم/جدید/ [فایل] — یا با پایپ')
+          break
+        }
+        const from = m[2]
+        const to = m[3]
+        const flags = m[4] ?? ''
+        const src = readInputLines(args[1])
+        if (!src) break
+        let re: RegExp
+        try {
+          re = new RegExp(
+            from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+            flags.includes('g') ? 'g' : ''
+          )
+        } catch {
+          push('err', 'الگو خراب است')
+          break
+        }
+        src.lines.forEach((l) => push('out', l.replace(re, to)))
+        break
+      }
+      case 'rev': {
+        const src = readInputLines(args[0])
+        if (!src) break
+        src.lines.forEach((l) => push('out', [...l].reverse().join('')))
+        break
+      }
+      case 'bc': {
+        const exprStr = argStr.replace(/\s+/g, '')
+        if (!exprStr) {
+          push('err', 'مثال: bc (2+3)*4')
+          break
+        }
+        if (!/^[\d+\-*/().%^]+$/.test(exprStr)) {
+          push('err', 'فقط عدد و عملگر قبول است — ریاضی، نه شعبده‌بازی!')
+          break
+        }
+        try {
+          const val = Function(`"use strict";return (${exprStr.replace(/\^/g, '**')})`)() as number
+          push('ok', String(val))
+        } catch {
+          push('err', 'عبارت خراب است')
+        }
+        break
+      }
+      case 'expr': {
+        if (args.length < 3) {
+          push('err', 'کاربرد: expr 2 + 2 (با فاصله!)')
+          break
+        }
+        const nx = Number(args[0])
+        const ny = Number(args[2])
+        if (!Number.isFinite(nx) || !Number.isFinite(ny)) {
+          push('err', 'عدد بده دیگه')
+          break
+        }
+        const op = args[1]
+        const r =
+          op === '+' ? nx + ny :
+          op === '-' ? nx - ny :
+          op === '*' || op === 'x' ? nx * ny :
+          op === '/' ? nx / ny :
+          op === '%' ? nx % ny : null
+        if (r === null) {
+          push('err', `عملگر «${op}» را نمی‌شناسم`)
+          break
+        }
+        push('ok', String(r))
+        break
+      }
+      case 'seq': {
+        const a = Number(args[0] ?? 1)
+        const b = Number(args[1] ?? args[0] ?? 5)
+        if (!Number.isFinite(a) || !Number.isFinite(b)) {
+          push('err', 'مثال: seq 1 5')
+          break
+        }
+        const [start, end] = args.length < 2 ? [1, a] : [a, b]
+        for (let i = start; i <= end && i - start < 200; i++) push('out', String(i))
+        break
+      }
+      case 'cal': {
+        const mth = args[0] ? parseInt(args[0], 10) : undefined
+        const yr = args[1] ? parseInt(args[1], 10) : undefined
+        pushMany('out', calGrid(Number.isFinite(mth) ? mth : undefined, Number.isFinite(yr) ? yr : undefined))
+        break
+      }
+
+      /* ---------------- سیستم ۴.۰ ---------------- */
+      case 'chmod': {
+        if (!args[0] || !args[1]) {
+          push('err', 'کاربرد: chmod +x فایل یا chmod 755 فایل')
+          break
+        }
+        const p = normalizePath(cwd, args[1])
+        const node = getNode(fs.fs, p)
+        if (!node || node.type !== 'file') {
+          push('err', `فایل «${args[1]}» پیدا نشد`)
+          break
+        }
+        const grant = args[0] === '+x' || /^[75][1-7][1-7]$/.test(args[0])
+        if (fs.chmod(p, grant)) {
+          push(
+            'ok',
+            grant
+              ? `«${baseName(p)}» حالا قابل اجراست! امتحان کن: ./${baseName(p)}`
+              : 'دسترسی اجرا گرفته شد (برگشت به حالت معمولی)'
+          )
+        } else push('err', 'تغییر دسترسی ممکن نشد')
+        break
+      }
+      case 'id':
+        push('out', 'uid=1000(pengo) gid=1000(pengo) groups=1000(pengo),27(sudo),150(بامزگی)')
+        break
+      case 'groups':
+        push('out', 'pengo sudo بامزگی')
+        break
+      case 'ln': {
+        const real = args.filter((a) => !a.startsWith('-'))
+        if (real.length < 2) {
+          push('err', 'کاربرد: ln -s هدف نام‌پیوند')
+          break
+        }
+        const target = normalizePath(cwd, real[0])
+        const linkPath = normalizePath(cwd, real[1])
+        if (!getNode(fs.fs, target)) {
+          push('err', `هدف «${real[0]}» نیست و نبود`)
+          break
+        }
+        if (fs.writeFile(linkPath, `پیوند به ${target}\n`))
+          push('ok', `پیوند «${baseName(linkPath)}» ساخته شد → ${prettyPath(target)}`)
+        else push('err', 'پیوند ساخته نشد')
+        break
+      }
+      case 'du': {
+        const root = args[0] ? normalizePath(cwd, args[0]) : cwd
+        const node = getNode(fs.fs, root)
+        if (!node) {
+          push('err', 'مسیر پیدا نشد')
+          break
+        }
+        const sizeOf = (nd: FsNode): number =>
+          nd.type === 'file'
+            ? Math.max(1, Math.round((nd.content.length || 8) / 102.4) / 10)
+            : Object.values(nd.children).reduce((s, c) => s + sizeOf(c), 4)
+        push('out', `${sizeOf(node).toFixed(1)}K\t${prettyPath(root)}`)
+        break
+      }
+      case 'which': {
+        const c = args[0]
+        if (!c) {
+          push('err', 'کدام دستور؟')
+          break
+        }
+        if (aliasRef.current[c]) push('ok', `${c}: alias به «${aliasRef.current[c]}»`)
+        else if (MAN[c] || ALL_COMMANDS.includes(c)) push('out', `/bin/${c}`)
+        else {
+          push('err', `«${c}» هیچ‌جا نیست`)
+          const sugg = didYouMean(c)
+          if (sugg) push('dim', `شاید «${sugg}»؟`)
+        }
+        break
+      }
+      case 'file': {
+        if (!args[0]) {
+          push('err', 'اسم فایل بده')
+          break
+        }
+        const node = getNode(fs.fs, normalizePath(cwd, args[0]))
+        if (!node) {
+          push('err', 'پیدا نشد')
+          break
+        }
+        if (node.type === 'dir') push('out', `${args[0]}: directory — پوشه`)
+        else if (node.kind === 'exe') push('out', `${args[0]}: ELF بامزه ۶۴-بیتی، قابل اجرا`)
+        else if (node.kind === 'img') push('out', `${args[0]}: image — عکس`)
+        else if (node.kind === 'audio') push('out', `${args[0]}: audio — صدا`)
+        else if (node.kind === 'pdf') push('out', `${args[0]}: PDF document`)
+        else push('out', `${args[0]}: ASCII text — متن ساده`)
+        break
+      }
+      case 'stat': {
+        if (!args[0]) {
+          push('err', 'فایل بده: stat فایل')
+          break
+        }
+        const node = getNode(fs.fs, normalizePath(cwd, args[0]))
+        if (!node) {
+          push('err', 'پیدا نشد')
+          break
+        }
+        push('out', `  File: ${args[0]}`)
+        push('out', `  Type: ${node.type === 'dir' ? 'directory' : node.kind === 'exe' ? 'executable' : node.kind}`)
+        push('out', `  Size: ${node.type === 'file' ? node.content.length : 4096} بایت`)
+        push('out', 'Access: (0644/-rw-r--r--)  Uid: 1000(pengo)')
+        break
+      }
+      case 'less':
+      case 'more': {
+        push('dim', 'اینجا همه‌چیز جا می‌شود؛ مثل cat رفتار می‌کنم:')
+        if (!args[0]) {
+          push('err', 'فایل بده')
+          break
+        }
+        const node = getNode(fs.fs, normalizePath(cwd, args[0]))
+        if (node && node.type === 'file' && node.kind !== 'img') pushMany('out', node.content)
+        else push('err', 'فایل متنی بده')
+        break
+      }
+      case 'alias': {
+        if (!args[0]) {
+          push('sys', 'اسم‌های مستعار فعال:')
+          Object.entries(aliasRef.current).forEach(([k, v]) =>
+            push('out', `  ${k}='${v}'`)
+          )
+          push('dim', 'بساز با: alias fish="echo یومی!" — برای همیشه یادم می‌ماند')
+          break
+        }
+        const m = argStr.match(/^(\w+)\s*=\s*["']?(.+?)["']?$/)
+        if (!m) {
+          push('err', 'مثال: alias fish="echo یومی!" (اسم لاتین)')
+          break
+        }
+        aliasRef.current[m[1]] = m[2]
+        saveMap('pengo-alias-v1', aliasRef.current)
+        push('ok', `از این به بعد «${m[1]}» یعنی: ${m[2]}`)
+        break
+      }
+      case 'unalias': {
+        if (!args[0]) {
+          push('err', 'کدام alias؟')
+          break
+        }
+        if (aliasRef.current[args[0]]) {
+          delete aliasRef.current[args[0]]
+          saveMap('pengo-alias-v1', aliasRef.current)
+          push('ok', `«${args[0]}» از یادم رفت`)
+        } else push('err', 'چنین aliasای ندارم')
+        break
+      }
+      case 'export': {
+        const m = argStr.match(/^([A-Za-z_]\w*)\s*=\s*(.*)$/)
+        if (!m) {
+          push('err', 'مثال: export NAME=Pengo')
+          break
+        }
+        envRef.current[m[1]] = m[2].replace(/^["']|["']$/g, '')
+        saveMap('pengo-env-v1', envRef.current)
+        push('ok', `${m[1]}=${envRef.current[m[1]]} — حالا با echo $${m[1]} صدایش کن`)
+        break
+      }
+      case 'top': {
+        push('sys', 'top — سان‌جاب‌او‌اس (بامزه‌ترین پروسه‌ها اول)')
+        push('out', '  PID  CPU%  پروسه')
+        if (os.windows.length === 0) push('dim', '(سیستم آروم و خواب‌آلود)')
+        os.windows.forEach((w, i) => {
+          push('out', `${String(pidOf(w.id)).padStart(5)}  ${String(3 + ((i * 7) % 23)).padStart(3)}%  ${w.title}${w.minimized ? ' (خوابیده)' : ''}`)
+        })
+        push('dim', 'نکته: این top ثابت است؛ اینجا هیچ‌چیز اذیت نمی‌کند.')
+        break
+      }
+      case 'jobs':
+        push(
+          'out',
+          os.windows.some((w) => w.minimized)
+            ? 'چند پروسه خوابیده در پس‌زمینه (کمینه‌شده)'
+            : 'بدون کار معلق — سیستم سرحال است'
+        )
+        break
+      case 'systemctl': {
+        const sub2 = args[0] ?? 'status'
+        const unit = args[1] ?? 'fun.service'
+        if (sub2 === 'status') {
+          push('sys', `● ${unit} — فعال و سرحال`)
+          push('out', '   Loaded: loaded (/lib/systemd/system/بامزگی.service)')
+          push('out', '   Active: active (running) از لحظه بوت')
+        } else if (sub2 === 'restart' || sub2 === 'stop' || sub2 === 'start') {
+          push('ok', `${unit} ${sub2 === 'stop' ? 'خوابانده شد' : 'راه افتاد'} — یونیت‌های ما هرگز واقعاً نمی‌میرند`)
+        } else push('err', 'مثال: systemctl status fun.service')
+        break
+      }
+      case 'journalctl': {
+        const log = getNode(fs.fs, '/var/log/kernel.log')
+        push('sys', '-- لاگ‌های اخیر هسته --')
+        if (log && log.type === 'file') pushMany('out', log.content)
+        else push('dim', 'لاگ خالی — سیستم خیلی آرام است')
+        break
+      }
+      case 'crontab':
+        push('out', '# برنامه زمانی بامزه')
+        push('out', '0 9 * * *    یادآوری آب خوردن')
+        push('out', '30 22 * * *  حال دلی نرم (خواب)')
+        push('out', '*/5 * * * *  یک فندق برای سنجابک')
+        break
+      case 'tar':
+      case 'zip': {
+        setBusy(true)
+        push('out', `در حال ${base === 'zip' ? 'زیپ' : 'تار'} کردن ${args.filter((a) => !a.startsWith('-'))[0] ?? 'همه‌چیز'}…`)
+        setTimeout(() => {
+          push('ok', 'بسته شد! (خیالی بود — اینجا دیسک سخت نداریم، قلب‌مان را داریم)')
+          setBusy(false)
+        }, 800)
+        break
+      }
+      case 'wget': {
+        const f = args[0] ?? 'فندق.zip'
+        setBusy(true)
+        push('out', `در حال دانلود ${f} …`)
+        setTimeout(() => push('out', '▕░░░░░░░░░░▏ ۱۰٪'), 250)
+        setTimeout(() => push('out', '▕▓▓▓▓▓░░░░▏ ۵۰٪'), 550)
+        setTimeout(() => {
+          push('ok', `«${f}» دانلود شد — ۱۰۰٪ (به گوشه‌ای خیالی از حافظه)`)
+          setBusy(false)
+        }, 900)
+        break
+      }
+      case 'ssh':
+        push('dim', `ssh ${args[0] ?? 'pengo@penguin.os'} …`)
+        push('err', 'اتصال رد شد: اینجا مرورگر است، پورت ۲۲ نداریم! ولی به شبکه پنگوئنی خوش آمدی.')
+        break
+      case 'ip':
+      case 'ifconfig':
+        push('out', 'lo0:   127.0.0.1     — خانه، شیرین خانه')
+        push('out', 'en0:   42.42.42.42   — تونل کوانتومی پنگوئنی (فعال)')
+        push('out', 'tux0:  10.0.cute.1   — کارت شبکه بامزگی')
+        break
+      case 'nano':
+      case 'vim':
+      case 'emacs': {
+        push(
+          'warn',
+          base === 'vim'
+            ? 'به vim خوش آمدی! برای خروج: :q! — موفق باشی، ۹۰٪ کاربران همین‌جا گم می‌شوند.'
+            : `${base} اینجا نصب نیست — ولی «نویسا» داریم که خیلی مهربان‌تر است!`
+        )
+        setTimeout(() => launch('writer'), 700)
+        break
+      }
+      case 'sleep': {
+        const n = Math.min(5, Number(args[0] ?? 1) || 1)
+        setBusy(true)
+        push('dim', `zzz… ${n} ثانیه`)
+        setTimeout(() => {
+          push('ok', 'بیدار! خواب خوبی بود')
+          setBusy(false)
+        }, n * 1000)
+        break
+      }
+      case 'ai':
+        push('ok', 'هوش‌یار باز شد — کلید API خودت را آنجا وصل کن!')
+        launch('ai-chat')
+        break
+
       /* ---------------- پیش‌فرض: غلط تایپی ---------------- */
       default: {
         const m = didYouMean(base, fixMapRef.current[base] ? [fixMapRef.current[base]] : [])
@@ -1250,7 +1948,7 @@ export default function TerminalApp() {
             ? m + cmdline.slice(base.length)
             : null
         if (fixedFull) {
-          setPendingFix({ from: base, fixed: fixedFull })
+          if (!nested) setPendingFix({ from: base, fixed: fixedFull })
           push('err', `پنگوئن‌شل: دستور «${base}» را نمی‌شناسم`)
           push('dim', `اما گمان می‌کنم منظورت «${fixedFull}» بود — Enter بزن تا اجرایش کنم، یا از نوار بالا استفاده کن.`)
         } else {
@@ -1304,6 +2002,33 @@ export default function TerminalApp() {
   }
 
   const onKeyDown = (e: ReactKeyboardEvent<HTMLInputElement>) => {
+    /* جستجوی معکوس تاریخچه (Ctrl+R) */
+    if (revSearch !== null) {
+      e.preventDefault()
+      if (e.key === 'Escape') {
+        setRevSearch(null)
+      } else if (e.key === 'Enter') {
+        if (revMatch) {
+          const cmd = revMatch
+          setRevSearch(null)
+          setInput(cmd)
+          execute(cmd)
+          setInput('')
+        } else {
+          setRevSearch(null)
+        }
+      } else if (e.key === 'Backspace') {
+        setRevSearch(revSearch.slice(0, -1))
+      } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        setRevSearch(revSearch + e.key)
+      }
+      return
+    }
+    if (e.ctrlKey && e.key.toLowerCase() === 'r') {
+      e.preventDefault()
+      setRevSearch('')
+      return
+    }
     if (e.ctrlKey && e.key.toLowerCase() === 'l') {
       e.preventDefault()
       setLines([])
@@ -1381,7 +2106,7 @@ export default function TerminalApp() {
         className="flex shrink-0 items-center gap-2 border-b border-white/10 bg-zinc-900/80 px-3 py-1 text-[10px] text-zinc-400"
         dir="ltr"
       >
-        <span className="font-black text-[var(--pengo-accent)]">pengo-sh 3.0</span>
+        <span className="font-black text-[var(--pengo-accent)]">pengo-sh 4.0</span>
         <span className="hidden truncate sm:inline">{prettyPath(cwd)}</span>
         <div className="flex-1" />
         <span
@@ -1391,6 +2116,24 @@ export default function TerminalApp() {
           <Zap size={10} className="text-amber-300" aria-hidden />
           {tutor.xp} XP — {levelOf(tutor.xp)}
         </span>
+        <button
+          onClick={() => setRevSearch('')}
+          className="hidden items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2 py-0.5 transition hover:bg-white/15 sm:flex"
+          title="جستجو در تاریخچه (Ctrl+R)"
+          aria-label="جستجو در تاریخچه"
+        >
+          <History size={10} aria-hidden />
+          جستجو
+        </button>
+        <button
+          onClick={() => setShowChips((v) => !v)}
+          className="flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2 py-0.5 transition hover:bg-white/15"
+          title="نوار دستورهای سریع"
+          aria-expanded={showChips}
+        >
+          <List size={10} aria-hidden />
+          سریع
+        </button>
         <span className="hidden md:inline">help | learn start</span>
       </div>
 
@@ -1421,6 +2164,44 @@ export default function TerminalApp() {
           )
         )}
       </div>
+
+      {/* جستجوی معکوس تاریخچه */}
+      {revSearch !== null && (
+        <div
+          className="flex shrink-0 items-center gap-2 border-t border-violet-400/20 bg-violet-500/10 px-3 py-1.5 text-[11px]"
+          dir="ltr"
+        >
+          <span className="font-black text-violet-300">reverse-i-search</span>
+          <code className="rounded bg-black/50 px-1.5 py-0.5 text-violet-100">
+            `{revSearch}`
+          </code>
+          <span className={`min-w-0 flex-1 truncate ${revMatch ? 'text-zinc-200' : 'text-rose-300'}`}>
+            {revMatch ?? 'پیدا نشد'}
+          </span>
+          <span className="hidden text-zinc-500 sm:inline">Enter=اجرا — Esc=خروج</span>
+        </div>
+      )}
+
+      {/* نوار دستورهای سریع */}
+      {showChips && (
+        <div className="flex shrink-0 flex-wrap gap-1 border-t border-white/10 bg-zinc-900/70 px-3 py-1.5">
+          {QUICK_CMDS.map((c) => (
+            <button
+              key={c.cmd}
+              type="button"
+              onClick={() => {
+                setInput(c.cmd)
+                inputRef.current?.focus()
+              }}
+              className="rounded-lg border border-white/10 bg-white/5 px-2 py-0.5 font-mono text-[10px] text-zinc-300 transition hover:border-emerald-400/40 hover:text-emerald-300 active:scale-95"
+              dir="ltr"
+            >
+              {c.cmd}
+              <span className="ms-1.5 font-sans text-[9px] text-zinc-500">{c.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* نوار پیشنهاد اصلاح غلط */}
       {activeFix && (

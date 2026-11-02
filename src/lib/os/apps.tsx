@@ -7,6 +7,7 @@ import {
   AlarmClock,
   AudioLines,
   Bird,
+  Bot,
   Bomb,
   BrickWall,
   Calculator,
@@ -17,6 +18,7 @@ import {
   Dices,
   FileText,
   FolderOpen,
+  Github,
   Grid3x3,
   Hammer,
   Hash,
@@ -26,8 +28,10 @@ import {
   Lightbulb,
   NotebookPen,
   Palette,
+  Presentation,
   Ruler,
   Settings,
+  Sheet,
   SpellCheck,
   SquareTerminal,
   Worm,
@@ -50,6 +54,10 @@ import CatTranslatorApp from '@/components/os/apps/cat-translator'
 import PhotosApp from '@/components/os/apps/photos'
 import WriterApp from '@/components/os/apps/writer'
 import CodeStudioApp from '@/components/os/apps/code-studio'
+import SpreadsheetApp from '@/components/os/apps/spreadsheet'
+import SlidesApp from '@/components/os/apps/slides'
+import AIChatApp from '@/components/os/apps/ai-chat'
+import GitHubApp from '@/components/os/apps/github'
 import UnitConverterApp from '@/components/os/apps/unit-converter'
 import PassgenApp from '@/components/os/apps/passgen'
 import WheelApp from '@/components/os/apps/wheel'
@@ -135,6 +143,51 @@ export const APPS: AppMeta[] = [
     desktop: true,
     tint: G.forest,
     keywords: ['python', 'code', 'js', 'سنجابی', 'برنامه‌نویسی', 'پایتون'],
+  },
+  {
+    id: 'ai-chat',
+    name: 'هوش‌یار (AI)',
+    icon: Bot,
+    category: 'app',
+    component: AIChatApp,
+    w: 740,
+    h: 540,
+    desktop: true,
+    tint: G.grape,
+    keywords: ['ai', 'chat', 'gpt', 'claude', 'llm', 'هوش', 'چت', 'ربات', 'مصنوعی'],
+  },
+  {
+    id: 'github',
+    name: 'گیت‌هاب',
+    icon: Github,
+    category: 'app',
+    component: GitHubApp,
+    w: 780,
+    h: 560,
+    tint: 'from-zinc-400 to-zinc-600',
+    keywords: ['github', 'git', 'repo', 'token', 'ریپو', 'توکن'],
+  },
+  {
+    id: 'spreadsheet',
+    name: 'صفحه‌گسترده',
+    icon: Sheet,
+    category: 'app',
+    component: SpreadsheetApp,
+    w: 800,
+    h: 560,
+    tint: G.lime,
+    keywords: ['excel', 'xlsx', 'csv', 'اکسل', 'جدول', 'فرمول'],
+  },
+  {
+    id: 'slides',
+    name: 'اسلایدساز',
+    icon: Presentation,
+    category: 'app',
+    component: SlidesApp,
+    w: 800,
+    h: 560,
+    tint: G.rose,
+    keywords: ['powerpoint', 'ppt', 'اسلاید', 'ارائه', 'سمینار'],
   },
   {
     id: 'file-manager',

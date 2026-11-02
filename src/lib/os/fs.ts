@@ -298,6 +298,7 @@ interface FsStore {
   remove: (path: string) => boolean
   copy: (src: string, dst: string) => boolean
   move: (src: string, dst: string) => boolean
+  chmod: (path: string, exe: boolean) => boolean
   resetFs: () => void
 }
 
@@ -373,6 +374,16 @@ export const useFs = create<FsStore>()(
         const st = get()
         if (!st.copy(src, dst)) return false
         return st.remove(src)
+      },
+      chmod: (path, exe) => {
+        const node = getNode(get().fs, path)
+        if (!node || node.type !== 'file') return false
+        const next = clone(get().fs)
+        const target = getNode(next, path)
+        if (!target || target.type !== 'file') return false
+        target.kind = exe ? 'exe' : 'txt'
+        set({ fs: next })
+        return true
       },
       resetFs: () => set({ fs: makeInitialFs() }),
     }),
