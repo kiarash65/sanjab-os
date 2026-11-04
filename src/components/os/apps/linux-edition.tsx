@@ -16,6 +16,7 @@ import {
   Zap,
 } from 'lucide-react'
 import { useOS } from '@/lib/os/store'
+import { launch } from '@/lib/os/apps'
 
 const REPO = 'https://github.com/kiarash65/sanjab-os'
 const RAW =
@@ -170,6 +171,13 @@ export default function LinuxEditionApp() {
             <HardDrive size={10} aria-hidden /> Debian · Arch · Docker · Kiosk
           </span>
         </div>
+        <button
+          onClick={() => launch('real-linux')}
+          className="mt-2.5 flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-emerald-400/40 bg-emerald-400/10 text-xs font-black text-emerald-300 transition hover:bg-emerald-400/20 active:scale-[0.98]"
+        >
+          <Zap size={14} aria-hidden />
+          همین الان کرنل واقعی را در همین مرورگر بوت کن — بدون نصب!
+        </button>
       </div>
 
       {/* بدنه */}

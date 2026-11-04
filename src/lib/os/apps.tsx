@@ -82,6 +82,7 @@ import ColorStudioApp from '@/components/os/apps/color-studio'
 import FlashcardsApp from '@/components/os/apps/flashcards'
 import FaceDetectApp from '@/components/os/apps/face-detect'
 import LinuxEditionApp from '@/components/os/apps/linux-edition'
+import RealLinuxApp from '@/components/os/apps/real-linux'
 
 import SnakeGame from '@/components/os/games/snake'
 import Game2048 from '@/components/os/games/g2048'
@@ -490,6 +491,18 @@ export const APPS: AppMeta[] = [
     desktop: true,
     tint: 'from-[#f7931e] to-[#0ea5a0]',
     keywords: ['linux', 'kernel', 'debian', 'ubuntu', 'arch', 'docker', 'install', 'هسته', 'نصب', 'لینوکس', 'دبین', 'آرچ', 'اوبونتو', 'کیوسک', 'واقعی'],
+  },
+  {
+    id: 'real-linux',
+    name: 'بوت کرنل واقعی',
+    icon: Cpu,
+    category: 'app',
+    component: RealLinuxApp,
+    w: 820,
+    h: 640,
+    desktop: true,
+    tint: G.forest,
+    keywords: ['linux', 'kernel', 'real', 'v86', 'alpine', 'vm', 'emulator', 'bzimage', 'کرنل', 'هسته', 'بوت', 'شبیه‌ساز', 'واقعی', 'مجازی'],
   },
   // ---------- بازی‌ها ----------
   {

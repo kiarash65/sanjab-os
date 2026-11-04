@@ -89,6 +89,29 @@ curl -fsSL https://raw.githubusercontent.com/kiarash65/sanjab-os/main/linux-edit
 
 ---
 
+## 🧨 بوت کرنل واقعی داخل مرورگر (Real Kernel Boot)
+
+اپ **«بوت کرنل واقعی»** یک کرنل **Linux 6.12.114** را با شبیه‌ساز x86 **v86** (WASM) درست داخل مرورگر بوت می‌کند — بدون هیچ فیک بودن:
+
+```text
+Welcome to Alpine Linux 3.21
+Kernel 6.12.114-0-virt on an i686 (/dev/ttyS0)
+localhost login: root        ← ورود خودکار
+localhost:~# uname -a
+Linux localhost 6.12.114-0-virt #1-Alpine SMP PREEMPT_DYNAMIC i686 Linux
+localhost:~# apk add htop    ← مخزن apk از روی ISO وصل است!
+```
+
+- 🧠 **کرنل واقعی**: bzImage رسمی Alpine 3.21.9 (i686) + initramfs — `dmesg`، `free`، `apk` همه واقعی
+- 💿 **ISO وصل به cdrom**: مخزن apk آفلاین + modloop — `ls /media/cdrom`
+- 🖥️ **ترمینال سریال سفارشی**: پارسر ANSI با رنگ، تاریخچهٔ فرمان، چیپ‌های دستور سریع، ورود خودکار root
+- ⚙️ **نمایشگر VGA**: خروجی گرافیکی ماشین قابل مشاهده است
+- 🌐 **شبکهٔ آزمایشی**: با رلهٔ fetch اتصال اینترنتی داخل ماشین (اختیاری)
+
+> فایل‌های بوت (~۸۵MB) در `public/v86/` قرار دارند و کاملاً آفلاین کار می‌کنند. چون v86 فعلاً ۶۴بیتی را اجرا نمی‌کند، از کرنل رسمی i686 استفاده شده — همان کِرنل، همان apk، همان musl.
+
+---
+
 ## 🚀 اجرا (Getting Started)
 
 ```bash
