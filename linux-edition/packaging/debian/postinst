@@ -1,0 +1,45 @@
+#!/bin/bash
+# postinst — بعد از نصب: بیلد پروژه و فعال‌سازی سرویس
+set -e
+APP=/opt/sanjabos
+
+echo "🐿️  SanjabOS: آماده‌سازی…"
+cd "$APP"
+
+# پیدا کردن runtime
+if command -v bun >/dev/null 2>&1; then
+  RUNTIME="bun"
+elif command -v node >/dev/null 2>&1 && command -v npm >/dev/null 2>&1; then
+  RUNTIME="node"
+else
+  echo "❌ نه bun هست نه node — لطفاً Node.js 18+ نصب کن" >&2
+  exit 1
+fi
+
+echo "▸ نصب وابستگی‌ها با $RUNTIME…"
+if [ "$RUNTIME" = "bun" ]; then
+  bun install --frozen-lockfile
+  bun run build
+else
+  npm install --no-audit --no-fund
+  npm run build
+fi
+
+# کاربر اختصاصی
+if ! id sanjabos >/dev/null 2>&1; then
+  useradd --system --home-dir "$APP" --shell /usr/sbin/nologin sanjabos || true
+fi
+chown -R sanjabos:sanjabos "$APP"
+
+# سرویس
+sed -i "s|ExecStart=/usr/bin/bun|ExecStart=$(command -v bun || echo /usr/bin/node) .next/standalone/server.js|" /lib/systemd/system/sanjabos.service 2>/dev/null || true
+if [ "$RUNTIME" = "node" ]; then
+  # اجرای server.js با node هم ممکن است (standalone خروجی node است)
+  sed -i 's|ExecStart=.*server.js|ExecStart=/usr/bin/node .next/standalone/server.js|' /lib/systemd/system/sanjabos.service 2>/dev/null || true
+fi
+
+systemctl daemon-reload || true
+systemctl enable --now sanjabos.service || true
+
+echo "✅ SanjabOS نصب شد → http://localhost:4310"
+echo "   با اسپانسری سان‌جاب — sunjob.ir"

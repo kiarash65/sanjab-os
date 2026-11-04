@@ -26,6 +26,7 @@ const LINES: BootLine[] = [
   { t: 'python-runtime: mini-python 3.11 «سنجابی» loaded (0 MB, جادویی)', tag: 'ok' },
   { t: 'word-processor: نویسا آمادهٔ خروجی Word و PDF', tag: 'ok' },
   { t: 'linux-academy: آکادمی لینوکس بوت شد — ۸ فصل، ترمینال تعاملی، توزیع‌ها و نصب', tag: 'ok' },
+  { t: 'linux-edition: نسخهٔ هستهٔ واقعی آماده است — install.sh در ریپو (Debian/Arch/Docker/Kiosk)', tag: 'ok' },
   { t: 'sanjob-logo: لوگوی رسمی سان‌جاب از sunjob.ir بارگذاری شد', tag: 'ok' },
   { t: 'Random crontab joke scheduled for later', tag: 'ok' },
   { t: 'systemd[1]: Reached target Colorful Cute Interface.', tag: 'ok' },

@@ -1,0 +1,7 @@
+sanjabos (1.0.0) stable; urgency=medium
+
+  * اولین انتشار نسخهٔ لینوکس واقعی سان‌جاب‌او‌اس 🐧
+  * نصب‌کنندهٔ جهانی + سرویس systemd + بستهٔ deb + PKGBUILD آرچ + ایمیج داکر
+  * با اسپانسری سان‌جاب — sunjob.ir
+
+ -- SanjabOS <sanjabos@sunjob.ir>  Sun, 02 Nov 2025 12:00:00 +0330

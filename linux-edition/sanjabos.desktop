@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=SanjabOS
+Name[fa]=سان‌جاب‌او‌اس
+GenericName=Persian WebOS
+Comment=سیستم‌عامل وب بامزهٔ فارسی — آکادمی لینوکس، هوش‌یار، پایتون و بازی‌ها — با اسپانسری سان‌جاب
+Exec=sanjabos open
+Icon=sanjabos
+Terminal=false
+Categories=Network;Utility;Education;
+Keywords=sanjabos;webos;linux;sanjab;لینوکس;سان‌جاب;
+StartupWMClass=sanjabos

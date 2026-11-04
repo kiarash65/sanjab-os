@@ -1,0 +1,20 @@
+Package: sanjabos
+Version: 1.0.0
+Section: web
+Priority: optional
+Architecture: all
+Maintainer: SanjabOS <sanjabos@sunjob.ir>
+Depends: nodejs (>=18) | bun, git, curl, ca-certificates, systemd | systemd-user
+Recommends: chromium | chromium-browser | google-chrome
+Suggests: docker.io
+Homepage: https://github.com/kiarash65/sanjab-os
+Description: سیستم‌عامل وب بامزه و رنگی فارسی (RTL) — نسخهٔ لینوکس واقعی
+ Cute, colorful Persian (RTL) WebOS desktop environment that runs as a
+ native systemd service on real Linux — Debian/Ubuntu ready.
+ .
+ امکانات: آکادمی لینوکس، ترمینال آموزشی، دستیار هوش مصنوعی «هوش‌یار»،
+ پایتون/سنجابی/JS/HTML، آفیس، نقاشی، تشخیص چهره، ۱۰ بازی و ۳۰+ اپ.
+ .
+ This package installs the app into /opt/sanjabos, builds it and
+ registers the "sanjabos" systemd service (port 4310) plus a desktop
+ launcher. With sponsorship of Sanjab — sunjob.ir

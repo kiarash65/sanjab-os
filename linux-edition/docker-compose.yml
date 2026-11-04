@@ -1,0 +1,23 @@
+# 🐳 SanjabOS — Docker Compose
+# اجرا:  docker compose -f linux-edition/docker-compose.yml up -d
+services:
+  sanjabos:
+    build:
+      context: ..
+      dockerfile: linux-edition/Dockerfile
+    image: sanjabos:latest
+    container_name: sanjabos
+    ports:
+      - "4310:4310"
+    environment:
+      - PORT=4310
+      - NODE_ENV=production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "bun -e \"fetch('http://127.0.0.1:4310').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    labels:
+      - "sanjab.os.description=سیستم‌عامل وب فارسی — با اسپانسری سان‌جاب"
+      - "sanjab.os.sponsor=sunjob.ir"

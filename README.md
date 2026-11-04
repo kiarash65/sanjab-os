@@ -67,6 +67,28 @@
 
 ---
 
+## 🐧 نسخه لینوکس واقعی (Real Linux Edition)
+
+سان‌جاب‌او‌اس فقط یک شبیه‌سازی مرورگری نیست — **نسخهٔ بومی لینوکس** هم دارد! همین WebOS به‌عنوان یک سرویس `systemd` روی هستهٔ واقعی لینوکس اجرا می‌شود:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/kiarash65/sanjab-os/main/linux-edition/install.sh | bash
+```
+
+| روش | توزیع | توضیح |
+|-----|-------|-------|
+| `install.sh` | همه (تشخیص خودکار) | نصب کاربری یا سراسری (`--system`) |
+| بستهٔ `.deb` | Debian/Ubuntu/Mint | `linux-edition/packaging/build-deb.sh` |
+| `PKGBUILD` | Arch/Manjaro | `linux-edition/arch && makepkg -si` |
+| Docker | همه | `docker compose -f linux-edition/docker-compose.yml up -d` |
+| کیوسک | همه | `install.sh --kiosk` → جعبهٔ فول‌اسکرین |
+
+پایهٔ اصلی توسعه: **Debian 13 (trixie)** — سازگار با اوبونتو. جزئیات: [`linux-edition/README.md`](linux-edition/README.md)
+
+فرمان‌های سرویس: `sanjabos start|stop|logs|kiosk|update` — پورت پیش‌فرض `4310`.
+
+---
+
 ## 🚀 اجرا (Getting Started)
 
 ```bash
@@ -124,6 +146,12 @@ src/
         ├── interpreter.ts # مفسر پایتون/سنجابی
         ├── fs.ts          # فایل‌سیستم شبیه‌سازی
         └── wallpapers.ts  # کاغذدیواری‌ها
+linux-edition/             # 🐧 نسخه لینوکس واقعی
+├── install.sh            # نصب‌کننده جهانی
+├── Dockerfile            # ایمیج داکر
+├── sanjabos.service      # سرویس systemd
+├── packaging/debian/     # بسته .deb
+└── arch/PKGBUILD         # پکیج آرچ
 ```
 
 ---

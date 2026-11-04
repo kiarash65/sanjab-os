@@ -1,0 +1,25 @@
+# SanjabOS — سیستم‌عامل وب فارسی — با اسپانسری سان‌جاب
+# این فایل نمونه است؛ install.sh آن را با مسیرهای واقعی می‌نویسد.
+[Unit]
+Description=SanjabOS — Persian RTL WebOS (sunjob.ir)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=sanjabos
+WorkingDirectory=/opt/sanjabos
+Environment=NODE_ENV=production
+Environment=PORT=4310
+Environment=HOSTNAME=0.0.0.0
+ExecStart=/usr/bin/bun .next/standalone/server.js
+Restart=on-failure
+RestartSec=3
+# امن‌تر:
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

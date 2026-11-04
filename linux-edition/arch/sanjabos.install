@@ -1,0 +1,18 @@
+## عملیات بعد از نصب/حذف — پکیج آرچ
+
+post_install() {
+  echo "🐿️  SanjabOS نصب شد!"
+  echo "   ▸ سرویس:    sudo systemctl enable --now sanjabos"
+  echo "   ▸ آدرس:     http://localhost:4310"
+  echo "   ▸ فرمان:    sanjabos open"
+  echo "   با اسپانسری سان‌جاب — sunjob.ir"
+}
+
+post_upgrade() {
+  post_install
+}
+
+pre_remove() {
+  systemctl stop sanjabos.service 2>/dev/null || true
+  systemctl disable sanjabos.service 2>/dev/null || true
+}

@@ -1,0 +1,48 @@
+# Maintainer: SanjabOS <sanjabos@sunjob.ir>
+# 🐧 SanjabOS — سیستم‌عامل وب فارسی برای لینوکس واقعی
+# نصب:  makepkg -si   (از پوشهٔ linux-edition/arch)
+pkgname=sanjabos
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="سیستم‌عامل وب بامزه و رنگی فارسی (RTL) — نسخهٔ لینوکس واقعی | Cute Persian RTL WebOS for real Linux"
+arch=('any')
+url="https://github.com/kiarash65/sanjab-os"
+license=('MIT')
+depends=('bun-bin')
+makedepends=('git')
+optdepends=('chromium: برای حالت کیوسک'
+            'docker: برای اجرای کانتینری')
+source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
+sha256sums=('SKIP')
+install="sanjabos.install"
+backup=('etc/sanjabos/sanjabos.env')
+
+build() {
+  cd "$srcdir/$pkgname-$pkgver"
+  bun install --frozen-lockfile
+  bun run build
+}
+
+package() {
+  cd "$srcdir/$pkgname-$pkgver"
+
+  # کد برنامه
+  install -dm755 "$pkgdir/opt/$pkgname"
+  cp -a --no-preserve=ownership . "$pkgdir/opt/$pkgname/"
+  rm -rf "$pkgdir/opt/$pkgname/node_modules/.cache"
+
+  # سرویس systemd
+  install -Dm644 linux-edition/sanjabos.service \
+    "$pkgdir/usr/lib/systemd/system/$pkgname.service"
+
+  # میان‌بر دسکتاپ و آیکن
+  install -Dm644 linux-edition/sanjabos.desktop \
+    "$pkgdir/usr/share/applications/$pkgname.desktop"
+  install -Dm644 public/logo.svg "$pkgdir/usr/share/pixmaps/sanjabos.svg"
+
+  # CLI
+  install -Dm755 linux-edition/sanjabos-cli "$pkgdir/usr/bin/sanjabos"
+
+  # مجوز
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

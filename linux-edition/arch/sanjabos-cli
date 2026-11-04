@@ -1,0 +1,10 @@
+# SanjabOS CLI برای پکیج آرچ
+case "${1:-open}" in
+  start|stop|restart|status) systemctl "$1" sanjabos.service ;;
+  logs)    journalctl -u sanjabos.service -f ;;
+  open)    xdg-open http://localhost:4310 ;;
+  kiosk)   exec /opt/sanjabos/linux-edition/kiosk.sh ;;
+  update)  cd /opt/sanjabos && git pull && bun install --frozen-lockfile && \
+           bun run build && systemctl restart sanjabos ;;
+  *) echo "sanjabos <start|stop|restart|status|logs|open|kiosk|update>" ;;
+esac

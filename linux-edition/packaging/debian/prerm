@@ -1,0 +1,6 @@
+#!/bin/bash
+# prerm — قبل از حذف
+set -e
+systemctl stop sanjabos.service 2>/dev/null || true
+systemctl disable sanjabos.service 2>/dev/null || true
+exit 0

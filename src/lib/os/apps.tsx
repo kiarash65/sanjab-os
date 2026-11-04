@@ -45,6 +45,7 @@ import {
   Worm,
   Code2,
   ScanFace,
+  Cpu,
 } from 'lucide-react'
 import { useOS } from '@/lib/os/store'
 
@@ -80,6 +81,7 @@ import RegexLabApp from '@/components/os/apps/regex-lab'
 import ColorStudioApp from '@/components/os/apps/color-studio'
 import FlashcardsApp from '@/components/os/apps/flashcards'
 import FaceDetectApp from '@/components/os/apps/face-detect'
+import LinuxEditionApp from '@/components/os/apps/linux-edition'
 
 import SnakeGame from '@/components/os/games/snake'
 import Game2048 from '@/components/os/games/g2048'
@@ -476,6 +478,18 @@ export const APPS: AppMeta[] = [
     desktop: true,
     tint: G.grape,
     keywords: ['face', 'camera', 'gender', 'age', 'دوربین', 'چهره', 'سن', 'جنسیت', 'تشخیص'],
+  },
+  {
+    id: 'linux-edition',
+    name: 'نسخه لینوکس واقعی',
+    icon: Cpu,
+    category: 'app',
+    component: LinuxEditionApp,
+    w: 760,
+    h: 600,
+    desktop: true,
+    tint: 'from-[#f7931e] to-[#0ea5a0]',
+    keywords: ['linux', 'kernel', 'debian', 'ubuntu', 'arch', 'docker', 'install', 'هسته', 'نصب', 'لینوکس', 'دبین', 'آرچ', 'اوبونتو', 'کیوسک', 'واقعی'],
   },
   // ---------- بازی‌ها ----------
   {
