@@ -74,7 +74,7 @@ fn spawn_server(app: &AppHandle) -> Result<(u16, CommandChild), String> {
         let mut rx = rx;
         while let Some(ev) = rx.recv().await {
             if let CommandEvent::Stdout(line) = ev {
-                print!("{line}");
+                print!("{}", String::from_utf8_lossy(&line));
             }
         }
     });
