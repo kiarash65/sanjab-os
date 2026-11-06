@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "سطح دسترسی پیش‌فرض پنجرهٔ سان‌جاب‌اواس",
+  "windows": ["main"],
+  "permissions": ["core:default"]
+}

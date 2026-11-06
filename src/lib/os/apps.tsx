@@ -55,6 +55,10 @@ import {
   Code2,
   ScanFace,
   Cpu,
+  Braces,
+  Feather,
+  Boxes,
+  Download,
 } from 'lucide-react'
 import { useOS } from '@/lib/os/store'
 
@@ -118,6 +122,11 @@ const PdfEditorApp = d(() => import('@/components/os/apps/pdf-editor'))
 const RustAcademyApp = d(() => import('@/components/os/apps/rust-academy'))
 const AIAcademyApp = d(() => import('@/components/os/apps/ai-academy'))
 const ProgressCenterApp = d(() => import('@/components/os/apps/progress-center'))
+const PythonAcademyApp = d(() => import('@/components/os/apps/python-academy'))
+const PowerShellAcademyApp = d(() => import('@/components/os/apps/powershell-academy'))
+const NeveshtYarApp = d(() => import('@/components/os/apps/neveshtyar'))
+const RuntimeManagerApp = d(() => import('@/components/os/apps/runtime-manager'))
+const DownloadsApp = d(() => import('@/components/os/apps/downloads'))
 
 const SnakeGame = d(() => import('@/components/os/games/snake'))
 const Game2048 = d(() => import('@/components/os/games/g2048'))
@@ -562,6 +571,66 @@ export const APPS: AppMeta[] = [
     desktop: true,
     tint: G.grape,
     keywords: ['ai', 'ml', 'perceptron', 'neural', 'llm', 'gradient', 'هوش مصنوعی', 'یادگیری ماشین', 'شبکه عصبی', 'مفاهیم'],
+  },
+  {
+    id: 'python-academy',
+    name: 'آکادمی پایتون',
+    icon: Braces,
+    category: 'app',
+    component: PythonAcademyApp,
+    w: 880,
+    h: 620,
+    desktop: true,
+    tint: G.orange,
+    keywords: ['python', 'pyodide', 'cpython', 'programming', 'پایتون', 'برنامه‌نویسی', 'آکادمی', 'تمرین'],
+  },
+  {
+    id: 'powershell-academy',
+    name: 'آکادمی پاورشل',
+    icon: SquareTerminal,
+    category: 'app',
+    component: PowerShellAcademyApp,
+    w: 840,
+    h: 600,
+    desktop: true,
+    tint: 'from-[#5391FE] to-[#2f6fce]',
+    keywords: ['powershell', 'windows', 'cmdlet', 'پاورشل', 'ویندوز', 'اسکریپت', 'آکادمی'],
+  },
+  {
+    id: 'neveshtyar',
+    name: 'نوشت‌یار',
+    icon: Feather,
+    category: 'app',
+    component: NeveshtYarApp,
+    w: 860,
+    h: 580,
+    desktop: true,
+    tint: 'from-emerald-400 to-teal-500',
+    keywords: ['fa', 'writing', 'persian', 'normalizer', 'فارسی', 'نوشتن', 'ویرایش', 'نیم‌فاصله', 'املا', 'چیدمان'],
+  },
+  {
+    id: 'runtime-manager',
+    name: 'مدیر اجراکننده‌ها',
+    icon: Boxes,
+    category: 'app',
+    component: RuntimeManagerApp,
+    w: 780,
+    h: 600,
+    desktop: true,
+    tint: G.sun,
+    keywords: ['runtime', 'pyodide', 'v86', 'webgpu', 'اجراکننده', 'موتور', 'وضعیت'],
+  },
+  {
+    id: 'downloads',
+    name: 'دانلود و به‌روزرسانی',
+    icon: Download,
+    category: 'app',
+    component: DownloadsApp,
+    w: 760,
+    h: 600,
+    desktop: true,
+    tint: G.teal,
+    keywords: ['download', 'release', 'update', 'installer', 'دانلود', 'نسخه', 'به‌روزرسانی', 'نصب', 'ویندوز'],
   },
   {
     id: 'browser',

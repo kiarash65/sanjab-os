@@ -179,6 +179,10 @@ export function useBestScore(
           submittedRef.current = nb
           const name = (getPlayerName() || 'پنگوئن بی‌نام').slice(0, 24)
           void submitScore(key, name, nb)
+          // گیمیفیکیشن: بازی کامل شد (رکورد جدید = پایان موفق یک دست)
+          import('@/lib/gamification/engine')
+            .then(({ useGame }) => useGame.getState().registerGame(key))
+            .catch(() => {})
         }
         return nb
       })

@@ -1276,7 +1276,7 @@ export default function LinuxAcademyApp() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" aria-hidden />
                     <div className="absolute bottom-3 right-4 left-4">
                       <p className="text-sm font-black text-white sm:text-base">سفرت را همین‌جا شروع کن، پنگوئن معلم صبور است!</p>
-                      <p className="mt-0.5 text-[11px] leading-4 text-zinc-300">۱۳ فصل کوتاه، یک ترمینال امن برای تمرین، انیمیشن‌های زندهٔ هسته، آزمون و گواهی پایانی — همه‌چیز آفلاین و بامزه.</p>
+                      <p className="mt-0.5 text-[11px] leading-4 text-zinc-300">۱۴ فصل کوتاه، یک ترمینال امن برای تمرین، انیمیشن‌های زندهٔ هسته، آزمون و گواهی پایانی — همه‌چیز آفلاین و بامزه.</p>
                     </div>
                   </div>
 
@@ -1541,7 +1541,7 @@ export default function LinuxAcademyApp() {
                       در لینوکس «دروازهٔ واقعی قدرت» ترمینال است؛ همان جایی که همه‌چیز با تایپ انجام می‌شود. عبارتی مثل <code dir="ltr" className="rounded bg-zinc-950 px-1.5 py-0.5 font-mono text-[10.5px] text-emerald-300">pengo@sunjob:~$</code> یعنی: کاربر pengo روی ماشین sunjob، در پوشهٔ خانه (~)، آمادهٔ دستور گرفتن ($).
                     </p>
                     <p>
-                      شل (shell) مفسرِ دستورهاست؛ محبوب‌ترینش <b className="text-zinc-100">bash</b> است. ترمینال پایین یک شبیه‌ساز امن است — ۸ ماموریت را در آن انجام بده تا فصل کامل شود:
+                      شل (shell) مفسرِ دستورهاست؛ محبوب‌ترینش <b className="text-zinc-100">bash</b> است. ترمینال پایین یک شبیه‌ساز امن است — ۱۰ ماموریت را در آن انجام بده تا فصل کامل شود:
                     </p>
                     <MiniTerminal progress={progress} onMissionDone={onMissionDone} />
                   </div>
