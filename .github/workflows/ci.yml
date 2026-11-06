@@ -30,6 +30,9 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Generate Prisma client
+        run: bunx prisma generate
+
       - name: Version consistency (VERSION / package.json / brand.ts)
         run: |
           V_FILE=$(tr -d ' \n' < VERSION)

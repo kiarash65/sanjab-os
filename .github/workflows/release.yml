@@ -37,6 +37,9 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Generate Prisma client
+        run: bunx prisma generate
+
       - name: Typecheck + Lint (release gate)
         run: |
           bunx tsc --noEmit
@@ -117,6 +120,9 @@ jobs:
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: bunx prisma generate
 
       - name: Build web (standalone)
         run: bun run build
