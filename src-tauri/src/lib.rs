@@ -70,15 +70,11 @@ fn spawn_server(app: &AppHandle) -> Result<(u16, CommandChild), String> {
 
     // لاگ سرور را در استدآوت اپ می‌ریزیم (لاگِ محلی؛ به شبکه نمی‌رود)
     tauri::async_runtime::spawn(async move {
-        use std::io::Read;
-        let mut reader = rx;
-        let mut buf = [0u8; 1024];
-        loop {
-            match reader.read(&mut buf) {
-                Ok(0) | Err(_) => break,
-                Ok(n) => {
-                    print!("{}", String::from_utf8_lossy(&buf[..n]));
-                }
+        use tauri_plugin_shell::process::CommandEvent;
+        let mut rx = rx;
+        while let Some(ev) = rx.recv().await {
+            if let CommandEvent::Stdout(line) = ev {
+                print!("{line}");
             }
         }
     });
@@ -131,9 +127,12 @@ pub fn run() {
             if let RunEvent::ExitRequested { .. } = event {
                 // خاموشی تمیز: پردازهٔ Node حتماً بسته شود
                 let guard = app.state::<ServerGuard>();
-                if let Some(child) = guard.0.lock().unwrap().take() {
+                let mut slot = guard.0.lock().unwrap();
+                let child = slot.take();
+                drop(slot);
+                if let Some(child) = child {
                     let _ = child.kill();
-                }
+                };
             }
         });
 }
