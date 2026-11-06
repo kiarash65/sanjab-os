@@ -2,6 +2,7 @@
 
 /* آکادمی Rust — دورهٔ تعاملی فارسی با شبیه‌ساز کوچک Rust و زمین بازی */
 
+import dynamic from 'next/dynamic'
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -28,6 +29,7 @@ import {
   Trophy,
   X,
   Zap,
+  Layers,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -61,6 +63,13 @@ interface Track {
   icon: LucideIcon
   lessons: Lesson[]
 }
+
+const RustMemoryLab = dynamic(() => import('@/components/os/academy/rust-memory').then((m) => m.RustMemoryLab), {
+  ssr: false,
+  loading: () => (
+    <div className="grid h-40 place-items-center text-xs text-zinc-500">در حال بارگیری آزمایشگاه حافظه…</div>
+  ),
+})
 
 const TRACKS: Track[] = [
   {
@@ -1728,7 +1737,7 @@ fn main() {
    رابط کاربری
    ================================================================ */
 
-type View = 'home' | 'track' | 'play' | 'quiz' | 'missions'
+type View = 'home' | 'track' | 'play' | 'quiz' | 'missions' | 'memory'
 
 const STORE_KEY = 'sunjob-rust-v1'
 
@@ -1992,6 +2001,7 @@ export default function RustAcademyApp() {
       active: view === 'track' && trackId === t.id,
       go: () => openTrack(t),
     })),
+    { key: 'memory', label: 'آزمایشگاه حافظه', active: view === 'memory', go: () => setView('memory') },
     { key: 'play', label: 'زمین بازی', active: view === 'play', go: () => setView('play') },
     { key: 'missions', label: 'مأموریت‌های کامپایلر', active: view === 'missions', go: () => setView('missions') },
     { key: 'quiz', label: 'آزمون', active: view === 'quiz', go: () => setView('quiz') },
@@ -2077,6 +2087,7 @@ export default function RustAcademyApp() {
             )
           })}
           <p className="px-2 pb-1 pt-2 text-[9px] font-bold text-zinc-500">ابزارها</p>
+          <SideItem icon={Layers} label="آزمایشگاه حافظه" active={view === 'memory'} onClick={() => setView('memory')} />
           <SideItem icon={FlaskConical} label="زمین بازی" active={view === 'play'} onClick={() => setView('play')} />
           <SideItem icon={ShieldCheck} label="مأموریت‌های کامپایلر" active={view === 'missions'} onClick={() => setView('missions')} />
           <SideItem icon={GraduationCap} label="آزمون" active={view === 'quiz'} onClick={() => setView('quiz')} />
@@ -2093,6 +2104,20 @@ export default function RustAcademyApp() {
               transition={{ duration: 0.16 }}
               className="mx-auto max-w-3xl space-y-3"
             >
+              {/* --------- آزمایشگاه حافظه (مالکیت بصری) --------- */}
+              {view === 'memory' && (
+                <div className="space-y-3">
+                  <div className="rounded-2xl border border-[#f7931e]/20 bg-[#f7931e]/[0.05] p-4">
+                    <h2 className="text-sm font-black text-zinc-100">آزمایشگاه حافظه — مالکیت را ببینید</h2>
+                    <p className="mt-1 text-[11.5px] leading-6 text-zinc-400">
+                      چهار دیاگرام تعاملی: انتقال (Move)، قرض‌گیری (Borrow)، کپی (Clone) و آزادسازی (Drop). مالکیت، مهم‌ترین مفهوم راست است —
+                      اینجا آن را گام‌به‌گام با انیمیشن تجربه کنید و خطاهای واقعی کامپایلر (E0382، E0502، E0499) را در عمل ببینید.
+                    </p>
+                  </div>
+                  <RustMemoryLab />
+                </div>
+              )}
+
               {/* ---------------- خانه ---------------- */}
               {view === 'home' && (
                 <>

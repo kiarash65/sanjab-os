@@ -8,7 +8,7 @@ import { useOS } from '@/lib/os/store'
 /* رویدادها idempotent هستند: هر event-id فقط یک‌بار امتیاز می‌دهد     */
 /* ------------------------------------------------------------------ */
 
-export type Track = 'linux' | 'python' | 'rust' | 'ai'
+export type Track = 'linux' | 'python' | 'rust' | 'ai' | 'powershell'
 
 export interface GameEvent {
   id: string
@@ -141,7 +141,7 @@ export const useGame = create<GameStore>()(
     (set, get) => ({
       xp: 0,
       events: [],
-      lessons: { linux: 0, python: 0, rust: 0, ai: 0 },
+      lessons: { linux: 0, python: 0, rust: 0, ai: 0, powershell: 0 },
       quizzesPerfect: 0,
       gamesCompleted: 0,
       streakLast: '',
@@ -221,7 +221,7 @@ export const useGame = create<GameStore>()(
         set({
           xp: 0,
           events: [],
-          lessons: { linux: 0, python: 0, rust: 0, ai: 0 },
+          lessons: { linux: 0, python: 0, rust: 0, ai: 0, powershell: 0 },
           quizzesPerfect: 0,
           gamesCompleted: 0,
           streakLast: '',

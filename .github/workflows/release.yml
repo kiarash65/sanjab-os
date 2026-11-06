@@ -1,7 +1,9 @@
 name: Release
 
-# انتشار روی push تگ v*: بیلد وب، بسته‌بندی، checksum، GitHub Release.
-# ساده و صادقانه: signing و SBOM هنوز نداریم (docs/ROADMAP.md فاز 9).
+# انتشار روی push تگ v*:
+#   1) job web: بیلد وب + بستهٔ CLI + SBOM + checksum → draft release
+#   2) job windows: بیلد نصب‌کنندهٔ دسکتاپ (Tauri v2 + Node sidecar) → NSIS/MSI به همان draft
+#   3) job publish: انتشار draft بعد از هر دو (اگر ویندوز شکست خورد، وب منتشر می‌شود و نکته صادقانه در یادداشت می‌رود)
 on:
   push:
     tags:
@@ -10,10 +12,15 @@ on:
 permissions:
   contents: write
 
+env:
+  NODE_SIDECAR_VERSION: "22.14.0"
+
 jobs:
-  release:
-    name: Build and publish release
+  web:
+    name: Web build, SBOM, draft release
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,52 +37,166 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Typecheck + Lint (release gate)
+        run: |
+          bunx tsc --noEmit
+          bun run lint
+
       - name: Build web (standalone)
         run: bun run build
 
-      - name: Package web standalone
+      - name: Assemble web package
         run: |
-          mkdir -p dist
-          tar -czf "dist/sanjabos-web-${{ steps.version.outputs.version }}-standalone.tar.gz" -C .next/standalone .
+          mkdir -p dist/web
+          cp -r .next/standalone/. dist/web/
+          cp -r .next/static dist/web/.next/static
+          cp -r public dist/web/public
+          tar -czf "dist/sanjabos-web-${{ steps.version.outputs.version }}-standalone.tar.gz" -C dist/web .
 
       - name: Package CLI (if present)
-        # CLI محصول جداگانه است و در این ریپو ممکن است نباشد — شرطی بسته‌بندی می‌شود
         run: |
           if [ -d cli ]; then
             tar -czf "dist/sanjab-cli-${{ steps.version.outputs.version }}.tar.gz" cli
           else
-            echo "cli/ not present in this repository — skipping CLI artifact (honest skip)"
+            echo "cli/ not present — honest skip"
           fi
+
+      - name: Generate SBOM (SPDX)
+        uses: anchore/sbom-action@v0
+        with:
+          format: spdx-json
+          artifact-name: SBOM.spdx.json
+          upload-artifact: false
+
+      - name: Third-party notices
+        run: cp THIRD_PARTY_LICENSES.md dist/THIRD-PARTY-NOTICES.md 2>/dev/null || echo "no notices file"
 
       - name: Collect metadata
         run: cp VERSION dist/VERSION
 
-      - name: Generate SHA256SUMS
+      - name: Pre-checksums (all except SHA256SUMS)
         working-directory: dist
-        run: sha256sum * > SHA256SUMS.txt
+        run: sha256sum sanjabos-web-* sanjab-cli-* SBOM.spdx.json THIRD-PARTY-NOTICES.md VERSION 2>/dev/null | sort -k2 > SHA256SUMS.txt || sha256sum * > SHA256SUMS.txt
 
-      - name: Create GitHub Release
+      - name: Create draft GitHub Release (web artifacts)
         uses: softprops/action-gh-release@v2
         with:
           name: SanjabOS ${{ steps.version.outputs.version }}
-          draft: false
+          draft: true
           prerelease: ${{ contains(steps.version.outputs.version, '-') }}
           generate_release_notes: true
-          body: |
-            ## سان‌جاب‌او‌اس ${{ steps.version.outputs.version }}
-
-            ### Artifacts
-            - `sanjabos-web-${{ steps.version.outputs.version }}-standalone.tar.gz` — بیلد Next.js standalone (اجرا: `bun server.js`)
-            - `sanjab-cli-${{ steps.version.outputs.version }}.tar.gz` — فقط اگر CLI در این tag موجود باشد
-            - `SHA256SUMS.txt` — checksum همهٔ فایل‌ها: `sha256sum -c SHA256SUMS.txt --ignore-missing`
-
-            ### Known limitations (صادقانه)
-            - ISO بوت‌تست رسمی ندارد (`docs/ROADMAP.md` فاز 10)
-            - امتیازهای جهانی ضد-spoof نیستند (`docs/AUDIT.md` AUDIT-005)
-            - وزن‌های face-api روی ref `master` پین‌اند (`docs/AUDIT.md` AUDIT-009)
-            - سیاست آپدیت: هرگز `git reset --hard` نزنید — `docs/RELEASES.md`
-
-            ### Docs
-            - `docs/SECURITY.md` · `docs/AUDIT.md` · `docs/RELEASES.md` · `THIRD_PARTY_LICENSES.md`
           files: |
             dist/*
+            SBOM.spdx.json
+
+  windows:
+    name: Windows desktop installer (Tauri v2)
+    runs-on: windows-latest
+    needs: web
+    continue-on-error: true
+    outputs:
+      ok: ${{ steps.status.outputs.ok }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build web (standalone)
+        run: bun run build
+
+      - name: Assemble sidecar server-dist
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path src-tauri/server-dist | Out-Null
+          Copy-Item -Recurse -Force .next/standalone/* src-tauri/server-dist/
+          Copy-Item -Recurse -Force .next/static src-tauri/server-dist/.next/static
+          Copy-Item -Recurse -Force public src-tauri/server-dist/public
+          Get-ChildItem src-tauri/server-dist | Select-Object Name
+
+      - name: Download portable Node.exe (sidecar)
+        shell: pwsh
+        run: |
+          $v = "${{ env.NODE_SIDECAR_VERSION }}"
+          $url = "https://nodejs.org/dist/v$v/win-x64/node.exe"
+          New-Item -ItemType Directory -Force -Path src-tauri/binaries | Out-Null
+          Invoke-WebRequest -Uri $url -OutFile "src-tauri/binaries/node-x86_64-pc-windows-msvc.exe"
+          $size = (Get-Item "src-tauri/binaries/node-x86_64-pc-windows-msvc.exe").Length / 1MB
+          Write-Output "node.exe sidecar: $([math]::Round($size,1)) MB"
+
+      - name: Generate Tauri icons
+        run: bunx @tauri-apps/cli icon ./public/squirrel-avatar.png -o src-tauri/icons
+
+      - name: Build installers (NSIS + MSI) via tauri-action
+        id: tauri
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: .
+          tauriScript: bunx @tauri-apps/cli
+          tagName: v${{ needs.web.outputs.version }}
+          releaseName: SanjabOS ${{ needs.web.outputs.version }}
+          releaseId: ""
+          releaseDraft: true
+          prerelease: false
+          includeUpdaterJson: false
+          args: "--target x86_64-pc-windows-msvc"
+
+      - name: Job status marker
+        id: status
+        if: always()
+        shell: pwsh
+        run: |
+          if ("${{ steps.tauri.outcome }}" -eq "success") { "ok=true" | Out-File -Append $env:GITHUB_OUTPUT } else { "ok=false" | Out-File -Append $env:GITHUB_OUTPUT }
+
+  publish:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs: [web, windows]
+    if: always()
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Final checksums
+        if: needs.windows.outputs.ok == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="v${{ needs.web.outputs.version }}"
+          gh release view "$TAG" --json assets --jq '.assets[].name' > assets.txt
+          gh release download "$TAG" --pattern "SHA256SUMS.txt" --clobber
+          # checksum نصب‌کننده‌ها را اضافه کن
+          gh release download "$TAG" --pattern "SanjabOS_*" --clobber
+          sha256sum SanjabOS_* >> SHA256SUMS.txt
+          gh release upload "$TAG" SHA256SUMS.txt --clobber
+
+      - name: Publish draft release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="v${{ needs.web.outputs.version }}"
+          if [ "${{ needs.windows.outputs.ok }}" != "true" ]; then
+            gh release edit "$TAG" --notes "$(gh release view "$TAG" --json body --jq .body)
+
+            > **نکتهٔ صادقانه:** بیلد نصب‌کنندهٔ ویندوز در این تگ شکست خورد؛ نسخهٔ وب (standalone) سالم است و منتشر شد. نصب‌کننده در تگ بعدی دوباره تلاش می‌شود."
+          fi
+          gh release edit "$TAG" --draft=false
+          echo "Release $TAG published"

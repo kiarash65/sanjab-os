@@ -1,8 +1,9 @@
 /* ------------------------------------------------------------------ */
-/* ورکر پایتون واقعی (CPython via Pyodide) — سان‌جاب‌اواس ۲.۰           */
+/* ورکر پایتون واقعی (CPython via Pyodide) — سان‌جاب‌اواس ۴.۰           */
 /* نسخه pyodide پین‌شده: v0.26.4 (jsDelivr)                            */
-/* خروجی streem می‌شود؛ محدودیت خروجی و تایم‌اوت سمت ورکر/والد رعایت   */
+/* خروجی stream می‌شود؛ سقف خروجی و تایم‌اوت سمت ورکر/والد رعایت        */
 /* می‌شود. این ورکر Web Worker است — اجرا از رشته اصلی جدا است.        */
+/* + بارگیری خودکار پکیج‌ها با loadPackagesFromImports (numpy و …)      */
 /* ------------------------------------------------------------------ */
 /* eslint-disable */
 
@@ -33,6 +34,22 @@ async function ensurePyodide() {
   return loading
 }
 
+/** اگر کد import numpy و… داشت، پکیج‌های سازگار WASM خودکار بارگیری می‌شوند */
+async function loadImports(id, code) {
+  const py = await ensurePyodide()
+  try {
+    const toLoad = await py.loadPackagesFromImports(code, {
+      messageCallback: (t) => post({ type: 'status', text: String(t) }),
+    })
+    if (toLoad && toLoad.length) {
+      post({ type: 'status', text: `پکیج‌های بارگیری‌شده: ${toLoad.join(', ')}` })
+    }
+  } catch (e) {
+    // پکیج‌های غیر-WASM را ساکت رد می‌کنیم؛ خطای واقعی موقع import خودش می‌آید
+    post({ type: 'status', text: 'برخی importها در محیط مرورگر موجود نیستند' })
+  }
+}
+
 async function runCode(id, code) {
   const py = await ensurePyodide()
   let lines = 0
@@ -50,15 +67,7 @@ async function runCode(id, code) {
 
   const t0 = performance.now()
   try {
-    // نتیجه آخرین عبارت اگر مقدار داشته باشد چاپ می‌شود (مثل REPL)
-    const wrapped =
-      'import sys\n' +
-      'def __sanjab_exec__():\n' +
-      code
-        .split('\n')
-        .map((l) => (l.length ? '    ' + l : ''))
-        .join('\n') +
-      '\n'
+    await loadImports(id, code)
     // اجرای مستقیم با runPythonAsync — پشتیبانی از await و top-level
     let result = await py.runPythonAsync(code)
     if (result !== undefined && result !== null) {

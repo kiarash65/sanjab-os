@@ -1,0 +1,419 @@
+/* ------------------------------------------------------------------ */
+/* آکادمی پایتون — برنامهٔ درسی (سطح‌های ۰ تا ۴)                        */
+/* تمرین‌ها با CPython واقعی (Pyodide) در مرورگر تصحیح می‌شوند           */
+/* ------------------------------------------------------------------ */
+
+export interface PyQuizQ {
+  q: string
+  options: string[]
+  answer: number
+  why: string
+}
+
+export interface PyExercise {
+  prompt: string
+  starter: string
+  /** تست‌های پایتون واقعی؛ به انتهای کد کاربر وصل می‌شود */
+  tests: string
+  hint: string
+}
+
+export interface PyLesson {
+  id: string
+  level: number
+  title: string
+  minutes: number
+  learn: string[]
+  prereq: string
+  intro: string
+  analogy: string
+  technical: string
+  example1: { title: string; code: string; explain: string }
+  example2: { title: string; code: string; explain: string }
+  lineByLine: string[]
+  mistakes: string[]
+  exercise: PyExercise
+  challenge: string
+  summary: string
+  quiz: PyQuizQ[]
+}
+
+export const PY_LEVELS = [
+  { id: 0, title: 'شروع — برنامه‌نویسی یعنی چه؟', desc: 'قبل از هر کدی: مفهوم برنامه، زبان، و پایتون واقعی' },
+  { id: 1, title: 'مبانی پایتون', desc: 'متغیر، نوع، عملگر، رشته و ورودی/خروجی' },
+  { id: 2, title: 'ساختارهای داده', desc: 'لیست، tuple، دیکشنری، set و پیمایش' },
+  { id: 3, title: 'جریان کنترل و حل مسئله', desc: 'شرط، حلقه، الگوریتم و تفکر تجزیه' },
+  { id: 4, title: 'تابع و برنامه‌نویسی ماژولار', desc: 'پارامتر، scope، lambda، ماژول و import' },
+  { id: 5, title: 'پایتون واقعی — خطا، فایل، JSON', desc: 'try/except، pathlib، فایل مجازی و JSON' },
+  { id: 6, title: 'پایتون میانی — OOP و ابزارها', desc: 'کلاس، dataclass، generator و decorator' },
+  { id: 7, title: 'پایتون حرفه‌ای', desc: 'type hints، asyncio و تست‌نویسی' },
+  { id: 8, title: 'پروژه‌های عملی', desc: 'چهار پروژهٔ واقعی با مشخصات و تست' },
+] as const
+
+export const PY_PASS = '___SANJAB_OK___'
+
+export const LESSONS_A: PyLesson[] = [
+  /* ================= سطح ۰ ================= */
+  {
+    id: 'l0-what',
+    level: 0,
+    title: 'برنامه‌نویسی یعنی چه؟',
+    minutes: 8,
+    learn: ['معنای واقعی «برنامه» و «دستور»', 'تفاوت زبان انسانی و زبان برنامه‌نویسی', 'چرا کامپیوتر حدس نمی‌زند'],
+    prereq: 'هیچی! از صفرِ صفر شروع می‌کنیم.',
+    intro: 'قبل از نوشتن اولین خط کد، باید بدانید «برنامه‌نویسی» دقیقاً چه کاری است. خبر خوب: هیچ چیزِ جادویی در کار نیست.',
+    analogy: 'برنامه مثل دستورِ پخت غذاست: مواد اولیه = داده، مراحل = دستورها، آشپز = پردازنده. اگر مرحله‌ای مبهم باشد («کمی نمک»)، آشپزِ دقیقِ کامپیوتر قاطی می‌کند — چون کامپیوتر هیچ «حدس زدنِ» انسانی ندارد.',
+    technical: 'کامپیوتر فقط دنباله‌ای از دستورهای بسیار ساده (جمع، مقایسه، انتقال داده) را اجرا می‌کند. «زبان برنامه‌نویسی» زبانی دقیق و بی‌ابهام است که انسان با آن دستور می‌نویسد و یک «مفسر» آن را به دستورهای ماشین تبدیل می‌کند. برنامه = الگوریتم (راه‌حل گام‌به‌گام) + بیانِ دقیق آن در یک زبان.',
+    example1: {
+      title: 'یک «برنامه» بدون کامپیوتر',
+      code: '# الگوریتم: بزرگ‌ترین دو عدد\n1. a را بگیر\n2. b را بگیر\n3. اگر a > b بزرگ‌ترین = a وگرنه بزرگ‌ترین = b\n4. بزرگ‌ترین را چاپ کن',
+      explain: 'این همان برنامه است — فقط به فارسی. نوشتنش در هر زبانی تقریباً یک‌به‌یک ترجمهٔ همین خط‌هاست. به این «شبه‌کد» (Pseudocode) می‌گویند.',
+    },
+    example2: {
+      title: 'همین برنامه به پایتون',
+      code: 'a = 12\nb = 30\nif a > b:\n    biggest = a\nelse:\n    biggest = b\nprint("بزرگ‌ترین:", biggest)   # بزرگ‌ترین: 30',
+      explain: 'می‌بینید؟ شبه‌کد قبلی و این کد خط‌به‌خط قرینهٔ هم‌اند. بقیهٔ این آکادمی فقط «گرامرِ» دقیق این ترجمه است.',
+    },
+    lineByLine: [
+      'a = 12 — یک نام به نام a می‌سازد و عدد ۱۲ را به آن وصل می‌کند.',
+      'if a > b: — «اگر» به فارسی؛ شرط را می‌سنجد و با دونقطه تمام می‌شود.',
+      '    biggest = a — تورفتگی در پایتون جای آکولاد را می‌گیرد؛ ۴ فاصله قانون است.',
+      'print(...) — دستور نمایش خروجی؛ تنها چیزی که کاربر می‌بیند.',
+    ],
+    mistakes: [
+      'فراموش کردن دونقطه (:) آخر if — رایج‌ترین خطای روز اول.',
+      'مخلوط کردن حروف کوچک/بزرگ: Print و print دو چیز متفاوت‌اند.',
+      'انتظار «حدس» از کامپیوتر: هر مرحله باید صددرصد دقیق باشد.',
+    ],
+    exercise: {
+      prompt: 'گرم‌کردن! متغیر greeting را با مقدار «سلام پایتون!» بسازید و چاپش کنید (print(greeting)).',
+      starter: '# متغیر بسازید و چاپ کنید\ngreeting = ...\nprint(greeting)',
+      tests: `try:\n    assert greeting == 'سلام پایتون!', f'greeting باید «سلام پایتون!» باشد، الان {greeting!r}'\nexcept NameError:\n    raise AssertionError('متغیر greeting را تعریف نکردید')\nprint('${PY_PASS}')`,
+      hint: 'print("سلام پایتون!") — فقط همین؛ گیومه فراموش نشود.',
+    },
+    challenge: 'همین برنامهٔ «بزرگ‌ترین عدد» را برای سه عدد روی کاغذ بنویسید — در درس شرط‌ها اجرایش می‌کنیم.',
+    summary: 'برنامه = دستورِ دقیق و گام‌به‌گام برای کامپیوتر. زبان برنامه‌نویسی یک قرارداد دقیق است؛ پایتون خواناترین‌شان است. شبه‌کد اول، کد بعد.',
+    quiz: [
+      { q: '«الگوریتم» دقیقاً چیست؟', options: ['زبان برنامه‌نویسی', 'راه‌حل گام‌به‌گام و دقیق', 'نوعی کامپیوتر', 'برنامهٔ آماده'], answer: 1, why: 'الگوریتم راه‌حلِ مرحله‌به‌مرحله است؛ زبان فقط ابزار بیان آن.' },
+      { q: 'چرا کامپیوتر «کم‌وبیش» نمی‌فهمد؟', options: ['چون سریع است', 'چون فقط دستورهای دقیق اجرا می‌کند', 'چون حافظه دارد', 'چون به برق وصل است'], answer: 1, why: 'پردازنده فقط دستورهای صریح اجرا می‌کند؛ ابهام جایی ندارد.' },
+    ],
+  },
+  {
+    id: 'l0-python',
+    level: 0,
+    title: 'پایتون و CPython — پشت صحنه',
+    minutes: 10,
+    learn: ['پایتون چگونه کد شما را اجرا می‌کند', 'CPython چیست', 'تفاوت زبان مفسری و کامپایلری', 'REPL چیست'],
+    prereq: 'درس قبل (برنامه‌نویسی یعنی چه؟)',
+    intro: 'وقتی دکمهٔ اجرا را می‌زنید واقعاً چه اتفاقی می‌افتد؟ فهمیدن این بخش، تفاوت «پایتون واقعی» و «شبیه‌سازها» را برای همیشه روشن می‌کند.',
+    analogy: 'دو راه برای خواندن کتاب خارجی: یک‌بار کل کتاب را ترجمه کن و بده (کامپایل — مثل C)، یا جمله‌به‌جمله همزمان اجرا کن (تفسیر — مثل پایتون). و «پایتون واقعی» همین‌جا در مرورگر شما هم هست: CPython کامپایل‌شده به WebAssembly.',
+    technical: '«پایتون» یک مشخصات (specification) است؛ CPython پیاده‌سازی مرجع آن به زبان C است — همان که python.org می‌دهد و در این آکادمی از طریق Pyodide داخل مرورگر اجرا می‌شود. CPython اول کد را به بایت‌کد (.pyc) کامپایل و بعد در ماشین مجازی خودش اجرا می‌کند؛ یعنی «مفسری با کامپایل داخلی». REPL = حلقهٔ خواندن-اجرا-چاپ که نتیجهٔ هر خط را فوری می‌دهد.',
+    example1: {
+      title: 'اجرای واقعی — نسخهٔ CPython خودتان را ببینید',
+      code: 'import sys\nprint(sys.version)\nprint(sys.implementation.name)   # cpython',
+      explain: 'این کد را در «اجراکنندهٔ پایتون واقعی» همین صفحه امتحان کنید: دقیقاً نسخهٔ CPython درون مرورگر چاپ می‌شود. این شبیه‌سازی نیست — همان پایتون python.org است.',
+    },
+    example2: {
+      title: 'بایت‌کد — غذا آماده قبل از خوردن',
+      code: 'import dis\n\ndef add(a, b):\n    return a + b\n\ndis.dis(add)   # بایت‌کد را نشان می‌دهد',
+      explain: 'dis بایت‌کد تابع را نمایش می‌دهد: LOAD_FAST, BINARY_OP, RETURN_VALUE. یعنی پایتون قبل از اجرا، کد شما را به دستورهای ریز ماشینِ خودش ترجمه می‌کند.',
+    },
+    lineByLine: [
+      'import sys — ماژول استاندارد «سیستم»: نسخه، مسیرها، ورودی/خروجی.',
+      'sys.implementation.name — می‌گوید این پایتون با چه موتوری اجرا شده: cpython.',
+      'dis.dis(add) — دامپ بایت‌کد؛ ابزار عالی برای فهم پشت صحنه.',
+    ],
+    mistakes: [
+      'خلط «پایتون» با «CPython»: پایتون استاندارد است، CPython رایج‌ترین پیاده‌سازی (دیگر: PyPy، MicroPython).',
+      'گمان اینکه پایتون «کامپایل نمی‌شود»: بایت‌کد .pyc همین کامپایل است — فقط مخفی.',
+      'خواندن فایل .py با دوبار کلیک و تعجب از بسته‌شدن فوری پنجرهٔ کنسول.',
+    ],
+    exercise: {
+      prompt: 'دو متغیر بسازید: impl_name = نام پیاده‌سازی (از sys) و year = 1991. سپس هر سه را چاپ کنید.',
+      starter: 'import sys\nimpl_name = ...   # نام پیاده‌سازی از sys\nyear = ...        # 1991\nprint(impl_name, year)',
+      tests: `try:\n    assert impl_name == 'cpython', f'impl_name باید cpython باشد، الان {impl_name!r}'\n    assert year == 1991, f'year باید 1991 باشد، الان {year!r}'\nexcept NameError as e:\n    raise AssertionError(f'متغیر تعریف نشده: {e}')\nprint('${PY_PASS}')`,
+      hint: 'print(1991)',
+    },
+    challenge: 'با help(sys) فهرست قابلیت‌های ماژول sys را ببینید؛ سه مورد جالب را یادداشت کنید.',
+    summary: 'پایتون = زبان؛ CPython = موتور اجرا. مفسر است ولی داخلش بایت‌کد کامپایل می‌شود. در این آکادمی با CPython واقعی تمرین می‌کنید.',
+    quiz: [
+      { q: 'CPython چیست؟', options: ['پایتون برای C-نویس‌ها', 'پیاده‌سازی مرجع پایتون به زبان C', 'کامپایلر C', 'نام فایل‌های پایتون'], answer: 1, why: 'CPython پیاده‌سازی مرجع است؛ وقتی می‌گوییم «پایتون» عملاً همان اجرا می‌شود.' },
+      { q: 'پایتون هنگام اجرا چه می‌کند؟', options: ['مستقیم به کد ماشین CPU می‌دهد', 'اول بایت‌کد می‌سازد و در VM خودش اجرا می‌کند', 'فقط متن را چاپ می‌کند', 'کد را به C برمی‌گرداند'], answer: 1, why: 'مرحلهٔ مخفی کامپایل به بایت‌کد همیشه انجام می‌شود.' },
+      { q: 'REPL چیست؟', options: ['نوعی حلقهٔ تکرار', 'محیط فوریِ خواندن-اجرا-چاپ', 'نام فایل پروژه', 'یک کتابخانه'], answer: 1, why: 'REPL = Read-Eval-Print Loop؛ پنجره‌ای که هر خط را زنده اجرا می‌کند.' },
+    ],
+  },
+
+  /* ================= سطح ۱ ================= */
+  {
+    id: 'l1-vars',
+    level: 1,
+    title: 'متغیرها و انواع داده',
+    minutes: 12,
+    learn: ['ساخت متغیر و قواعد نام‌گذاری', 'int، float، str، bool و None', 'نوع‌دهی پویا (dynamic typing)', 'تبدیل نوع'],
+    prereq: 'سطح ۰',
+    intro: 'متغیرها نام‌هایی برای داده‌ها هستند. پایتون این را بی‌دردسر می‌کند — ولی همین راحتی، دام‌هایی هم دارد.',
+    analogy: 'برچسب روی جعبه، نه خودِ جعبه: در پایتون متغیر فقط یک «برچسب» است که به یک شیء چسبیده. وقتی می‌نویسید x = y، برچسب x را برمی‌دارید و به همان جعبهٔ y می‌چسبانید.',
+    technical: 'در پایتون همه‌چیز شیء است. انتساب x = 5 نامِ x را به شیء int(5) متصل (bind) می‌کند. type(x) نوع شیء فعلی را می‌دهد و چون نوع به شیء وصل است نه به نام، x = "hi" در خط بعد کاملاً مجاز است (dynamic typing). تبدیل نوع با int()، float()، str() انجام می‌شود؛ None یعنی «هیچ مقداری».',
+    example1: {
+      title: 'چهار نوع اصلی',
+      code: 'age = 26              # int\nprice = 199000.5      # float\nname = "آرش"          # str\nis_student = True     # bool\nnothing = None        # بدون مقدار\n\nprint(type(age), type(price))\nprint(type(name), type(is_student))',
+      explain: 'در اجراکنندهٔ واقعی اجرا کنید: <class int> و بقیه چاپ می‌شود. متن فارسی هم در str کاملاً معتبر است — رشتهٔ پایتون یونیکد است.',
+    },
+    example2: {
+      title: 'نوع‌دهی پویا و تبدیل',
+      code: 'x = 100          # الان int است\nprint(type(x))\nx = "صد"         # الان str است — هیچ خطایی نیست!\nprint(type(x))\n\nn = int("42")    # تبدیل رشته به عدد\nf = float("3.5")\nt = str(3.5)\nprint(n + 1, f * 2, t + "!")',
+      explain: 'int("42") + 1 می‌شود 43. اما int("42.5") خطا می‌دهد — تبدیل فقط وقتی معنا دارد که متن دقیقاً عدد باشد.',
+    },
+    lineByLine: [
+      'age = 26 — نام age به شیء int(26) وصل شد؛ اعلام نوع لازم نبود.',
+      'x = "صد" — همان نام به شیء رشته وصل شد؛ این «dynamic typing» است.',
+      'int("42") — رشته را می‌گیرد و int می‌سازد؛ تبدیل ناممکن → ValueError.',
+      't + "!" — چون t رشته است، + یعنی چسباندن رشته.',
+    ],
+    mistakes: [
+      '"5" + 5 — جمع رشته و عدد → TypeError؛ اول int("5") کنید.',
+      'نام با فاصله یا خط تیره: age-2 یعنی age منهای ۲!',
+      'مقایسهٔ float با == برای پول: 0.1 + 0.2 != 0.3 در همهٔ زبان‌ها.',
+    ],
+    exercise: {
+      prompt: 'متغیر بسازید: price با 250000.5، qty با 3، و total = حاصل‌ضرب آن‌ها؛ سپس total را چاپ کنید. تست انتظار total == 750001.5 دارد.',
+      starter: 'price = 250000.5\nqty = 3\ntotal = ...\nprint(total)',
+      tests: `try:\n    assert total == 750001.5, 'total باید 750001.5 باشد'\n    assert isinstance(price, float) and isinstance(qty, int), 'نوع price=float و qty=int'\nexcept NameError as e:\n    raise AssertionError(f'متغیری تعریف نشده: {e}')\nprint('${PY_PASS}')`,
+      hint: 'total = price * qty',
+    },
+    challenge: 'با f-string (درس بعد) جملهٔ «قیمت کل: ۷۵۰۰۰۱ تومان» را از total بسازید.',
+    summary: 'متغیر = برچسبِ روی شیء؛ نوع با شیء است نه با نام. تبدیل صریح با int()/float()/str(). None یعنی بدون مقدار.',
+    quiz: [
+      { q: 'بعد از x = 5 سپس x = "hi" وضع x چیست؟', options: ['خطا می‌دهد', 'x رشته است — نوع پویا', 'x هم عدد هم رشته', 'باید del شود'], answer: 1, why: 'نام‌ها آزادانه به شیءهای مختلف وصل می‌شوند.' },
+      { q: 'خروجی type(True) چیست؟', options: ["<class 'bool'>", "<class 'int'>", "<class 'True'>", "<class 'str'>"], answer: 0, why: 'bool نوع مستقل است (هرچند زیرکلاس int — نکتهٔ پیشرفته!).' },
+      { q: 'int("3.5") چه می‌کند؟', options: ['3.5 می‌دهد', '4 می‌دهد', 'ValueError می‌دهد', '3 می‌دهد'], answer: 2, why: 'رشتهٔ اعشاری را مستقیم به int نمی‌شود داد؛ اول float بعد int.' },
+    ],
+  },
+  {
+    id: 'l1-fstring',
+    level: 1,
+    title: 'رشته‌ها و f-string',
+    minutes: 12,
+    learn: ['ساخت رشته و سه‌گیومه', 'f-string برای قالب‌بندی', 'برش رشته (slicing)', 'متدهای پرکاربرد str'],
+    prereq: 'متغیرها و انواع',
+    intro: 'بخش بزرگی از برنامه‌های واقعی با متن سروکار دارد: نام کاربر، پیام خطا، گزارش. پایتون ابزار متن‌بازی دارد که بهترش را هیچ زبانی ندارد.',
+    analogy: 'f-string مثل پرکردن چک بانکی است: متن ثابت + جاهای خالی که با اطلاعات واقعی پر می‌شوند. به‌جای چسباندن تکه‌های رشته با + و گیومه‌های تو در تو، قالبِ تمیز دارید.',
+    technical: 'رشته غیرقابل‌تغییر (immutable) است؛ هر متدِ «تغییر» یک رشتهٔ جدید می‌سازد. f-string: f"متن {expr}" — داخل آکولاد هر عبارت پایتونی مجاز است، حتی فرمت مثل {price:,.0f}. برش s[start:stop:step] با stop انحصاری. متدهای کلیدی: strip، split، join، replace، startswith، upper/lower.',
+    example1: {
+      title: 'f-string حرفه‌ای با فرمت اعداد',
+      code: 'name = "سارا"\nprice = 1234567.891\nprint(f"سلام {name}!")\nprint(f"قیمت: {price:,.0f} تومان")   # جداکنندهٔ هزارگان\nprint(f"دقیق: {price:.2f}")          # دو رقم اعشار',
+      explain: ':,.0f یعنی جداکنندهٔ هزارگان + بدون اعشار؛ نتیجه: «قیمت: 1,234,568 تومان». این فرمت‌کننده‌ها در گزارش‌های مالی نجات‌بخش‌اند.',
+    },
+    example2: {
+      title: 'برش و متدها — پاک‌سازی ورودی',
+      code: 'raw = "  گزارش-فروش.CSV  "\nclean = raw.strip()                  # حذف فاصلهٔ دو طرف\nprint(clean.lower())\nprint(clean.startswith("گزارش"))\nprint(clean[-4:])                    # چهار حرف آخر\nprint(clean.split("-"))              # تقسیم به لیست',
+      explain: 'strip فاصله‌ها را می‌گیرد، split با جداکننده لیست می‌سازد و join برعکسش است. s[-4:] از چهارمخلِ آخر تا انتها — ایندکس منفی از راست می‌شمارد.',
+    },
+    lineByLine: [
+      'f"...{price:,.0f}..." — داخل آکولاد: عبارت + : + spec فرمت.',
+      'raw.strip() — رشتهٔ جدید بدون فاصلهٔ ابتدا/انتها؛ raw دست‌نخورده می‌ماند.',
+      'clean.split("-") — لیست دو عنصری می‌سازد.',
+      'clean[-4:] — برش با ایندکس منفی: «.CSV».',
+    ],
+    mistakes: [
+      's[0] = "ع" — رشته تغییرناپذیر است؛ TypeError. رشتهٔ جدید بسازید.',
+      'فراموش کردن f: بعد print("{name}") خودِ {name} چاپ می‌شود!',
+      'split() بدون آرگومان با split(" ") فرق دارد: اولی هر فاصلهٔ متوالی را یکی می‌کند.',
+    ],
+    exercise: {
+      prompt: 'تابع ticket(name, price) بنویسید که رشتهٔ «[بلیت] نام — 9,500 تومان» برگرداند؛ قیمت با جداکنندهٔ هزارگان و بدون اعشار.',
+      starter: 'def ticket(name, price):\n    ...\n\nprint(ticket("مینا", 9500))',
+      tests: `out = ticket("مینا", 9500)\nassert out == '[بلیت] مینا — 9,500 تومان', f'خروجی اشتباه: {out!r}'\nassert ticket("علی", 1234567) == '[بلیت] علی — 1,234,567 تومان', 'جداکنندهٔ هزارگان درست نیست'\nprint('${PY_PASS}')`,
+      hint: 'return f"[بلیت] {name} — {price:,.0f} تومان"',
+    },
+    challenge: 'تابع initials(full_name) بنویسید که «آرش کمانگیر» را بگیرد و «آ.ک» برگرداند (split + حرف اول هر بخش).',
+    summary: 'f-string استاندارد قالب‌بندی مدرن است. برش با start:stop:step و ایندکس منفی. رشته immutable؛ متدها رشتهٔ جدید برمی‌گردانند.',
+    quiz: [
+      { q: 'خروجی f"{2+3}" چیست؟', options: ['{2+3}', '5', '2+3', 'خطا'], answer: 1, why: 'داخل f-string عبارت محاسبه و نتیجه جایگزین می‌شود.' },
+      { q: 's = "پایتون"؛ s[1:4] کدام است؟', options: ['ایت', 'ایتو', 'ایتون', 'تای'], answer: 0, why: 'بازه [1,4) یعنی ایندکس‌های ۱،۲،۳ → «ایت». (stop انحصاری)' },
+      { q: 'کدام متد رشته را درجا تغییر می‌دهد؟', options: ['replace', 'هیچ‌کدام — رشته immutable است', 'upper', 'strip'], answer: 1, why: 'همه رشتهٔ جدید می‌سازند؛ متد درجا برای str نداریم.' },
+    ],
+  },
+  {
+    id: 'l1-ops',
+    level: 1,
+    title: 'عملگرها و منطق',
+    minutes: 10,
+    learn: ['عملگرهای حسابی و اولویت', 'مقایسه و منطقی (and/or/not)', 'مقایسهٔ زنجیره‌ای', 'تفاوت = و =='],
+    prereq: 'متغیرها و انواع',
+    intro: 'عملگرها فعل‌های زبان پایتون‌اند. اشتباه کوچک اینجا یعنی منطق برعکسِ برنامه — و این خطاها سخت‌گیرترین باگ‌ها هستند.',
+    analogy: 'and مثل درِ دو قفل: هر دو باید باز باشد. or مثل دو راه ورودی: یکی کافی است. not معکوس‌کننده است. اولویت عملگرها مثل «ضرب قبل از جمع» است — پرانتز همیشه برنده است.',
+    technical: 'حسابی: + - * / (همیشه float) // (تقسیم صحیح به کف) % (باقیمانده) ** (توان). مقایسه‌ای: == != > < >= <= که bool می‌دهند و زنجیره‌ای مجازند: 0 < x < 10. منطقی: and/or/not با ارزیابی کوتاه (short-circuit). = انتساب است، == مقایسه.',
+    example1: {
+      title: 'تقسیم‌ها — دام همیشگی',
+      code: 'print(7 / 2)    # 3.5 — تقسیم واقعی\nprint(7 // 2)   # 3   — صحیح (به سمت پایین)\nprint(-7 // 2)  # -4  — دقت! به سمت منفی‌تر\nprint(7 % 2)    # 1   — باقیمانده\nprint(2 ** 10)  # 1024 — توان',
+      explain: 'نکتهٔ طلایی: // به سمت «منفی بی‌نهایت» گرد می‌کند، نه صفر. 9_000_000 هم نویسهٔ خوانایی است: همان 9000000.',
+    },
+    example2: {
+      title: 'منطق و زنجیرهٔ مقایسه',
+      code: 'age = 25\nsalary = 9_000_000\n\nprint(age >= 18 and salary > 5_000_000)   # True\nprint(age < 18 or salary > 100_000_000)   # False\nprint(not (age > 30))                     # True\nprint(0 < age < 100)                      # زنجیره‌ای — پایتونیک!',
+      explain: 'زنجیرهٔ 0 < age < 100 همان ریاضیِ دبیرستان است و age یک‌بار ارزیابی می‌شود — به‌جای and دوتایی و خطاهای احتمالی.',
+    },
+    lineByLine: [
+      '7 / 2 — هر تقسیم / نتیجهٔ float می‌دهد: 3.5 (نه 3).',
+      '-7 // 2 — کفِ -3.5 یعنی -4؛ نه -3.',
+      '0 < age < 100 — کامپایلر به (0<age) and (age<100) تبدیل می‌کند.',
+      'and کوتاه‌مدت است: اگر اولی False باشد دومی اصلاً اجرا نمی‌شود.',
+    ],
+    mistakes: [
+      'if x = 5: — SyntaxError؛ انتساب در شرط ممنوع.',
+      'انتظار 3 از 7/2 — پایتون ۳ همیشه float می‌دهد.',
+      'خواندن 9_000_000 به‌عنوان «عدد با زیرخط» — زیرخط فقط خوانایی است.',
+    ],
+    exercise: {
+      prompt: 'تابع is_leap(year) بنویسید: کبیسه اگر بر ۴ بخش‌پذیر ولی بر ۱۰۰ نباشد، مگر بر ۴۰۰ باشد. بازگشت True/False.',
+      starter: 'def is_leap(year):\n    ...\n\nprint(is_leap(1403))  # True',
+      tests: `assert is_leap(1403) == True, '1403 کبیسه است'\nassert is_leap(1402) == False\nassert is_leap(1400) == True, 'تقویم: 1400 کبیسه است'\nassert is_leap(2023) == False\nassert is_leap(2000) == True and is_leap(1900) == False, 'قانون 400'\nprint('${PY_PASS}')`,
+      hint: 'return (y%4==0 and y%100!=0) or (y%400==0)',
+    },
+    challenge: 'عبارت (True or False and False) را بدون اجرا حدس بزنید، بعد با print چک کنید — and قبل از or است.',
+    summary: '/ همیشه float؛ // کف؛ % باقیمانده؛ ** توان. مقایسه زنجیره‌ای پایتونیک است. = انتساب، == مقایسه.',
+    quiz: [
+      { q: 'خروجی 10 // 3؟', options: ['3.33', '3', '4', '1'], answer: 1, why: '// کف تقسیم: 3.33 → 3.' },
+      { q: '0 < 5 < 3 یعنی چه؟', options: ['(0<5) and (5<3) → False', 'خطا', 'True', '0'], answer: 0, why: 'زنجیرهٔ مقایسه با and ترکیب می‌شود.' },
+      { q: 'کدام برابر True است؟', options: ['not True', 'False or not False', 'False and True', 'not (1==1)'], answer: 1, why: 'not False = True و or با یک True برابر True.' },
+    ],
+  },
+
+  /* ================= سطح ۲ ================= */
+  {
+    id: 'l2-lists',
+    level: 2,
+    title: 'لیست و tuple',
+    minutes: 12,
+    learn: ['ساخت و دسترسی به لیست', 'append/insert/remove/pop/sort', 'برش و ایندکس منفی', 'tuple و تفاوت mutable/immutable', 'دام کپی مرجع'],
+    prereq: 'مبانی پایتون',
+    intro: 'لیست پرکاربردترین ساختار دادهٔ پایتون است. و دام کپی‌کردنش، باگ شمارهٔ یکِ مبتدی‌ها — که بعد از این درس دیگر هرگز نمی‌افتید.',
+    analogy: 'لیست = برگهٔ خرید: append یعنی آیتم به ته برگه اضافه کن. tuple = فاکتورِ صادره: بعد از چاپ تغییر نمی‌کند. و b = a فوتوکپیِ برگه نیست — همان برگه را با دستِ دیگر گرفتید!',
+    technical: 'لیست آرایهٔ پویای مرجع‌دار: a[i] با O(1)، append با هزینهٔ سرشکن O(1). متدها درجا (in-place) تغییر می‌دهند و None برمی‌گردانند — پس x = a.sort() اشتباه است. tuple تغییرناپذیر و hashable است. b = a فقط مرجع کپی می‌کند؛ کپی واقعی: a.copy() یا a[:] — برای تودرتو copy.deepcopy.',
+    example1: {
+      title: 'چرخهٔ حیات یک لیست',
+      code: 'grades = [18, 13.5, 20, 15]\ngrades.append(17)          # ته\ngrades.insert(0, 19.5)     # اول\ngrades.remove(13.5)        # اولین مقدار برابر\nlast = grades.pop()        # برداشتن آخرین\ngrades.sort()              # مرتب‌سازی درجا\nprint(grades, last, len(grades))\nprint(grades[0], grades[-1])',
+      explain: 'همهٔ متدها درجا کار می‌کنند: بعد از sort خود grades مرتب است و مقدار بازگشتی None. pop آخرین را برمی‌دارد و برمی‌گرداند — پشته (stack) با همین می‌سازند.',
+    },
+    example2: {
+      title: 'دام کپی — و راه‌حل',
+      code: 'a = [1, 2, 3]\nb = a              # کپیِ مرجع!\nb.append(4)\nprint(a)           # [1, 2, 3, 4]  — a هم تغییر کرد!\n\nc = a.copy()       # کپی سطح اول\nc.append(5)\nprint(a, c)\n\ngrid = [[0, 0], [0, 0]]\nwrong = grid * 2          # دام بزرگ‌تر!\nwrong[0][0] = 9\nprint(grid)               # [[9,0],[9,0]] — دو سطر، یک لیستِ مشترک',
+      explain: 'b = a یعنی دو برچسب روی یک جعبه. grid*2 دو «برچسب» به همان سطرِ داخلی است — کلاسیک‌ترین باگ مبتدی. راه درست تودرتو: comprehension.',
+    },
+    lineByLine: [
+      'grades.append(17) — لیست درجا بزرگ می‌شود؛ خروجی None است.',
+      'grades.remove(13.5) — اولین تطابق را حذف می‌کند؛ نبودش ValueError.',
+      'b = a — هیچ کپی‌ای رخ نمی‌دهد؛ فقط نام دوم.',
+      'a.copy() — کپی سطح اول: لیست جدید با همان اعضا.',
+    ],
+    mistakes: [
+      'x = a.sort() — x برابر None؛ sort درجا است، sorted(a) کپیِ مرتب می‌دهد.',
+      'remove مقدار را می‌گیرد نه ایندکس — حذف با ایندکس: pop(i) یا del a[i].',
+      'grid = [[0]*n]*m — همهٔ سطرها یک لیست‌اند؛ با comprehension بسازید.',
+    ],
+    exercise: {
+      prompt: 'تابع top3(nums) بنویسید که سه نمرهٔ برتر را به‌ترتیب نزولی در یک لیستِ جدید برگرداند؛ لیست اصلی نباید تغییر کند.',
+      starter: 'def top3(nums):\n    ...\n\nprint(top3([12, 20, 17, 9]))  # [20, 17, 12]',
+      tests: `src = [12, 20, 17, 9]\nout = top3(src)\nassert out == [20, 17, 12], f'خروجی: {out}'\nassert src == [12, 20, 17, 9], 'لیست اصلی نباید تغییر کند! (sorted نه sort)'\nassert top3([]) == [], 'لیست خالی → خروجی خالی'\nprint('${PY_PASS}')`,
+      hint: 'return sorted(nums, reverse=True)[:3]',
+    },
+    challenge: 'تابع second_largest بنویسید که دومین مقدار متمایزِ بزرگ را در یک گذر (بدون sort) پیدا کند.',
+    summary: 'لیست mutable و همه‌کاره؛ متدها درجاست (None برمی‌گردانند). tuple ثابت و hashable. b=a کپی نیست! کپی سطح اول copy().',
+    quiz: [
+      { q: 'x = [3,1,2]; y = x.sort() — y چیست؟', options: ['[1,2,3]', 'None', '[3,1,2]', 'خطا'], answer: 1, why: 'sort درجا می‌کند و None برمی‌گرداند؛ باید sorted(x) می‌گرفتید.' },
+      { q: 'a=[1,2]; b=a; b.append(3) — a چیست؟', options: ['[1,2]', '[1,2,3]', 'خطا', '[3]'], answer: 1, why: 'a و b یک شیء واحدند.' },
+      { q: 'کدام تغییرناپذیر است؟', options: ['list', 'dict', 'tuple', 'set'], answer: 2, why: 'tuple immutable است؛ بقیه mutable.' },
+    ],
+  },
+  {
+    id: 'l2-dicts',
+    level: 2,
+    title: 'دیکشنری و set',
+    minutes: 12,
+    learn: ['دیکشنری: ساخت، خواندن، نوشتن', 'get، keys/values/items', 'حلقه روی دیکشنری', 'set و رفع تکرار', 'کدام ساختار برای کدام کار؟'],
+    prereq: 'لیست و tuple',
+    intro: 'اگر لیست «صف» باشد، دیکشنری «فهرست تلفن» است: به‌جای شمارهٔ ردیف، با کلیدِ معنادار به داده می‌رسید. و set تکرارها را در یک لحظه می‌سوزاند.',
+    analogy: 'لیست = آپارتمان‌های پلاک‌دار (واحد ۰، واحد ۱...)، دیکشنری = نقشهٔ گوگل (جستجو با «نام»: فوری)، set = کارت‌های یکتای مهمانی: هر نام فقط یک‌بار.',
+    technical: 'dict از پایتون ۳.۷ ترتیب درج را حفظ می‌کند و lookup با O(1) (هش‌تابل). کلید باید hashable باشد (str/int/tuple، نه list). d[k] در نبود کلید KeyError می‌دهد؛ d.get(k, default) امن است. set هش‌تابل بدون مقدار: تقاطع/اجتماع/اختلاف با & | - و set(a) تکرارها را حذف می‌کند (ترتیب تضمین نمی‌شود).',
+    example1: {
+      title: 'دیکشنری — فهرست نمرات',
+      code: 'grades = {"علی": 18, "سارا": 19.5}\ngrades["مینا"] = 17          # افزودن\nprint(grades["علی"])\nprint(grades.get("رضا"))          # None — بدون خطا\nprint(grades.get("رضا", 0))       # 0\n\nfor name, g in grades.items():\n    print(f"{name}: {g}")\n\nprint(sum(grades.values()) / len(grades))   # میانگین',
+      explain: '.items() جفت‌های (کلید, مقدار) می‌دهد تا در یک حلقه هر دو را بگیرید. قاعدهٔ طلایی: اگر ممکن است کلید نباشد، get بزنید.',
+    },
+    example2: {
+      title: 'set — شمارش واژه‌های یکتا',
+      code: 'text = "توپ توپ سنگ سنگ سنگ آب"\nwords = text.split()\nprint(len(words), "واژه", len(set(words)), "یکتا")\n\ntags1 = {"python", "ai"}\ntags2 = {"ai", "rust"}\nprint(tags1 & tags2)   # مشترک\nprint(tags1 | tags2)   # اجتماع\nprint(tags1 - tags2)   # اختلاف',
+      explain: 'set(words) تکرارها را حذف می‌کند. عملگرهای & | - روی set همان اشتراک/اجتماع/تفاضل ریاضی‌اند.',
+    },
+    lineByLine: [
+      'grades["مینا"] = 17 — کلید جدید می‌سازد یا مقدار موجود را عوض می‌کند.',
+      'grades.get("رضا") — نبودِ کلید خطا نیست؛ None برمی‌گردد.',
+      'for name, g in grades.items() — بازکردن tuple در متغیرها (unpacking).',
+      'set(words) — هر عنصر فقط یک‌بار؛ ترتیب تضمین نمی‌شود.',
+    ],
+    mistakes: [
+      'd[کلیدِ نیست] → KeyError؛ یا get یا in چک کنید.',
+      'کلید لیستی: {[1,2]: "x"} → TypeError (لیست hashable نیست؛ tuple کنید).',
+      'انتظار ترتیب مرتب از set — set ترتیب ندارد؛ sorted(set(...)) کنید.',
+    ],
+    exercise: {
+      prompt: 'تابع word_count(text) بنویسید که دیکشنریِ {واژه: تعداد} بسازد (با split و حروف کوچک). «آب آب آتش» → {"آب": 2, "آتش": 1}',
+      starter: 'def word_count(text):\n    ...\n\nprint(word_count("آب آب آتش"))',
+      tests: `r = word_count("آب آب آتش")\nassert r == {'آب': 2, 'آتش': 1}, f'{r}'\nassert word_count("") == {}, 'متن خالی → دیکشنری خالی'\nassert word_count("A a A")['a'] == 2, 'کوچک‌سازی حروف'\nprint('${PY_PASS}')`,
+      hint: 'd = {} ; for w in text.lower().split(): d[w] = d.get(w, 0) + 1 ; return d',
+    },
+    challenge: 'با collections.Counter همان کار را در یک خط انجام دهید: Counter(text.split()).',
+    summary: 'dict: کلید→مقدار با O(1) و حفظ ترتیب درج؛ get امن. set: یکتاسازی و عملیات مجموعه‌ای. کلید باید hashable باشد.',
+    quiz: [
+      { q: 'd = {} ; d["a"] — چه می‌شود؟', options: ['None', 'KeyError', 'خطای syntax', '0'], answer: 1, why: 'دسترسی مستقیم به کلیدِ غایب KeyError می‌دهد؛ get امن است.' },
+      { q: 'len(set([1,1,2,2,3]))؟', options: ['5', '3', '2', 'خطا'], answer: 1, why: 'یکتاها: {1,2,3} → 3 عضو.' },
+      { q: 'کدام به‌عنوان کلید dict مجاز نیست؟', options: ['"نام"', '(1,2)', '[1,2]', '3.14'], answer: 2, why: 'لیست mutable و hashable نیست.' },
+    ],
+  },
+  {
+    id: 'l2-comp',
+    level: 2,
+    title: 'پیمایش و comprehensions',
+    minutes: 12,
+    learn: ['for روی هر شیء تکرارپذیر', 'enumerate و zip', 'list/dict comprehension', 'فیلتر با if', 'generator expression'],
+    prereq: 'لیست و دیکشنری',
+    intro: 'حلقهٔ for پایتون روی «هر چیزی که تکرارپذیر است» کار می‌کند — نه فقط عدد. و comprehension همان حلقه است اما فشرده و به سبک ریاضی.',
+    analogy: 'comprehension مثل فرمولِ «مجموع مربعات زوج‌ها» روی تخته است: {x² : x زوج}. یک خط، معنا کامل. حلقهٔ سنتی هم همان است — فقط کلمه‌به‌کلمه گفته شده.',
+    technical: 'for روی iterator کار می‌کند؛ range(n) تنبل است و لیست نمی‌سازد. enumerate(seq, start=0) جفت (شاخص, مقدار) می‌دهد؛ zip(a,b) جفت‌های موازی تا کوتاه‌ترین. list comp: [expr for x in it if cond] — سریع‌تر از append در حلقه. dict comp: {k: v for ...}. generator expression: (x for x in it) بدون مصرف حافظه.',
+    example1: {
+      title: 'enumerate و zip — دو چاقوی سوئیسی',
+      code: 'names = ["علی", "سارا", "مینا"]\nscores = [18, 19.5, 17]\n\nfor i, n in enumerate(names, start=1):\n    print(i, n)\n\nfor n, s in zip(names, scores):\n    print(f"{n} → {s}")\n\nprint(dict(zip(names, scores)))   # دیکشنری در یک خط!',
+      explain: 'enumerate جای شمارندهٔ دستی را می‌گیرد. zip دو لیست موازی را جفت می‌کند و dict(zip(...)) دیکشنری می‌سازد — الگویی که هر روز لازمش دارید.',
+    },
+    example2: {
+      title: 'comprehension — فیلتر و تبدیل',
+      code: 'nums = [3, -1, 4, -1, 5, -9, 2, 6]\n\npositives = [n for n in nums if n > 0]\nsquares = [n**2 for n in positives]\nlookup = {n: ("زوج" if n % 2 == 0 else "فرد") for n in positives}\n\nprint(positives)\nprint(squares)\nprint(lookup)\nprint(sum(n for n in nums if n > 0))   # generator expression',
+      explain: 'سه لایهٔ یک فکر: فیلتر (if)، تبدیل (n**2)، دیکشنری‌سازی. خط آخر genexp است: مثل comprehension ولی تنبل — برای sum/all/any بهترین انتخاب.',
+    },
+    lineByLine: [
+      'enumerate(names, start=1) — جفت (۱, علی)؛ شمارش انسانی.',
+      '[n for n in nums if n > 0] — بخوان: «n از nums برای آن n مثبت است».',
+      '{n: ... for n in positives} — dict comp؛ کلید n، مقدار شرطی.',
+      'sum(genexp) — بدون ساختن لیست میانی؛ حافظهٔ صفر.',
+    ],
+    mistakes: [
+      'comprehension سه‌سطح تودرتو — خوانایی قربانی نشود.',
+      'for i in range(len(names)) — پایتونیک نیست؛ enumerate بزنید.',
+      'zip لیست‌های نابرابر: بی‌سروصدا کوتاه‌ترین را می‌گیرد.',
+    ],
+    exercise: {
+      prompt: 'با یک list comprehension از range(1, 21) لیست اعدادی بساز که بر ۳ یا ۵ بخش‌پذیرند: [3, 5, 6, 9, ...]. سپس مجموع‌شان را در متغیر total بگذارید.',
+      starter: 'multiples = [...]\ntotal = sum(multiples)\nprint(multiples)\nprint(total)',
+      tests: `assert multiples[:5] == [3, 5, 6, 9, 10], f'{multiples[:5]}'\nassert multiples[-1] == 18\nassert total == 98, f'total={total}'\nassert isinstance(multiples, list)\nprint('${PY_PASS}')`,
+      hint: '[n for n in range(1, 21) if n % 3 == 0 or n % 5 == 0]',
+    },
+    challenge: 'با dict comp از یک رشته، {حرف: تعداد تکرار} بسازید — فقط حروف، بدون فاصله.',
+    summary: 'for روی هر iterable؛ enumerate برای شاخص+مقدار، zip برای موازی‌ها. comprehension فشرده و سریع؛ genexp حافظهٔ صفر.',
+    quiz: [
+      { q: 'list(range(3)) چیست؟', options: ['[1,2,3]', '[0,1,2]', '0 1 2', 'range(0,3)'], answer: 1, why: 'range از صفر شروع و انتها را شامل نمی‌شود.' },
+      { q: 'zip([1,2],["a","b","c"]) چند جفت می‌دهد؟', options: ['3', '2', '5', 'خطا'], answer: 1, why: 'تا کوتاه‌ترین لیست: 2 جفت.' },
+      { q: 'کدام یک comprehension معتبر است؟', options: ['[x for x in xs if x]', 'for x in xs -> x', '[if x for x in xs]', '(x: x in xs)'], answer: 0, why: 'ساختار: [عبارت for ... if ...].' },
+    ],
+  },
+]

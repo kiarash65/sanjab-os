@@ -1,4 +1,4 @@
-# مجوزهای اشخاص ثالث — Third-Party Licenses (v2.0.0)
+# مجوزهای اشخاص ثالث — Third-Party Licenses (v4.0.0)
 
 > سان‌جاب‌او‌اس خودش تحت **MIT** منتشر می‌شود (فایل `LICENSE`). این سند فهرست وابستگی‌های زمان اجرا با مجوز، منبع، نسخهٔ پین‌شده و محل استفاده است. نسخه‌های دقیق در `package.json` / `bun.lock`.
 
@@ -21,6 +21,8 @@
 | pdfjs-dist | Apache-2.0 | https://github.com/mozilla/pdf.js | 6.5.438 (+ worker در `public/pdf/pdf.worker.min.mjs`) | PDF ساز (رندر) |
 | docx | MIT | https://github.com/dolanmiu/docx | 9.15.1 | خروجی Word نویسا |
 | jspdf | MIT | https://github.com/parallax/jsPDF | 4.2.1 | خروجی PDF نویسا/اسلایدساز |
+| **Pyodide (CPython WASM)** | MPL-2.0 | https://github.com/pyodide/pyodide | 0.26.4 از `https://cdn.jsdelivr.net/pyodide/v0.26.4/full/` (پین‌شده در `public/pyodide-worker.js`) | موتور پایتون واقعی — آکادمی پایتون، کداستودیو (حالت واقعی)، مدیر اجراکننده‌ها |
+| Node.js sidecar (دسکتاپ) | MIT | https://nodejs.org | v22.14.0 win-x64 — در CI دانلود و در نصب‌کننده Tauri باندل می‌شود | اجرای سرور محلی Next standalone در نسخهٔ دسکتاپ (`src-tauri`) |
 | z-ai-web-dev-sdk | مجوز platform (سرویس‌دهنده) | platform سان‌جاب | 0.0.18 | فقط server-side در `/api/tutor` |
 | lucide-react | ISC | https://github.com/lucide-icons/lucide | 0.525.0 | آیکن‌ها |
 | framer-motion | MIT | https://github.com/motiondivision/motion | 12.x | انیمیشن |
@@ -56,3 +58,19 @@
 1. هنگام افزودن وابستگی جدید، ردیف این جدول + ردیف ماتریس `docs/DEPENDENCIES.md` هم‌زمان به‌روزرسانی می‌شود.
 2. مجوزهای non-permissive قبل از ورود بررسی می‌شوند.
 3. در توزیع‌های بسته‌بندی (deb/arch)، فایل این سند همراه بسته کپی می‌شود (`packaging/debian/copyright` مرجع دبین است).
+
+
+## منابع آموزشی (الهام ساختاری — بدون کپی محتوا)
+
+| پروژه | مجوز | استفادهٔ ما |
+|---|---|---|
+| rust-lang/rustlings | MIT | الگوی مأموریت‌های کوتاه تصحیح‌شوندهٔ آکادمی Rust |
+| google/comprehensive-rust | Apache-2.0 | ساختار مراحل (مالکیت → انواع → پیشرفته) |
+| microsoft/ML-For-Beginners | MIT | چیدمان مفاهیم ML (بخش‌های AI آکادمی) |
+| microsoft/generative-ai-for-beginners | MIT | سرفصل بخش LLM/RAG |
+| denysdovhan/learnyoubash (GPL) و bash-handbook (CC-BY-SA) | GPL / CC-BY-SA | فقط الهام طراحی تمرین‌ها؛ محتوایی کپی نشده است |
+| FarsioIR/NeveshtYar | MIT | الهام قابلیت‌های نوشت‌یار (چیدمان، نرمال‌سازی) — پیاده‌سازی اصلی |
+| Dadmatech/DadmaTools | Apache-2.0 | الهام فهرست قابلیت‌های نرمال‌سازی فارسی — پیاده‌سازی اصلی |
+| karpathy/micrograd | MIT | الگوی autodiff — `src/lib/ai/micrograd.ts` بازنویسی آموزشی مستقل است |
+
+> قاعده: هر محتوای آموزشی این پروژه متنِ اصلی فارسی است؛ پروژه‌های بالا فقط به‌عنوان مرجعِ ساختار دوره استفاده شده‌اند و کد/متن آن‌ها کپی نشده است.

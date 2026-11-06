@@ -9,6 +9,7 @@
    با اسپانسری سان‌جاب
    ================================================================== */
 
+import dynamic from 'next/dynamic'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode, RefObject } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -40,6 +41,9 @@ import {
   Users,
   Video,
   Zap,
+  Scissors,
+  Eye,
+  Search,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
@@ -114,7 +118,23 @@ type ViewId =
   | 'overfit'
   | 'ethics'
   | 'lab'
+  | 'tokenizer'
+  | 'attention'
+  | 'rag'
   | 'quiz'
+
+const TokenizerLab = dynamic(() => import('@/components/os/academy/ai-labs').then((m) => m.TokenizerLab), {
+  ssr: false,
+  loading: () => <div className="grid h-32 place-items-center text-xs text-zinc-500">در حال بارگیری آزمایشگاه…</div>,
+})
+const AttentionLab = dynamic(() => import('@/components/os/academy/ai-labs').then((m) => m.AttentionLab), {
+  ssr: false,
+  loading: () => <div className="grid h-32 place-items-center text-xs text-zinc-500">در حال بارگیری آزمایشگاه…</div>,
+})
+const RagLab = dynamic(() => import('@/components/os/academy/ai-labs').then((m) => m.RagLab), {
+  ssr: false,
+  loading: () => <div className="grid h-32 place-items-center text-xs text-zinc-500">در حال بارگیری آزمایشگاه…</div>,
+})
 
 interface SectionDef {
   id: ViewId
@@ -135,6 +155,9 @@ const SECTIONS: SectionDef[] = [
   { id: 'overfit', short: 'بیش‌برازش', title: 'بیش‌برازش (Overfitting)', subtitle: 'وقتی مدل حفظ می‌کند ولی یاد نمی‌گیرد', icon: AlertTriangle, tint: TEAL },
   { id: 'ethics', short: 'اخلاق', title: 'اخلاق و آینده', subtitle: 'قدرت بزرگ، مسئولیت بزرگ می‌آورد', icon: Scale, tint: PINK },
   { id: 'lab', short: 'آزمایشگاه آموزش', title: 'آزمایشگاه شبکه عصبی', subtitle: 'یک شبکه واقعی را در مرورگر تو آموزش بده — پس‌انتشار زنده', icon: Activity, tint: TEAL },
+  { id: 'tokenizer', short: 'توکن‌ساز (BPE)', title: 'توکن‌ساز — زبانِ مدل‌ها', subtitle: 'متن چطور به توکن شکسته می‌شود؟ BPE زنده', icon: Scissors, tint: VIOLET },
+  { id: 'attention', short: 'توجه (Attention)', title: 'خودتوجهی — قلب ترنسفورمر', subtitle: 'هر واژه به کدام واژه‌ها «نگاه» می‌کند؟', icon: Eye, tint: ORANGE },
+  { id: 'rag', short: 'RAG', title: 'بازیابی‌افزوده (RAG)', subtitle: 'چطور مدلِ بدون حافظه، از اسناد شما جواب می‌دهد', icon: Search, tint: TEAL },
   { id: 'quiz', short: 'آزمون', title: 'آزمون نهایی', subtitle: '۸ سؤال؛ قبولی با ۶ یا بیشتر', icon: Trophy, tint: ORANGE },
 ]
 
@@ -2578,6 +2601,7 @@ export default function AIAcademyApp() {
         const willBeDone = !p.done.includes(id)
         const done = willBeDone ? [...p.done, id] : p.done.filter((d) => d !== id)
         if (willBeDone) {
+          useGame.getState().completeLesson('ai', id, 20)
           const finishedAll = done.length >= SECTIONS.length
           pushToast({
             title: finishedAll ? 'همهٔ مفاهیم AI را یاد گرفتی!' : `بخش «${title}» تمام شد!`,
@@ -2730,6 +2754,9 @@ export default function AIAcademyApp() {
                 {view === 'overfit' && renderSection('overfit', <OverfitSection />)}
                 {view === 'ethics' && renderSection('ethics', <EthicsSection />)}
                 {view === 'lab' && renderSection('lab', <NNLab />)}
+                {view === 'tokenizer' && renderSection('tokenizer', <TokenizerLab />)}
+                {view === 'attention' && renderSection('attention', <AttentionLab />)}
+                {view === 'rag' && renderSection('rag', <RagLab />)}
                 {view === 'quiz' && renderSection('quiz', <QuizSection best={progress.quizBest} onSave={saveQuizBest} />)}
               </motion.div>
             </AnimatePresence>

@@ -1,4 +1,4 @@
-# پشتیبانی پلتفرم — Platform Support (v2.0.0)
+# پشتیبانی پلتفرم — Platform Support (v4.0.0)
 
 ## ۱. مرورگرها (WebOS)
 
@@ -15,9 +15,10 @@
 |-----|---------------|------|
 | `getUserMedia` | اپ‌های دوربین (تشخیص چهره، قدسنج/وزن‌یاب، ماشین زمان چهره) | **فقط HTTPS یا localhost** — روی HTTP ناامن دوربین مرورگرها در دسترس نیست |
 | WASM | شبیه‌ساز v86 (کرنل واقعی Alpine) | همیشه فعال در مرورگرهای مدرن؛ ~85MB فایل بوت از `public/v86/` |
-| Web Worker | اجرای JS کاربر در کداستودیو | — |
+| Web Worker | اجرای JS کاربر در کداستودیو + Pyodide CPython (ورکر جدا) | — |
+| WASM (Pyodide) | **پایتون واقعی** — CPython 3.12؛ بارگیری اول ~۱۰MB از CDN با اینترنت | سقف اجرا ۱۵ ثانیه؛ فایل روی MEMFS |
 | localStorage | fs مجازی، تنظیمات، یادداشت‌ها، رکوردها | حالت ناشناس (private) داده‌ها را ذخیره نمی‌کند |
-| IndexedDB | وضعیت VM/بکاپ — `[planned]` | هنوز پیاده‌سازی نشده |
+| IndexedDB | وضعیت VM v86 (`v86-alpine-state-v1`)، کش Releases، سندهای نوشت‌یار | فعال |
 | WebGL/GPU | **لازم نیست** — هیچ اپی GPU اجباری ندارد | Face AI روی CPU با TinyFaceDetector اجرا می‌شود |
 
 ## ۳. پروفایل منابع پایین (Low-resource)
@@ -67,3 +68,14 @@ npm run build && npx next start -p 4310
 
 - فایل یونیت: `linux-edition/sanjabos.service` — کاربر/گروه اختصاصی `sanjabos`، hardening کامل (`NoNewPrivileges`, `ProtectSystem=strict`, `ProtectHome`, `PrivateTmp`, `RestrictSUIDSGID`, `LockPersonality`, `RestrictAddressFamilies`, `ReadWritePaths` محدود، `MemoryMax=1G`, `CPUQuota=80%`)، پیش‌فرض گوش‌دادن روی loopback (`HOSTNAME=127.0.0.1`).
 - فرمان‌ها: `sanjabos start|stop|restart|status|logs|open|kiosk|update`.
+
+
+## ۵. نسخهٔ دسکتاپ ویندوز (Tauri v2 — POC)
+
+| مؤلفه | جزئیات |
+|---|---|
+| معماری | Webview → `http://127.0.0.1:<پورت آزاد>` — سایدکار Node.exe سرور Next standalone را بالا می‌آورد |
+| شبکه | فقط loopback؛ هیچ پورت عمومی؛ خاموشی تمیز پردازه در خروج اپ |
+| نصب‌کننده | NSIS (per-user، بدون نیاز به ادمین) و MSI — WebView2 با downloadBootstrapper |
+| منابع کاربر | localStorage/IndexedDB پروفایل WebView2 — آپدیت داده‌ها را پاک نمی‌کند |
+| محدودیت | تا اولین تگ `v4.x` با pipeline سبز، artifact تضمین نمی‌شود؛ نقطهٔ `/api/tutor` میزبان در دسکتاپ غیرفعال است (دستیار با کلید خود کاربر کار می‌کند) |

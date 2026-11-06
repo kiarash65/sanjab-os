@@ -24,11 +24,12 @@ import {
   xpForLevel,
 } from '@/lib/gamification/engine'
 
-const TRACK_LABELS: { key: 'linux' | 'python' | 'rust' | 'ai'; label: string; tint: string }[] = [
+const TRACK_LABELS: { key: 'linux' | 'python' | 'rust' | 'ai' | 'powershell'; label: string; tint: string }[] = [
   { key: 'linux', label: 'آکادمی لینوکس', tint: '#f7931e' },
-  { key: 'python', label: 'کداستودیو پایتون', tint: '#2dd4bf' },
+  { key: 'python', label: 'آکادمی پایتون', tint: '#2dd4bf' },
   { key: 'rust', label: 'آکادمی Rust', tint: '#b7410e' },
   { key: 'ai', label: 'آکادمی هوش مصنوعی', tint: '#8b5cf6' },
+  { key: 'powershell', label: 'آکادمی پاورشل', tint: '#5391fe' },
 ]
 
 const fa = (n: number | string) => String(n).replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[Number(d)])
