@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sanjab-cli"
+version = "2.0.0"
+description = "Sanjab CLI — سان‌جاب CLI: offline Persian-first learning terminal for SanjabOS 2.0"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "SanjabOS" }]
+keywords = ["persian", "farsi", "cli", "learning", "linux", "python", "rust", "offline"]
+classifiers = [
+    "Environment :: Console",
+    "Intended Audience :: Education",
+    "Natural Language :: Persian",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Education",
+    "Topic :: Terminals",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://sunjob.ir"
+Repository = "https://github.com/kiarash65/sanjab-os"
+
+[project.scripts]
+sanjab = "sanjab_cli.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

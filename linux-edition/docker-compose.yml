@@ -1,5 +1,9 @@
 # 🐳 SanjabOS — Docker Compose
 # اجرا:  docker compose -f linux-edition/docker-compose.yml up -d
+#
+# امنیت: پورت فقط روی 127.0.0.1 مپ شده است.
+# اگر «عمداً» می‌خواهید روی LAN دیده شود، mapping را به "4310:4310" تغییر دهید —
+# این یک تصمیم اپراتور است، نه پیش‌فرض پروژه.
 services:
   sanjabos:
     build:
@@ -8,10 +12,12 @@ services:
     image: sanjabos:latest
     container_name: sanjabos
     ports:
-      - "4310:4310"
+      # فقط loopback — LAN exposure باید صریح و آگاهانه باشد
+      - "127.0.0.1:4310:4310"
     environment:
       - PORT=4310
       - NODE_ENV=production
+      - HOSTNAME=0.0.0.0
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "bun -e \"fetch('http://127.0.0.1:4310').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]

@@ -48,6 +48,8 @@ import { Progress } from '@/components/ui/progress'
 import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
 import { useOS } from '@/lib/os/store'
+import { useGame } from '@/lib/gamification/engine'
+import NNLab from './nn-lab'
 
 /* ================================================================
    پالت و ابزارهای پایه
@@ -111,6 +113,7 @@ type ViewId =
   | 'llm'
   | 'overfit'
   | 'ethics'
+  | 'lab'
   | 'quiz'
 
 interface SectionDef {
@@ -131,6 +134,7 @@ const SECTIONS: SectionDef[] = [
   { id: 'llm', short: 'مدل زبانی', title: 'مدل زبانی چطور حرف می‌زند؟', subtitle: 'بایگرام، توکن و دما — مدل زبانی جیبی خودت', icon: MessageSquare, tint: VIOLET },
   { id: 'overfit', short: 'بیش‌برازش', title: 'بیش‌برازش (Overfitting)', subtitle: 'وقتی مدل حفظ می‌کند ولی یاد نمی‌گیرد', icon: AlertTriangle, tint: TEAL },
   { id: 'ethics', short: 'اخلاق', title: 'اخلاق و آینده', subtitle: 'قدرت بزرگ، مسئولیت بزرگ می‌آورد', icon: Scale, tint: PINK },
+  { id: 'lab', short: 'آزمایشگاه آموزش', title: 'آزمایشگاه شبکه عصبی', subtitle: 'یک شبکه واقعی را در مرورگر تو آموزش بده — پس‌انتشار زنده', icon: Activity, tint: TEAL },
   { id: 'quiz', short: 'آزمون', title: 'آزمون نهایی', subtitle: '۸ سؤال؛ قبولی با ۶ یا بیشتر', icon: Trophy, tint: ORANGE },
 ]
 
@@ -2416,6 +2420,7 @@ function QuizSection({ best, onSave }: { best: number; onSave: (score: number) =
     if (!allPicked || submitted) return
     setSubmitted(true)
     onSave(score)
+    useGame.getState().registerQuiz('ai', 'quiz', score === QUIZ.length, score >= 6 ? 25 : 10)
     if (score >= 6) {
       pushToast({
         title: 'قبول شدی!',
@@ -2724,6 +2729,7 @@ export default function AIAcademyApp() {
                 {view === 'llm' && renderSection('llm', <LLMSection />)}
                 {view === 'overfit' && renderSection('overfit', <OverfitSection />)}
                 {view === 'ethics' && renderSection('ethics', <EthicsSection />)}
+                {view === 'lab' && renderSection('lab', <NNLab />)}
                 {view === 'quiz' && renderSection('quiz', <QuizSection best={progress.quizBest} onSave={saveQuizBest} />)}
               </motion.div>
             </AnimatePresence>

@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useOS } from '@/lib/os/store'
+import { useGame } from '@/lib/gamification/engine'
 import { getApp, launch } from '@/lib/os/apps'
 import { WALLPAPERS, wallpaperCss } from '@/lib/os/wallpapers'
 import BootScreen from './boot-screen'
@@ -192,6 +193,11 @@ export default function OSRoot() {
   const setBooted = useOS((s) => s.setBooted)
 
   const [menu, setMenu] = useState<{ x: number; y: number } | null>(null)
+
+  // ثبت زنجیره روزهای فعال (استریک) هنگام بوت دسکتاپ
+  useEffect(() => {
+    if (booted) useGame.getState().touchStreak()
+  }, [booted])
 
   // سرویس اعلان‌های بامزه (اگر حالت سرگرم‌کننده فعال باشد)
   useEffect(() => {

@@ -1,5 +1,6 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import type { ComponentType } from 'react'
 import type { LucideIcon } from 'lucide-react'
 import {
@@ -35,6 +36,7 @@ import {
   KeyRound,
   Layers,
   Lightbulb,
+  Loader2,
   NotebookPen,
   Palette,
   PersonStanding,
@@ -48,6 +50,7 @@ import {
   SquareTerminal,
   SwatchBook,
   Timer,
+  Trophy,
   Worm,
   Code2,
   ScanFace,
@@ -55,57 +58,77 @@ import {
 } from 'lucide-react'
 import { useOS } from '@/lib/os/store'
 
-import TerminalApp from '@/components/os/apps/terminal'
-import FileManagerApp from '@/components/os/apps/file-manager'
-import NotesApp from '@/components/os/apps/notes'
-import ClockApp from '@/components/os/apps/clock-app'
-import PaintApp from '@/components/os/apps/paint'
-import CalculatorApp from '@/components/os/apps/calculator'
-import WeatherApp from '@/components/os/apps/weather'
-import SystemMonitorApp from '@/components/os/apps/system-monitor'
-import MusicApp from '@/components/os/apps/music'
-import SettingsApp from '@/components/os/apps/settings'
-import IdeaGeneratorApp from '@/components/os/apps/idea-generator'
-import CatTranslatorApp from '@/components/os/apps/cat-translator'
-import PhotosApp from '@/components/os/apps/photos'
-import WriterApp from '@/components/os/apps/writer'
-import CodeStudioApp from '@/components/os/apps/code-studio'
-import SpreadsheetApp from '@/components/os/apps/spreadsheet'
-import SlidesApp from '@/components/os/apps/slides'
-import AIChatApp from '@/components/os/apps/ai-chat'
-import GitHubApp from '@/components/os/apps/github'
-import UnitConverterApp from '@/components/os/apps/unit-converter'
-import PassgenApp from '@/components/os/apps/passgen'
-import WheelApp from '@/components/os/apps/wheel'
-import AboutApp from '@/components/os/apps/about'
-import LinuxAcademyApp from '@/components/os/apps/linux-academy'
-import CalendarApp from '@/components/os/apps/calendar'
-import KanbanApp from '@/components/os/apps/kanban'
-import PomodoroApp from '@/components/os/apps/pomodoro'
-import MarkdownApp from '@/components/os/apps/markdown'
-import RegexLabApp from '@/components/os/apps/regex-lab'
-import ColorStudioApp from '@/components/os/apps/color-studio'
-import FlashcardsApp from '@/components/os/apps/flashcards'
-import FaceDetectApp from '@/components/os/apps/face-detect'
-import LinuxEditionApp from '@/components/os/apps/linux-edition'
-import RealLinuxApp from '@/components/os/apps/real-linux'
-import BodyMetricsApp from '@/components/os/apps/body-metrics'
-import AgeMachineApp from '@/components/os/apps/age-machine'
-import BrowserApp from '@/components/os/apps/browser'
-import PdfEditorApp from '@/components/os/apps/pdf-editor'
-import RustAcademyApp from '@/components/os/apps/rust-academy'
-import AIAcademyApp from '@/components/os/apps/ai-academy'
+/* ------------------------------------------------------------------ */
+/* بارگذاری تنبل اپ‌ها — هر اپ/بازی یک chunk جدا (code splitting)      */
+/* با next/dynamic؛ آیکن‌ها و فراداده سبک می‌مانند در bundle اصلی.     */
+/* ------------------------------------------------------------------ */
 
-import SnakeGame from '@/components/os/games/snake'
-import Game2048 from '@/components/os/games/g2048'
-import TicTacToeGame from '@/components/os/games/tictactoe'
-import MemoryGame from '@/components/os/games/memory'
-import MinesweeperGame from '@/components/os/games/minesweeper'
-import PongGame from '@/components/os/games/pong'
-import FlappyGame from '@/components/os/games/flappy'
-import WhackamoleGame from '@/components/os/games/whackamole'
-import BreakoutGame from '@/components/os/games/breakout'
-import WordleGame from '@/components/os/games/wordle-fa'
+function AppLoading() {
+  return (
+    <div className="grid h-full w-full place-items-center bg-zinc-950/60" role="status" aria-live="polite">
+      <div className="flex flex-col items-center gap-2 text-zinc-500">
+        <Loader2 className="size-6 animate-spin" aria-hidden />
+        <span className="text-xs font-bold">در حال باز شدن…</span>
+      </div>
+    </div>
+  )
+}
+
+const d = (loader: () => Promise<{ default: ComponentType }>) =>
+  dynamic(loader, { ssr: false, loading: () => <AppLoading /> })
+
+const TerminalApp = d(() => import('@/components/os/apps/terminal'))
+const FileManagerApp = d(() => import('@/components/os/apps/file-manager'))
+const NotesApp = d(() => import('@/components/os/apps/notes'))
+const ClockApp = d(() => import('@/components/os/apps/clock-app'))
+const PaintApp = d(() => import('@/components/os/apps/paint'))
+const CalculatorApp = d(() => import('@/components/os/apps/calculator'))
+const WeatherApp = d(() => import('@/components/os/apps/weather'))
+const SystemMonitorApp = d(() => import('@/components/os/apps/system-monitor'))
+const MusicApp = d(() => import('@/components/os/apps/music'))
+const SettingsApp = d(() => import('@/components/os/apps/settings'))
+const IdeaGeneratorApp = d(() => import('@/components/os/apps/idea-generator'))
+const CatTranslatorApp = d(() => import('@/components/os/apps/cat-translator'))
+const PhotosApp = d(() => import('@/components/os/apps/photos'))
+const WriterApp = d(() => import('@/components/os/apps/writer'))
+const CodeStudioApp = d(() => import('@/components/os/apps/code-studio'))
+const SpreadsheetApp = d(() => import('@/components/os/apps/spreadsheet'))
+const SlidesApp = d(() => import('@/components/os/apps/slides'))
+const AIChatApp = d(() => import('@/components/os/apps/ai-chat'))
+const GitHubApp = d(() => import('@/components/os/apps/github'))
+const UnitConverterApp = d(() => import('@/components/os/apps/unit-converter'))
+const PassgenApp = d(() => import('@/components/os/apps/passgen'))
+const WheelApp = d(() => import('@/components/os/apps/wheel'))
+const AboutApp = d(() => import('@/components/os/apps/about'))
+const LinuxAcademyApp = d(() => import('@/components/os/apps/linux-academy'))
+const CalendarApp = d(() => import('@/components/os/apps/calendar'))
+const KanbanApp = d(() => import('@/components/os/apps/kanban'))
+const PomodoroApp = d(() => import('@/components/os/apps/pomodoro'))
+const MarkdownApp = d(() => import('@/components/os/apps/markdown'))
+const RegexLabApp = d(() => import('@/components/os/apps/regex-lab'))
+const ColorStudioApp = d(() => import('@/components/os/apps/color-studio'))
+const FlashcardsApp = d(() => import('@/components/os/apps/flashcards'))
+const FaceDetectApp = d(() => import('@/components/os/apps/face-detect'))
+const LinuxEditionApp = d(() => import('@/components/os/apps/linux-edition'))
+const RealLinuxApp = d(() => import('@/components/os/apps/real-linux'))
+const BodyMetricsApp = d(() => import('@/components/os/apps/body-metrics'))
+const AgeMachineApp = d(() => import('@/components/os/apps/age-machine'))
+const BrowserApp = d(() => import('@/components/os/apps/browser'))
+const PdfEditorApp = d(() => import('@/components/os/apps/pdf-editor'))
+const RustAcademyApp = d(() => import('@/components/os/apps/rust-academy'))
+const AIAcademyApp = d(() => import('@/components/os/apps/ai-academy'))
+const ProgressCenterApp = d(() => import('@/components/os/apps/progress-center'))
+
+const SnakeGame = d(() => import('@/components/os/games/snake'))
+const Game2048 = d(() => import('@/components/os/games/g2048'))
+const TicTacToeGame = d(() => import('@/components/os/games/tictactoe'))
+const MemoryGame = d(() => import('@/components/os/games/memory'))
+const MinesweeperGame = d(() => import('@/components/os/games/minesweeper'))
+const PongGame = d(() => import('@/components/os/games/pong'))
+const FlappyGame = d(() => import('@/components/os/games/flappy'))
+const WhackamoleGame = d(() => import('@/components/os/games/whackamole'))
+const BreakoutGame = d(() => import('@/components/os/games/breakout'))
+const WordleGame = d(() => import('@/components/os/games/wordle-fa'))
 
 export type AppCategory = 'app' | 'game' | 'system'
 
@@ -575,6 +598,18 @@ export const APPS: AppMeta[] = [
     desktop: true,
     tint: G.forest,
     keywords: ['height', 'weight', 'bmi', 'camera', 'قد', 'وزن', 'سلامت', 'دوربین'],
+  },
+  {
+    id: 'progress',
+    name: 'مرکز پیشرفت',
+    icon: Trophy,
+    category: 'app',
+    component: ProgressCenterApp,
+    w: 620,
+    h: 580,
+    desktop: true,
+    tint: G.sun,
+    keywords: ['xp', 'progress', 'achievement', 'امتیاز', 'دستاورد', 'پیشرفت', 'گیمیفیکیشن', 'مرکز پیشرفت', 'مأموریت'],
   },
   {
     id: 'age-machine',

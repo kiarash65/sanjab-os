@@ -23,6 +23,7 @@ import {
   Loader2,
   Play,
   Rocket,
+  RotateCcw,
   ShieldCheck,
   Trophy,
   X,
@@ -33,6 +34,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { useOS } from '@/lib/os/store'
+import { useGame } from '@/lib/gamification/engine'
 
 const fa = (n: number) => n.toLocaleString('fa-IR')
 
@@ -1572,10 +1574,161 @@ function runRust(src: string): RunResult {
 }
 
 /* ================================================================
+   مأموریت‌های کامپایلر — سبک rustlings (MIT) با چک‌گر ساختاری
+   کامپایلر واقعی rustc این‌جا نیست؛ هر مأموریت با اجرای شبیه‌ساز +
+   شرط‌های ساختاری سنجیده می‌شود و خطای واقعی rustc آموزش داده می‌شود.
+   ================================================================ */
+
+interface Mission {
+  id: string
+  title: string
+  errCode: string
+  errFa: string
+  broken: string
+  goalFa: string
+  hint: string
+  /** خروجی مورد انتظار — هر خط باید در خروجی شبیه‌ساز باشد */
+  expect: string[]
+  /** شرط‌های ساختاری روی کد — جایگزین صادقانه‌ی چک‌گر کامپایلر */
+  patterns: { re: RegExp; why: string }[]
+  solution: string
+}
+
+const MISSIONS: Mission[] = [
+  {
+    id: 'm-e0382',
+    title: 'قرض بگیر، مالک نباش',
+    errCode: 'E0382',
+    errFa: 'borrow of moved value — مقدار جابه‌جا شده دوباره استفاده شده',
+    broken: `fn main() {
+  let s = "سلام";
+  let t = s;      // مالکیت به t رفت
+  println!(s);
+  println!(t);
+}`,    goalFa: 'کد را طوری اصلاح کن که s جابه‌جا نشود — از قرض (&) استفاده کن تا هر دو خط چاپ شوند.',
+    hint: 'در Rust واقعی باید به‌جای `let t = s` بنویسی `let t = &s`. شبیه‌ساز هم همین ساختار را می‌پذیرد.',
+    expect: ['سلام', 'سلام'],
+    patterns: [{ re: /&s/, why: 'در تخصیص یا چاپ باید ارجاع & بیاید' }],
+    solution: `fn main() {
+  let s = "سلام";
+  let t = &s;     // فقط قرض — مالکیت نرفت
+  println!(s);
+  println!(t);
+}`,  },
+  {
+    id: 'm-e0384',
+    title: 'متغیر تغییرپذیر',
+    errCode: 'E0384',
+    errFa: 'cannot assign twice to immutable variable — به متغیر تغییرناپذیر دوباره مقدار ندی',
+    broken: `fn main() {
+  let شمارنده = 5;
+  شمارنده = 10;
+  println!(شمارنده);
+}`,    goalFa: 'کد را درست کن که مقدار دوباره گذاشته شود — Rust باید بداند متغیر mut است.',
+    hint: 'کلمه‌ی کلیدی `mut` را بعد از let بگذار: `let mut شمارنده = 5`',
+    expect: ['10'],
+    patterns: [{ re: /let\s+mut/, why: 'باید let mut بنویسی' }],
+    solution: `fn main() {
+  let mut شمارنده = 5;
+  شمارنده = 10;
+  println!(شمارنده);
+}`,  },
+  {
+    id: 'm-e0308',
+    title: 'جمع ناسازگار',
+    errCode: 'E0308',
+    errFa: 'mismatched types — نوع‌ها هم‌خوان نیستند',
+    broken: `fn main() {
+  let a = 12;
+  let b = "۳۴";
+  println!(a + b);
+}`,    goalFa: 'به‌جای رشتهٔ "۳۴" عدد بگذار تا جمع معنا داشته باشد.',
+    hint: 'b را به عدد تغییر بده: `let b = 34;`',
+    expect: ['46'],
+    patterns: [{ re: /let\s+b\s*=\s*34\s*;/, why: 'b باید عدد 34 باشد نه رشته' }],
+    solution: `fn main() {
+  let a = 12;
+  let b = 34;
+  println!(a + b);
+}`,  },
+  {
+    id: 'm-e0308-fn',
+    title: 'خروجی تابع را برگردان',
+    errCode: 'E0308',
+    errFa: 'mismatched return type — نوع خروجی تابع غلط است',
+    broken: `fn دوبل(n) {
+  n * 2
+}
+
+fn main() {
+  println!(دوبل(21));
+}`,    goalFa: 'کد باید ۴۲ چاپ کند — اگر خطا گرفتی، ساختار تابع و برگرداندن مقدار را درست کن.',
+    hint: 'در Rust واقعی آخرین عبارتِ بدون سمی‌کالن، مقدار برگشتی است. شبیه‌ساز همین‌طور است.',
+    expect: ['42'],
+    patterns: [{ re: /fn\s+دوبل/, why: 'تابع دوبل باید تعریف شود' }],
+    solution: `fn دوبل(n) {
+  n * 2
+}
+
+fn main() {
+  println!(دوبل(21));
+}`,  },
+  {
+    id: 'm-e0030',
+    title: 'حلقهٔ گیرکرده',
+    errCode: 'PANIC / E0308',
+    errFa: 'حلقهٔ بی‌نهایت — شرط هیچ‌وقت false نمی‌شود',
+    broken: `fn main() {
+  let mut i = 0;
+  while i < 5 {
+    println!(i);
+  }
+}`,    goalFa: 'حلقه را طوری درست کن که ۰ تا ۴ چاپ شود و تمام — نه بی‌نهایت.',
+    hint: 'داخل حلقه i را زیاد کن: `i = i + 1`',
+    expect: ['0', '1', '2', '3', '4'],
+    patterns: [
+      { re: /while/, why: 'همان حلقه while باید بماند' },
+      { re: /i\s*=\s*i\s*\+\s*1|i\s*\+=\s*1/, why: 'باید i را داخل حلقه زیاد کنی' },
+    ],
+    solution: `fn main() {
+  let mut i = 0;
+  while i < 5 {
+    println!(i);
+    i = i + 1;
+  }
+}`,  },
+  {
+    id: 'm-e0369',
+    title: 'جمع بونوس',
+    errCode: 'E0369',
+    errFa: 'cannot add — عملگر برای این نوع‌ها تعریف نشده',
+    broken: `fn میانگین(آ, ب) {
+  (آ + ب) / 2
+}
+
+fn main() {
+  println!(میانگین(10, 21));
+}`,    goalFa: 'خروجی باید ۱۵٫۵ باشد — اول جمع بعد تقسیم روی ۲. اگر شبیه‌ساز اعشار نشاند، گرد کردن را خودت مدیریت کن.',
+    hint: 'ساختار درست است؛ فقط مطمئن شو آرگومان‌ها عدد‌اند و پرانتز جمع درست است. خروجی مورد قبول: 15 یا 15.5',
+    expect: [],
+    patterns: [
+      { re: /fn\s+میانگین/, why: 'تابع میانگین باید باشد' },
+      { re: /آ\s*\+\s*ب/, why: 'دو آرگومان جمع می‌شوند' },
+    ],
+    solution: `fn میانگین(آ, ب) {
+  (آ + ب) / 2
+}
+
+fn main() {
+  println!(میانگین(10, 21));
+}`,  },
+]
+
+/* ================================================================
    رابط کاربری
    ================================================================ */
 
-type View = 'home' | 'track' | 'play' | 'quiz'
+type View = 'home' | 'track' | 'play' | 'quiz' | 'missions'
 
 const STORE_KEY = 'sunjob-rust-v1'
 
@@ -1670,6 +1823,12 @@ export default function RustAcademyApp() {
   const [running, setRunning] = useState(false)
   const [answers, setAnswers] = useState<(number | null)[]>(() => Array(QUIZ.length).fill(null))
   const [submitted, setSubmitted] = useState(false)
+  const [missionId, setMissionId] = useState(MISSIONS[0].id)
+  const [missionCode, setMissionCode] = useState(MISSIONS[0].broken)
+  const [missionMsg, setMissionMsg] = useState<string[]>([])
+  const [missionOk, setMissionOk] = useState(false)
+  const [showHint, setShowHint] = useState(false)
+  const [missionsDone, setMissionsDone] = useState<string[]>([])
 
   /* ---------- ذخیره‌سازی ---------- */
   useEffect(() => {
@@ -1677,9 +1836,10 @@ export default function RustAcademyApp() {
       try {
         const raw = localStorage.getItem(STORE_KEY)
         if (raw) {
-          const d = JSON.parse(raw) as { done?: string[]; quizBest?: number }
+          const d = JSON.parse(raw) as { done?: string[]; quizBest?: number; missionsDone?: string[] }
           if (Array.isArray(d.done)) setDone(d.done)
           if (typeof d.quizBest === 'number') setQuizBest(d.quizBest)
+          if (Array.isArray(d.missionsDone)) setMissionsDone(d.missionsDone)
         }
       } catch {
         /* ignore */
@@ -1692,11 +1852,11 @@ export default function RustAcademyApp() {
   useEffect(() => {
     if (!loaded) return
     try {
-      localStorage.setItem(STORE_KEY, JSON.stringify({ done, quizBest }))
+      localStorage.setItem(STORE_KEY, JSON.stringify({ done, quizBest, missionsDone }))
     } catch {
       /* ignore */
     }
-  }, [done, quizBest, loaded])
+  }, [done, quizBest, missionsDone, loaded])
 
   /* ---------- محاسبات ---------- */
   const flat = useMemo(() => TRACKS.flatMap((t) => t.lessons.map((l) => ({ track: t, lesson: l }))), [])
@@ -1746,6 +1906,7 @@ export default function RustAcademyApp() {
   const markDone = () => {
     if (!done.includes(lesson.id)) {
       setDone([...done, lesson.id])
+      useGame.getState().completeLesson('rust', lesson.id, 20)
       pushToast({ title: 'درس ثبت شد', body: `«${lesson.title}» به خوانده‌شده‌ها اضافه شد`, icon: CheckCircle2 })
     }
   }
@@ -1758,6 +1919,7 @@ export default function RustAcademyApp() {
   const submitQuiz = () => {
     setSubmitted(true)
     if (score > quizBest) setQuizBest(score)
+    useGame.getState().registerQuiz('rust', 'quiz', score === QUIZ.length, score >= 6 ? 25 : 10)
     pushToast({
       title: score >= 6 ? 'قبول شدی!' : 'نمره ثبت شد',
       body: `نمرهٔ تو ${fa(score)} از ${fa(QUIZ.length)} بود`,
@@ -1770,6 +1932,57 @@ export default function RustAcademyApp() {
     setSubmitted(false)
   }
 
+  /* ---------- مأموریت‌های کامپایلر ---------- */
+  const activeMission = MISSIONS.find((m) => m.id === missionId) ?? MISSIONS[0]
+
+  const openMission = (m: Mission) => {
+    setMissionId(m.id)
+    setMissionCode(m.broken)
+    setMissionMsg([])
+    setMissionOk(false)
+    setShowHint(false)
+  }
+
+  const checkMission = () => {
+    const m = activeMission
+    const msgs: string[] = []
+    // ۱) اجرای شبیه‌ساز — کد باید واقعاً اجرا شود
+    const res = runRust(missionCode)
+    if (!res.ok) {
+      setMissionMsg([
+        `شبیه‌ساز: error[${res.err.code}]: ${res.err.message}`,
+        `راهنما: ${res.err.hint}`,
+      ])
+      setMissionOk(false)
+      return
+    }
+    // ۲) شرط‌های ساختاری — جایگزین صادقانه‌ی چک‌گر کامپایلر واقعی
+    for (const p of m.patterns) {
+      if (!p.re.test(missionCode)) {
+        msgs.push(`شرط برآورده نشد: ${p.why}`)
+      }
+    }
+    // ۳) خروجی مورد انتظار
+    for (const exp of m.expect) {
+      if (!res.out.some((l) => l.trim().includes(exp))) {
+        msgs.push(`خروجی «${exp}» پیدا نشد — خروجی فعلی: ${res.out.join(' | ') || '(خالی)'}`)
+      }
+    }
+    setMissionMsg(msgs)
+    if (msgs.length === 0) {
+      setMissionOk(true)
+      if (!missionsDone.includes(m.id)) {
+        setMissionsDone((prev) => [...prev, m.id])
+        useGame.getState().completeLesson('rust', m.id, 25)
+      }
+      pushToast({
+        title: 'مأموریت انجام شد!',
+        body: `«${m.title}» حل شد — در Rust واقعی هم کامپایلر همین را می‌خواست`,
+        icon: ShieldCheck,
+      })
+    }
+  }
+
   /* ---------- ناوبری ---------- */
   const navChips: { key: string; label: string; active: boolean; go: () => void }[] = [
     { key: 'home', label: 'خانه', active: view === 'home', go: () => setView('home') },
@@ -1780,6 +1993,7 @@ export default function RustAcademyApp() {
       go: () => openTrack(t),
     })),
     { key: 'play', label: 'زمین بازی', active: view === 'play', go: () => setView('play') },
+    { key: 'missions', label: 'مأموریت‌های کامپایلر', active: view === 'missions', go: () => setView('missions') },
     { key: 'quiz', label: 'آزمون', active: view === 'quiz', go: () => setView('quiz') },
   ]
 
@@ -1864,6 +2078,7 @@ export default function RustAcademyApp() {
           })}
           <p className="px-2 pb-1 pt-2 text-[9px] font-bold text-zinc-500">ابزارها</p>
           <SideItem icon={FlaskConical} label="زمین بازی" active={view === 'play'} onClick={() => setView('play')} />
+          <SideItem icon={ShieldCheck} label="مأموریت‌های کامپایلر" active={view === 'missions'} onClick={() => setView('missions')} />
           <SideItem icon={GraduationCap} label="آزمون" active={view === 'quiz'} onClick={() => setView('quiz')} />
         </nav>
 
@@ -2090,6 +2305,116 @@ export default function RustAcademyApp() {
                   >
                     <code>{out.length ? out.join('\n') : '— output appears here —'}</code>
                   </pre>
+                </>
+              )}
+
+              {/* ---------------- مأموریت‌های کامپایلر ---------------- */}
+              {view === 'missions' && (
+                <>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="flex items-center gap-2 text-sm font-bold text-zinc-100">
+                      <ShieldCheck className="h-4 w-4 text-[#f7931e]" aria-hidden /> مأموریت‌های کامپایلر
+                    </h2>
+                    <Badge variant="outline" className="border-white/10 text-[10px] font-normal text-zinc-400">
+                      {fa(missionsDone.length)}/{fa(MISSIONS.length)} حل شده
+                    </Badge>
+                  </div>
+                  <p className="rounded-xl border border-white/10 bg-zinc-900/60 p-3 text-[11px] leading-6 text-zinc-400">
+                    سبک تمرین rustlings: یک کد خراب می‌گیری، خطای کامپایلر را می‌بینی و باید درستش کنی.
+                    نکته‌ی صادقانه: کامپایلر واقعی rustc در مرورگر وجود ندارد؛ این‌جا خطای شبیه‌سازی‌شده + شرط‌های
+                    ساختاری + اجرای شبیه‌ساز سنجیده می‌شوند، ولی هر خطای واقعی rustc (کد E مربوط) آموزش داده می‌شود.
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {MISSIONS.map((m) => (
+                      <button
+                        key={m.id}
+                        onClick={() => openMission(m)}
+                        className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-bold transition ${
+                          m.id === missionId
+                            ? 'border-[#f7931e]/60 bg-[#f7931e]/15 text-[#f7931e]'
+                            : 'border-white/10 bg-white/5 text-zinc-300 hover:border-[#f7931e]/40'
+                        }`}
+                      >
+                        {missionsDone.includes(m.id) && <Check className="h-3 w-3 text-emerald-400" aria-hidden />}
+                        {m.title}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="rounded-xl border border-white/10 bg-zinc-900/60 p-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge variant="outline" dir="ltr" className="border-red-500/40 text-[10px] text-red-300">
+                        error[{activeMission.errCode}]
+                      </Badge>
+                      <span className="text-[11.5px] text-zinc-300">{activeMission.errFa}</span>
+                    </div>
+                    <p className="mt-2 text-[12px] leading-6 text-zinc-200">{activeMission.goalFa}</p>
+                  </div>
+
+                  <pre
+                    dir="ltr"
+                    className="os-scroll max-h-40 overflow-y-auto rounded-xl border border-white/10 bg-zinc-950 p-3 text-left font-mono text-[11.5px] leading-6 text-red-200/90"
+                  >
+                    <code>{activeMission.broken}</code>
+                  </pre>
+
+                  <textarea
+                    dir="ltr"
+                    value={missionCode}
+                    onChange={(e) => setMissionCode(e.target.value)}
+                    spellCheck={false}
+                    aria-label="ویرایشگر مأموریت"
+                    className="os-scroll h-48 w-full resize-none rounded-xl border border-white/10 bg-zinc-950 p-3 text-left font-mono text-[12px] leading-6 text-emerald-200 outline-none transition-colors focus:border-[#f7931e]/40"
+                  />
+
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Button size="sm" onClick={checkMission} className="gap-1.5">
+                      <ShieldCheck className="h-3.5 w-3.5" aria-hidden /> بررسی مأموریت
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => setShowHint((s) => !s)} className="gap-1.5">
+                      <Lightbulb className="h-3.5 w-3.5" aria-hidden /> {showHint ? 'بستن راهنما' : 'راهنما'}
+                    </Button>
+                    {missionOk && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setMissionCode(activeMission.solution)
+                          runIt(activeMission.solution)
+                        }}
+                        className="gap-1.5"
+                      >
+                        <CheckCircle2 className="h-3.5 w-3.5" aria-hidden /> دیدن راه‌حل
+                      </Button>
+                    )}
+                    <Button size="sm" variant="outline" onClick={() => openMission(activeMission)} className="gap-1.5">
+                      <RotateCcw className="h-3.5 w-3.5" aria-hidden /> بازنشانی
+                    </Button>
+                  </div>
+
+                  {showHint && (
+                    <p className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-[11.5px] leading-6 text-amber-100">
+                      {rich(activeMission.hint)}
+                    </p>
+                  )}
+
+                  {missionMsg.length > 0 && !missionOk && (
+                    <div className="rounded-xl border border-red-500/30 bg-red-950/40 p-3">
+                      {missionMsg.map((msg, i) => (
+                        <p key={i} dir="ltr" className="text-left font-mono text-[11px] leading-5 text-red-300">
+                          {msg}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+
+                  {missionOk && (
+                    <div className="rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-3">
+                      <p className="text-[12px] font-black text-emerald-300">
+                        مأموریت حل شد! +۲۵ XP — رویداد در مرکز پیشرفت ثبت شد
+                      </p>
+                    </div>
+                  )}
                 </>
               )}
 

@@ -57,3 +57,12 @@ tool-results/
 webos-src/
 download/
 upload/
+
+# SJB-2.0 security: never track secrets or runtime databases
+.env
+.env.*
+db/
+*.db
+*.db-journal
+.agent-ctx/
+dev.pid

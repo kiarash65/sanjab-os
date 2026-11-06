@@ -1,15 +1,30 @@
 'use client'
 
-import { Trash2, RotateCcw } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { Download, HardDrive, RotateCcw, Trash2, Upload } from 'lucide-react'
 import { useOS } from '@/lib/os/store'
 import { WALLPAPERS, ACCENTS } from '@/lib/os/wallpapers'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
+import {
+  downloadBackup,
+  fmtBytes,
+  restoreFromFile,
+  usageReport,
+  type UsageReport,
+} from '@/lib/os/backup'
 
 export default function SettingsApp() {
   const settings = useOS((s) => s.settings)
   const setSetting = useOS((s) => s.setSetting)
   const pushToast = useOS((s) => s.pushToast)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [usage, setUsage] = useState<UsageReport | null>(null)
+
+  useEffect(() => {
+    const t = setTimeout(() => setUsage(usageReport()), 0)
+    return () => clearTimeout(t)
+  }, [])
 
   const handleClearRecords = () => {
     try {
@@ -136,6 +151,70 @@ export default function SettingsApp() {
                 aria-label="صدا"
               />
             </div>
+          </div>
+        </section>
+
+        <section>
+          <h3 className="mb-2 text-xs font-bold text-zinc-500">پشتیبان‌گیری و بازیابی</h3>
+          <div className="rounded-xl border border-white/10 bg-zinc-900/60 p-3">
+            <p className="mb-2 flex items-center gap-1.5 text-[11px] leading-5 text-zinc-400">
+              <HardDrive size={13} className="text-teal-400" />
+              {usage
+                ? `داده‌های سیستم: ${fmtBytes(usage.appBytes)} در ${usage.keyCount} کلید (کل مرورگر: ${fmtBytes(usage.localStorageBytes)})`
+                : 'محاسبه حجم داده‌ها…'}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                size="sm"
+                onClick={() => {
+                  const ok = downloadBackup(false)
+                  pushToast({
+                    icon: '💾',
+                    title: ok ? 'پشتیبان ساخته شد' : 'پشتیبان‌گیری ناموفق',
+                    body: ok
+                      ? 'فایل JSON دانلود شد — کلیدهای API داخلش نیستند (امن)'
+                      : 'مرورگرت اجازه دانلود نداد',
+                  })
+                }}
+                className="bg-emerald-600 text-white hover:bg-emerald-500"
+              >
+                <Download size={14} />
+                دانلود پشتیبان
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                className="border-white/15 text-zinc-200 hover:bg-white/10"
+              >
+                <Upload size={14} />
+                بازیابی از فایل
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="application/json"
+                className="hidden"
+                aria-label="انتخاب فایل پشتیبان"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0]
+                  if (!file) return
+                  const res = await restoreFromFile(file)
+                  pushToast({
+                    icon: res.ok ? '✅' : '❌',
+                    title: res.ok ? 'بازیابی انجام شد' : 'بازیابی ناموفق',
+                    body: res.ok
+                      ? `${res.count} کلید برگشت — برای اعمال کامل، سیستم را ری‌استارت کن`
+                      : (res.error ?? 'خطای ناشناخته'),
+                  })
+                  e.target.value = ''
+                }}
+              />
+            </div>
+            <p className="mt-2 text-[10px] leading-4 text-zinc-500">
+              پشتیبان شامل تنظیمات، فایل‌سیستم مجازی، پیشرفت درس‌ها و رکورد بازی‌هاست؛ رازهای API
+              (مثل کلید هوش‌یار) عمداً داخل فایل نمی‌آیند.
+            </p>
           </div>
         </section>
 

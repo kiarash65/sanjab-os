@@ -1,3 +1,15 @@
+sanjabos (2.0.0) stable; urgency=medium
+
+  * هم‌ترازی نسخه با WebOS 2.0.0 (فایل VERSION ریشهٔ ریپو)
+  * hardening سرویس systemd: کاربر/گروه اختصاصی sanjabos، ProtectSystem=strict،
+    RestrictAddressFamilies، ReadWritePaths محدود، MemoryMax/CPUQuota، گوش‌دادن loopback
+  * install.sh: بیلد با کاربر سرویس (نه root)، بکاپ داده قبل از آپدیت، آپدیت فقط با git pull --ff-only
+  * uninstall.sh: حفظ دادهٔ کاربر به‌صورت پیش‌فرض؛ حذف کامل فقط با --purge
+  * docker-compose: مپ پورت فقط روی 127.0.0.1
+  * مجموعهٔ مستندات docs/ + THIRD_PARTY_LICENSES.md + CI/release workflows
+
+ -- SanjabOS <sanjabos@sunjob.ir>  Thu, 06 Nov 2025 12:00:00 +0330
+
 sanjabos (1.0.0) stable; urgency=medium
 
   * اولین انتشار نسخهٔ لینوکس واقعی سان‌جاب‌او‌اس 🐧

@@ -9,6 +9,7 @@ import {
   ArrowLeft,
   ArrowRight,
   Bookmark,
+  BookmarkPlus,
   ExternalLink,
   Globe,
   House,
@@ -16,6 +17,7 @@ import {
   Plus,
   RotateCcw,
   Search,
+  ShieldAlert,
   X,
   ZoomIn,
   ZoomOut,
@@ -78,6 +80,7 @@ const BOOKMARKS: { label: string; url: string }[] = [
 ]
 
 const HIST_KEY = 'sunjob-browser-hist'
+const BM_KEY = 'sunjob-browser-bm'
 
 function normalizeInput(raw: string): { url: string; search?: string } {
   const t = raw.trim()
@@ -121,6 +124,8 @@ export default function BrowserApp() {
   const [wikiBusy, setWikiBusy] = useState(false)
   const [histOpen, setHistOpen] = useState(false)
   const [history, setHistory] = useState<string[]>([])
+  const [userBm, setUserBm] = useState<{ label: string; url: string }[]>([])
+  const [frameBlocked, setFrameBlocked] = useState(false)
   const didInit = useRef(false)
 
   /* init در کلاینت (جلوگیری از mismatch) */
@@ -138,6 +143,8 @@ export default function BrowserApp() {
     try {
       const raw = localStorage.getItem(HIST_KEY)
       if (raw) setHistory(JSON.parse(raw) as string[])
+      const rawBm = localStorage.getItem(BM_KEY)
+      if (rawBm) setUserBm(JSON.parse(rawBm) as { label: string; url: string }[])
     } catch {
       /* ignore */
     }
@@ -150,7 +157,45 @@ export default function BrowserApp() {
     setAddr(active?.url ?? '')
     setLoading(false)
     setWikiResults(null)
+    // اگر آدرس عوض شد، فریم دوباره لود می‌شود — وضعیت «سایت رفریم نمی‌شود» ریست
+    setFrameBlocked(false)
   }, [active?.id, active?.url, active?.key])
+
+  /* برخی سایت‌ها با X-Frame-Options/CSP اجازهٔ فریم نمی‌دهند؛
+     اگر iframe ظرف چند ثانیه onLoad نداد، پیام راهنما نشان می‌دهیم */
+  useEffect(() => {
+    if (loading && active?.url) {
+      const t = setTimeout(() => {
+        setLoading((l) => {
+          if (l) setFrameBlocked(true)
+          return false
+        })
+      }, 6500)
+      return () => clearTimeout(t)
+    }
+  }, [loading, active?.url])
+
+  const toggleBookmark = useCallback(() => {
+    const url = active?.url
+    if (!url) return
+    setUserBm((prev) => {
+      const exists = prev.find((b) => b.url === url)
+      const next = exists
+        ? prev.filter((b) => b.url !== url)
+        : [...prev, { label: hostOf(url), url }].slice(0, 12)
+      try {
+        localStorage.setItem(BM_KEY, JSON.stringify(next))
+      } catch {
+        /* ignore */
+      }
+      pushToast({
+        icon: '⭐',
+        title: exists ? 'بوکمارک حذف شد' : 'بوکمارک شد',
+        body: hostOf(url),
+      })
+      return next
+    })
+  }, [active?.url, pushToast])
 
   const remember = useCallback((url: string) => {
     if (!url) return
@@ -366,6 +411,17 @@ export default function BrowserApp() {
           </div>
         </form>
         <button
+          onClick={toggleBookmark}
+          disabled={isHome}
+          className={`grid size-7 place-items-center rounded-md transition hover:bg-white/10 disabled:opacity-30 ${
+            active?.url && userBm.some((b) => b.url === active.url) ? 'text-amber-400' : 'text-zinc-400 hover:text-zinc-100'
+          }`}
+          aria-label="بوکمارک این صفحه"
+          title="بوکمارک / حذف بوکمارک این صفحه"
+        >
+          <BookmarkPlus size={14} />
+        </button>
+        <button
           onClick={() => setZoom((z) => Math.min(1.6, z + 0.1))}
           className="grid size-7 place-items-center rounded-md text-zinc-400 transition hover:bg-white/10 hover:text-zinc-100"
           aria-label="بزرگ‌نمایی"
@@ -390,15 +446,34 @@ export default function BrowserApp() {
       </div>
 
       {/* بوکمارک‌ها */}
-      <div className="flex items-center gap-1 border-b border-white/10 bg-zinc-900/40 px-2 py-1">
+      <div className="flex items-center gap-1 overflow-x-auto border-b border-white/10 bg-zinc-900/40 px-2 py-1">
         {BOOKMARKS.map((b) => (
           <button
             key={b.label}
             onClick={() => navigate(b.url)}
-            className="rounded-md px-2 py-1 text-[10px] font-bold text-zinc-400 transition hover:bg-white/10 hover:text-zinc-100"
+            className="shrink-0 rounded-md px-2 py-1 text-[10px] font-bold text-zinc-400 transition hover:bg-white/10 hover:text-zinc-100"
           >
             {b.label}
           </button>
+        ))}
+        {userBm.length > 0 && <span className="mx-1 h-4 w-px shrink-0 bg-white/15" aria-hidden />}
+        {userBm.map((b) => (
+          <span key={b.url} className="flex shrink-0 items-center">
+            <button
+              onClick={() => navigate(b.url)}
+              className="rounded-md px-2 py-1 text-[10px] font-bold text-amber-300/90 transition hover:bg-white/10"
+              title={b.url}
+            >
+              {b.label}
+            </button>
+            <button
+              onClick={toggleBookmark}
+              aria-label={`حذف بوکمارک ${b.label}`}
+              className="grid size-4 place-items-center rounded text-zinc-600 transition hover:text-rose-300"
+            >
+              <X size={9} />
+            </button>
+          </span>
         ))}
       </div>
 
@@ -492,6 +567,36 @@ export default function BrowserApp() {
               referrerPolicy="no-referrer"
               sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
             />
+          </div>
+        )}
+
+        {/* هشدار سایت رفریم‌نشدنی */}
+        {!isHome && frameBlocked && (
+          <div className="pengo-fadein absolute inset-0 z-10 grid place-items-center bg-zinc-950/95 p-6 text-center">
+            <div className="max-w-xs space-y-3">
+              <ShieldAlert size={34} className="mx-auto text-amber-400" aria-hidden />
+              <h3 className="text-sm font-black text-zinc-100">این سایت اجازهٔ نمایش داخل فریم نمی‌دهد</h3>
+              <p className="text-[11px] leading-5 text-zinc-400">
+                خیلی از سایت‌ها (گوگل، یوتیوب، سایت‌های بانکی…) با سیاست امنیتی
+                X-Frame-Options جلوی نمایش داخل مرورگرهای دیگر را می‌گیرند. این محدودیت
+                مرورگر است، نه خرابی سان‌جاب‌اواس.
+              </p>
+              <div className="flex items-center justify-center gap-2">
+                <button
+                  onClick={() => openExternal(active?.url ?? '')}
+                  className="flex items-center gap-1.5 rounded-lg bg-[#f7931e] px-3 py-2 text-[11px] font-black text-white transition hover:brightness-110"
+                >
+                  <ExternalLink size={12} />
+                  باز کردن در تب جدید
+                </button>
+                <button
+                  onClick={() => navigate('')}
+                  className="rounded-lg border border-white/15 px-3 py-2 text-[11px] font-bold text-zinc-300 transition hover:bg-white/10"
+                >
+                  برگشت به خانه
+                </button>
+              </div>
+            </div>
           </div>
         )}
 

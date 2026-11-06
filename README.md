@@ -199,6 +199,29 @@ This project is an **educational simulation** — it does not use a real Linux k
 
 ---
 
+## 📚 مستندات و امنیت (Docs & Security)
+
+مجموعهٔ مستندات نسخهٔ 2.0.0 (فارسی، اصطلاحات فنی انگلیسی):
+
+| سند | محتوا |
+|-----|-------|
+| [`docs/AUDIT.md`](docs/AUDIT.md) | ممیزی امنیتی — ۱۰ یافته با شناسه، شدت، بازتولید، اصلاح، تست و وضعیت |
+| [`docs/SECURITY.md`](docs/SECURITY.md) | مدل تهدید: چه چیزی کجا اجرا می‌شود، قوانین کلیدها، حریم خصوصی دوربین، سیاست بارگذاری مدل‌ها |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | معماری: بوت، window manager، لایه‌های ذخیره‌سازی، آداپتورهای رانتایم، API routes |
+| [`docs/DEPENDENCIES.md`](docs/DEPENDENCIES.md) | ماتریس تصمیم وابستگی‌ها + موارد ارزیابی‌شده و حذف‌شده |
+| [`docs/ROADMAP.md`](docs/ROADMAP.md) | نقشهٔ راه فازهای ۱–۱۰ با وضعیت صادقانه |
+| [`docs/RELEASES.md`](docs/RELEASES.md) | SemVer، کانال‌ها، چک‌لیست انتشار، سیاست آپدیت (بدون `git reset --hard`) |
+| [`docs/PLATFORM_SUPPORT.md`](docs/PLATFORM_SUPPORT.md) | ماتریس مرورگرها، WSL2، Termux، پروفایل منابع پایین |
+| [`VERSION`](VERSION) / [`CHANGELOG.md`](CHANGELOG.md) / [`THIRD_PARTY_LICENSES.md`](THIRD_PARTY_LICENSES.md) | نسخهٔ واحد 2.0.0، تاریخچهٔ تغییرات، مجوزهای اشخاص ثالث |
+
+**خلاصهٔ سیاست امنیتی:**
+- همهٔ پردازش‌های دوربین ۱۰۰٪ محلی در مرورگر است — هیچ تصویری upload نمی‌شود.
+- کلیدهای API/توکن‌ها فقط در مرورگر کاربر ذخیره می‌شوند و مستقیم به سرویس مقصد می‌روند.
+- مدل‌ها فقط از CDN پین‌شده و فقط با اقدام صریح کاربر بارگذاری می‌شوند.
+- این نسخه یک استقرار production چندکاربرهٔ harden شده نیست — جزئیات و known limitations در `docs/SECURITY.md` و `docs/AUDIT.md`.
+
+---
+
 ## 📜 مجوز (License)
 
 MIT License — آزاد برای استفاده، تغییر و توزیع.

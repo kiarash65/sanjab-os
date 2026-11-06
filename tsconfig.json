@@ -37,6 +37,16 @@
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "examples",
+    "skills",
+    "tool-results",
+    "upload",
+    "agent-ctx",
+    "mini-services",
+    "cli",
+    "linux-edition",
+    "download",
+    "webos-src"
   ]
 }

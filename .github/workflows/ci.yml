@@ -1,0 +1,46 @@
+name: CI
+
+# CI صادقانه و تک‌جاب: تایپ‌چک + لینت + بیلد.
+# هیچ تست‌job یا artifact آپلودی وجود ندارد (تست‌ها هنوز author نشده‌اند — docs/DEPENDENCIES.md).
+on:
+  push:
+    branches:
+      - main
+      - "**"
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: Typecheck, Lint, Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Typecheck (strict)
+        # gate مستقل تایپ — مسیر حذف typescript.ignoreBuildErrors از next.config.ts (AUDIT-003)
+        run: bunx tsc --noEmit
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Build (standalone + copy static/public)
+        # اسکریپت build با cp -r کار می‌کند؛ روی ubuntu-latest مشکلی ندارد
+        run: bun run build
+
+      - name: Verify standalone output
+        run: test -f .next/standalone/server.js

@@ -213,27 +213,61 @@ export async function aiComplete(
 /* ----------------------------- گیت‌هاب ----------------------------- */
 
 const GH_STORAGE = 'pengo-gh-token-v1'
+const GH_SESSION_STORAGE = 'pengo-gh-token-session'
+
+/** نمایش ماسک‌شده‌ی توکن — فقط ۴ کاراکتر آخر */
+export function maskToken(token: string): string {
+  const t = token.trim()
+  if (!t) return ''
+  const head = t.slice(0, 4)
+  return `${head}${'•'.repeat(Math.max(0, Math.min(8, t.length - 8)))}${t.slice(-4)}`
+}
+
+/**
+ * توکن گیت‌هاب — دو حالت:
+ *  - sessionOnly=true → فقط sessionStorage (با بستن تب پاک می‌شود — کم‌ریسک‌تر)
+ *  - پیش‌فرض localStorage (ماندگار) — توجه: هیچ‌کدام در برابر XSS هم‌مبدا محافظت قوی نیستند
+ */
+export function saveGhToken(token: string, sessionOnly = false): void {
+  try {
+    if (sessionOnly) {
+      window.sessionStorage.setItem(GH_SESSION_STORAGE, token.trim())
+      window.localStorage.removeItem(GH_STORAGE)
+    } else {
+      window.localStorage.setItem(GH_STORAGE, token.trim())
+      window.sessionStorage.removeItem(GH_SESSION_STORAGE)
+    }
+  } catch {
+    /* ignore */
+  }
+}
 
 export function loadGhToken(): string {
   try {
     if (typeof window === 'undefined') return ''
-    return window.localStorage.getItem(GH_STORAGE) ?? ''
+    return (
+      window.sessionStorage.getItem(GH_SESSION_STORAGE) ??
+      window.localStorage.getItem(GH_STORAGE) ??
+      ''
+    )
   } catch {
     return ''
   }
 }
 
-export function saveGhToken(token: string): void {
+export function isGhTokenSessionOnly(): boolean {
   try {
-    window.localStorage.setItem(GH_STORAGE, token.trim())
+    if (typeof window === 'undefined') return false
+    return !!window.sessionStorage.getItem(GH_SESSION_STORAGE)
   } catch {
-    /* ignore */
+    return false
   }
 }
 
 export function clearGhToken(): void {
   try {
     window.localStorage.removeItem(GH_STORAGE)
+    window.sessionStorage.removeItem(GH_SESSION_STORAGE)
   } catch {
     /* ignore */
   }
