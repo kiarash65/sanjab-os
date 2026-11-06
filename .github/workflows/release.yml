@@ -147,7 +147,7 @@ jobs:
           Write-Output "node.exe sidecar: $([math]::Round($size,1)) MB"
 
       - name: Generate Tauri icons
-        run: bunx @tauri-apps/cli icon ./public/squirrel-avatar.png -o src-tauri/icons
+        run: bunx @tauri-apps/cli icon ./public/sanjab-icon.png -o src-tauri/icons
 
       - name: Build installers (NSIS + MSI) via tauri-action
         id: tauri
