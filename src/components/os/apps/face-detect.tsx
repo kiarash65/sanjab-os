@@ -132,40 +132,7 @@ export default function FaceDetectApp() {
     }
   }, [])
 
-  const startCamera = useCallback(async () => {
-    const ok = await ensureLoaded()
-    if (!ok) return
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' },
-        audio: false,
-      })
-      streamRef.current = stream
-      const v = videoRef.current
-      if (!v) return
-      v.srcObject = stream
-      await v.play()
-      setRunning(true)
-      pushToast({
-        icon: '🎥',
-        title: 'دوربین روشن شد',
-        body: 'حالا صورتت را جلوی دوربین بگیر — سان‌جاب حدس می‌زنه!',
-      })
-      detectLoop()
-    } catch (err) {
-      const msg =
-        err instanceof DOMException && err.name === 'NotAllowedError'
-          ? 'دسترسی به دوربین داده نشد — اجازه بده!'
-          : err instanceof DOMException && err.name === 'NotFoundError'
-            ? 'دوربینی پیدا نشد — شاید روی دسکتاپ بدون وب‌کم هستی'
-            : 'خطا در باز کردن دوربین'
-      setError(msg)
-      pushToast({ icon: '⚠️', title: 'دوربین کار نکرد', body: msg })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ensureLoaded, pushToast])
-
-  const detectLoop = useCallback(() => {
+  const detectLoop = useCallback(function detectLoop() {
     const f = window.faceapi
     const v = videoRef.current
     const cv = canvasRef.current
@@ -209,18 +176,29 @@ export default function FaceDetectApp() {
             age,
             expression: EXP_FA[bestExp] || bestExp,
           })
-          // رسم مستطیل
+          // فقط قاب — برچسب‌ها با HTML روی ویدیو می‌نشینند تا متن فارسی برعکس/بریده نشود
           ctx.lineWidth = 3
           ctx.strokeStyle = r.gender === 'male' ? '#38bdf8' : '#f472b6'
           ctx.strokeRect(box.x, box.y, box.width, box.height)
-          // برچسب
-          const label = `${gender} · ~${age} · ${EXP_FA[bestExp] || bestExp}`
-          ctx.font = 'bold 14px sans-serif'
-          const tw = ctx.measureText(label).width + 12
-          ctx.fillStyle = r.gender === 'male' ? 'rgba(56,189,248,0.92)' : 'rgba(244,114,182,0.92)'
-          ctx.fillRect(box.x, box.y - 22, tw, 20)
-          ctx.fillStyle = '#0b1120'
-          ctx.fillText(label, box.x + 6, box.y - 7)
+          // گوشه‌های قاب لنگری
+          ctx.lineWidth = 5
+          const c = Math.min(22, box.width * 0.22)
+          const corners: [number, number, number, number][] = [
+            [box.x, box.y, box.x + c, box.y],
+            [box.x, box.y, box.x, box.y + c],
+            [box.x + box.width, box.y, box.x + box.width - c, box.y],
+            [box.x + box.width, box.y, box.x + box.width, box.y + c],
+            [box.x, box.y + box.height, box.x + c, box.y + box.height],
+            [box.x, box.y + box.height, box.x, box.y + box.height - c],
+            [box.x + box.width, box.y + box.height, box.x + box.width - c, box.y + box.height],
+            [box.x + box.width, box.y + box.height, box.x + box.width, box.y + box.height - c],
+          ]
+          ctx.beginPath()
+          for (const [x1, y1, x2, y2] of corners) {
+            ctx.moveTo(x1, y1)
+            ctx.lineTo(x2, y2)
+          }
+          ctx.stroke()
         }
         setDetections(ds)
         const now = performance.now()
@@ -233,6 +211,38 @@ export default function FaceDetectApp() {
         rafRef.current = requestAnimationFrame(detectLoop)
       })
   }, [])
+
+  const startCamera = useCallback(async () => {
+    const ok = await ensureLoaded()
+    if (!ok) return
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' },
+        audio: false,
+      })
+      streamRef.current = stream
+      const v = videoRef.current
+      if (!v) return
+      v.srcObject = stream
+      await v.play()
+      setRunning(true)
+      pushToast({
+        icon: '🎥',
+        title: 'دوربین روشن شد',
+        body: 'حالا صورتت را جلوی دوربین بگیر — سان‌جاب حدس می‌زنه!',
+      })
+      detectLoop()
+    } catch (err) {
+      const msg =
+        err instanceof DOMException && err.name === 'NotAllowedError'
+          ? 'دسترسی به دوربین داده نشد — اجازه بده!'
+          : err instanceof DOMException && err.name === 'NotFoundError'
+            ? 'دوربینی پیدا نشد — شاید روی دسکتاپ بدون وب‌کم هستی'
+            : 'خطا در باز کردن دوربین'
+      setError(msg)
+      pushToast({ icon: '⚠️', title: 'دوربین کار نکرد', body: msg })
+    }
+  }, [ensureLoaded, pushToast, detectLoop])
 
   useEffect(() => {
     return () => stopCamera()
@@ -287,6 +297,31 @@ export default function FaceDetectApp() {
             className="absolute inset-0 h-full w-full"
             style={{ transform: 'scaleX(-1)' }}
           />
+          {/* برچسب‌های HTML — چون canvas آینه‌ای است، متن را اینجا فارسی می‌کشیم */}
+          {detections.map((d, i) => {
+            const vw = videoRef.current?.videoWidth || 640
+            const vh = videoRef.current?.videoHeight || 480
+            const leftPct = ((vw - d.x - d.w) / vw) * 100
+            const boxTopPct = (d.y / vh) * 100
+            const above = d.y > 44
+            const topPct = above
+              ? Math.max(0.5, boxTopPct - 7)
+              : Math.min(88, ((d.y + d.h) / vh) * 100 + 2)
+            const leftClamped = Math.min(78, Math.max(2, leftPct))
+            const male = d.gender === 'آقا'
+            return (
+              <span
+                key={i}
+                dir="rtl"
+                className={`pengo-fadein pointer-events-none absolute z-10 max-w-[96%] truncate rounded-lg px-2 py-1 text-[11px] font-black text-zinc-950 shadow-lg backdrop-blur ${
+                  male ? 'bg-sky-400/90' : 'bg-pink-400/90'
+                }`}
+                style={{ left: `${leftClamped}%`, top: `${topPct}%` }}
+              >
+                {d.gender} · ~{d.age.toLocaleString('fa-IR')} سال · {d.expression}
+              </span>
+            )
+          })}
           {!running && (
             <div className="absolute inset-0 grid place-items-center bg-black/70 p-4 text-center">
               <div className="flex flex-col items-center gap-2">

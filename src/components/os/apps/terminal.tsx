@@ -121,6 +121,33 @@ const MAN: Record<string, { u: string; d: string }> = {
   sleep: { u: 'sleep ثانیه', d: 'مکث. حداکثر ۵ ثانیه، چون بیشترش بی‌ادبیه.' },
   env: { u: 'env', d: 'متغیرهای محیطی فعلی.' },
   ai: { u: 'ai', d: 'اپ «هوش‌یار» را باز می‌کند تا کلید API خودت را وصل کنی.' },
+  /* ---------- نسخه ۵.۰: شبکه و سخت‌افزار و امنیت ---------- */
+  htop: { u: 'htop', d: 'مانیتور زنده و رنگی پروسه‌ها — همان top ولی با گراف.' },
+  traceroute: { u: 'traceroute مقصد', d: 'مسیر بسته‌ها تا مقصد، هاپ به هاپ.' },
+  netstat: { u: 'netstat یا ss -tulpn', d: 'پورت‌های باز و اتصال‌های فعال.' },
+  iptables: { u: 'iptables -L', d: 'جدید قواعد فایروال کرنل (netfilter).' },
+  ufw: { u: 'ufw status | ufw enable', d: 'فایروال سادهٔ اوبونتو (Uncomplicated Firewall).' },
+  mount: { u: 'mount', d: 'سیستم‌فایل‌های متصل و نقاط اتصال را نشان می‌دهد.' },
+  lsblk: { u: 'lsblk', d: 'درخت دیسک‌ها و پارتیشن‌ها.' },
+  lscpu: { u: 'lscpu', d: 'مشخصات پردازنده — تعداد هسته‌ها را واقعی از دستگاهت می‌خواند!' },
+  lsusb: { u: 'lsusb', d: 'دستگاه‌های USB متصل (خیالی و بامزه).' },
+  lspci: { u: 'lspci', d: 'دستگاه‌های روی گذرگاه PCI (کارت گرافیک و…).' },
+  vmstat: { u: 'vmstat', d: 'خلاصهٔ حافظه، swap و CPU.' },
+  gzip: { u: 'gzip فایل | gunzip فایل', d: 'فشرده‌سازی با الگوریتم معروف gzip و باز کردنش.' },
+  unzip: { u: 'unzip بسته.zip', d: 'باز کردن بستهٔ زیپ (خیالی).' },
+  sha256sum: { u: 'sha256sum فایل', d: 'اثر انگشت رمزنگاری فایل — برای چک سلامت دانلودها.' },
+  base64: { u: 'base64 متن | base64 -d متن', d: 'کدگذاری و کدگشایی base64 — واقعی کار می‌کند!' },
+  killall: { u: 'killall نام‌پروسه', d: 'همهٔ پروسه‌های با آن نام را می‌بندد (پنجره‌های واقعی!).' },
+  pgrep: { u: 'pgrep نام', d: 'شمارهٔ پروسه‌های حاوی آن نام.' },
+  pacman: { u: 'pacman -S بسته', d: 'مدیر بستهٔ آرچ. اینجا مهمان هستیم، apt صاحبخانه است!' },
+  dnf: { u: 'dnf install بسته', d: 'مدیر بستهٔ فدورا/Red Hat.' },
+  apk: { u: 'apk add بسته', d: 'مدیر بستهٔ Alpine — همان که در «بوت کرنل واقعی» واقعی اجرا می‌شود!' },
+  timedatectl: { u: 'timedatectl', d: 'ساعت و منطقهٔ زمانی سیستم — با دادهٔ واقعی مرورگر.' },
+  hostnamectl: { u: 'hostnamectl', d: 'نام و مشخصات میزبان.' },
+  useradd: { u: 'sudo useradd نام', d: 'کاربر جدید می‌سازد. بعدش با passwd برایش رمز بگذار.' },
+  passwd: { u: 'passwd [کاربر]', d: 'تغییر رمز عبور. هیچ‌وقت 123456 نگذار!' },
+  su: { u: 'su [کاربر]', d: 'عوض کردن هویت. su root یعنی تبدیل به مدیر.' },
+  xxd: { u: 'xxd فایل', d: 'نمای هگز فایل — زبان مشترک ماشین‌ها.' },
 }
 
 const MAN_KEYS = Object.keys(MAN)
@@ -824,7 +851,8 @@ export default function TerminalApp() {
           ['آموزش', ['learn', 'ask', 'ai', 'man', 'help']],
           ['فایل‌ها', ['ls', 'cd', 'pwd', 'cat', 'mkdir', 'touch', 'echo', 'rm', 'cp', 'mv', 'tree', 'find', 'ln', 'du', 'stat', 'file']],
           ['متن و فیلتر', ['grep', 'sort', 'uniq', 'diff', 'cut', 'tr', 'sed', 'rev', 'wc', 'head', 'tail', 'bc', 'expr', 'seq', 'cal']],
-          ['سیستم', ['chmod', 'id', 'whoami', 'uname', 'date', 'uptime', 'ps', 'top', 'kill', 'jobs', 'df', 'free', 'env', 'export', 'alias', 'unalias', 'which', 'systemctl', 'journalctl', 'crontab', 'history', 'clear', 'exit']],
+          ['سیستم', ['chmod', 'id', 'whoami', 'uname', 'date', 'uptime', 'ps', 'top', 'htop', 'kill', 'killall', 'pgrep', 'jobs', 'df', 'free', 'env', 'export', 'alias', 'unalias', 'which', 'systemctl', 'journalctl', 'crontab', 'history', 'clear', 'exit', 'timedatectl', 'hostnamectl', 'useradd', 'passwd', 'su']],
+          ['شبکه و سخت‌افزار', ['ip', 'netstat', 'traceroute', 'iptables', 'ufw', 'mount', 'lsblk', 'lscpu', 'lsusb', 'lspci', 'vmstat', 'gzip', 'gunzip', 'unzip', 'sha256sum', 'base64', 'xxd', 'pacman', 'dnf', 'apk']],
           ['سرگرمی', ['neofetch', 'cowsay', 'fortune', 'banner', 'matrix', 'sl', 'coffee', 'tux', 'sunjob', 'python', 'ping', 'curl', 'wget', 'ssh', 'ip', 'tar', 'zip', 'nano', 'vim', 'sleep', 'less', 'wallpaper', 'lock']],
           ['گراف', ['open', 'apps', 'sudo', 'apt']],
         ]
@@ -1937,6 +1965,209 @@ export default function TerminalApp() {
         push('ok', 'هوش‌یار باز شد — کلید API خودت را آنجا وصل کن!')
         launch('ai-chat')
         break
+
+      /* ---------------- نسخه ۵.۰: شبکه، سخت‌افزار و امنیت ---------------- */
+      case 'htop': {
+        push('sys', 'htop — مانیتور زنده و رنگی (نسخهٔ بی‌استرس)')
+        push('out', '  PID  CPU%  MEM%  پروسه')
+        if (os.windows.length === 0) push('dim', '(هیچ پروسه‌ای بجز خود ما — سیستم در حال مدیتیشن)')
+        os.windows.forEach((w, i) => {
+          push(
+            'out',
+            `${String(pidOf(w.id)).padStart(5)}  ${String(2 + ((i * 11) % 19)).padStart(3)}%  ${String(4 + ((i * 5) % 12)).padStart(3)}%  ${w.title}`
+          )
+        })
+        push('dim', 'نکته: F10 برای خروج — ولی اینجا هیچ‌وقت لازم نمی‌شود!')
+        break
+      }
+      case 'traceroute': {
+        const dest = args[0] ?? 'penguin.os'
+        push('sys', `traceroute به ${dest} — حداکثر ۳۰ هاپ`)
+        const hops = [
+          ' 1   gateway.local        0.4 ms',
+          ' 2   10.10.0.1            8.2 ms',
+          ' 3   tehran-ix.ir        21.5 ms',
+          ' 4   penguin-backbone    44.0 ms',
+          ' 5   the-cute-hop        66.6 ms',
+          ` 6   ${dest}           88.8 ms`,
+        ]
+        setBusy(true)
+        hops.forEach((h, i) => setTimeout(() => push('out', h), i * 260))
+        setTimeout(() => setBusy(false), hops.length * 260 + 80)
+        break
+      }
+      case 'netstat':
+      case 'ss':
+        push('sys', 'اتصال‌های فعال (Active Internet connections)')
+        push('out', 'Proto  Local           State   یادداشت')
+        push('out', 'tcp    127.0.0.1:3000  LISTEN  (همین سایتی که الان باز است!)')
+        push('out', 'tcp    0.0.0.0:443     ESTAB   (تونل امن پنگوئن)')
+        push('out', 'udp    0.0.0.0:53      —       (DNS؛ اسم‌ها را به عدد ترجمه می‌کند)')
+        break
+      case 'iptables':
+        push('sys', 'Chain INPUT (policy ACCEPT)')
+        push('out', 'target  prot  source           destination')
+        push('out', 'ACCEPT  tcp   anywhere         anywhere      tcp dpt:ssh')
+        push('out', 'DROP    all   13.37.bad.guys   anywhere      /* ورود ممنوع */')
+        push('dim', 'یادت باشد: ACCEPT یعنی راه بده، DROP یعنی بی‌خبر رد کن!')
+        break
+      case 'ufw':
+        if (args[0] === 'enable') push('ok', 'فایروال فعال شد — حالا این سیستم مثل قلعه است!')
+        else if (args[0] === 'status') {
+          push('sys', 'Status: active')
+          push('out', '22/tcp   ALLOW   anywhere')
+          push('out', '80,443   ALLOW   anywhere')
+        } else push('out', 'مثال: ufw status یا ufw enable')
+        break
+      case 'mount':
+        push('sys', 'سیستم‌فایل‌های متصل:')
+        push('out', '/dev/root   /       ext4    rw')
+        push('out', 'tmpfs       /tmp    tmpfs   rw (در RAM؛ ری‌استارت یعنی خداحافظ)')
+        push('out', 'proc        /proc   proc    rw (قلب تپندهٔ هسته)')
+        break
+      case 'lsblk':
+        push('sys', 'درخت دیسک‌ها:')
+        push('out', 'sda       8:0    1  500G')
+        push('out', '├─sda1    8:1    1  512M  /boot/efi')
+        push('out', '├─sda2    8:2    1   16G  [SWAP]')
+        push('out', '└─sda3    8:3    1  483G  /')
+        break
+      case 'lscpu':
+        push('out', 'Architecture:        x86_64')
+        push('out', `CPU(s):              ${navigator.hardwareConcurrency || 8}  ← واقعی از دستگاهت!`)
+        push('out', 'Model name:          بسته به دستگاه تو')
+        push('out', 'Virtualization:      داخل مرورگر — پس همیشه بله!')
+        break
+      case 'lsusb':
+        push('out', 'Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub')
+        push('out', 'Bus 001 Device 003: ID 1949:snack SnackCorp فندق‌خور سنجابک')
+        push('out', 'Bus 001 Device 004: ID f793:1e00 Sanjab WebOS Mouse (خیالی)')
+        break
+      case 'lspci':
+        push('out', '00:00.0  Host bridge:              PengoCore Bridge')
+        push('out', '00:02.0  VGA compatible controller: BrowserGPU 9000')
+        push('out', '00:1f.3  Audio device:             ChipTune HD Audio')
+        break
+      case 'vmstat':
+        push('out', 'procs   memory    swap    io      system    cpu')
+        push('out', 'r  b    swpd  free   si  so   bi  bo   in   cs   us sy id')
+        push('out', '1  0    0     2048   0   0    2   1    12   22   5  2  93')
+        break
+      case 'gzip':
+      case 'gunzip': {
+        const f = args[0] ?? 'فایل'
+        setBusy(true)
+        push('out', base === 'gzip' ? `فشرده‌سازی ${f} …` : `باز کردن ${f} …`)
+        setTimeout(() => {
+          if (base === 'gzip') push('ok', `«${f}.gz» آماده — حدود ۶۰٪ کوچکتر شد (تقریباً!)`)
+          else push('ok', 'باز شد — دمِ فشرده‌ساز گرم!')
+          setBusy(false)
+        }, 600)
+        break
+      }
+      case 'unzip':
+        push('out', `Archive: ${args[0] ?? 'بسته.zip'}`)
+        push('out', '  extracting: فندق‌ها.txt')
+        push('ok', 'باز شد — خوش آمدی به مهمانی!')
+        break
+      case 'sha256sum':
+      case 'md5sum': {
+        const f = args[0] ?? 'فایل'
+        push(
+          'out',
+          `${
+            base === 'sha256sum'
+              ? 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
+              : 'd41d8cd98f00b204e9800998ecf8427e'
+          }  ${f}`
+        )
+        push('dim', 'اثر انگشت فایل — اگر بعد از دانلود با نسخهٔ رسمی فرق داشت، مشکل‌دار است!')
+        break
+      }
+      case 'base64': {
+        const dec = args.includes('-d')
+        const rest2 = args.filter((a) => a !== '-d').join(' ')
+        try {
+          if (dec) {
+            push('ok', decodeURIComponent(escape(atob(rest2))))
+          } else {
+            push('ok', btoa(unescape(encodeURIComponent(rest2 || 'سلام سان‌جاب'))))
+          }
+        } catch {
+          push('err', 'رشتهٔ ورودی base64 معتبر نیست')
+        }
+        break
+      }
+      case 'killall':
+      case 'pkill': {
+        const name = args[0]
+        if (!name) {
+          push('err', 'مثال: killall chrome')
+          break
+        }
+        const victim = os.windows.find(
+          (w) => w.title.toLowerCase().includes(name.toLowerCase()) || w.appId === name
+        )
+        if (victim) {
+          useOS.getState().closeWindow(victim.id)
+          push('ok', `«${victim.title}» بسته شد — بدون قید و شرط`)
+        } else push('err', `پروسه‌ای به نام «${name}» در حال اجرا نیست. با ps نگاه کن`)
+        break
+      }
+      case 'pgrep': {
+        const name = (args[0] ?? '').toLowerCase()
+        const found = os.windows.filter((w) => w.title.toLowerCase().includes(name))
+        if (found.length === 0) push('dim', 'چیزی پیدا نشد')
+        else found.forEach((w) => push('out', String(pidOf(w.id))))
+        break
+      }
+      case 'pacman':
+        push('warn', 'پنگوئن: «آنجا آرچ است! من Debian/Ubuntu-سان‌جابی هستم» — ولی apt را امتحان کن، همان کار را می‌کند.')
+        break
+      case 'dnf':
+        push('warn', 'اینجا apt صاحبخانه است؛ dnf مهمان فدورایی است که هنوز نرسیده!')
+        break
+      case 'apk':
+        push('ok', 'Alpine! همان که در اپ «بوت کرنل واقعی» واقعاً اجرا می‌شود — آنجا apk add واقعی کار می‌کند!')
+        launch('real-linux')
+        break
+      case 'timedatectl':
+        push('sys', `               Local time: ${new Date().toLocaleString('fa-IR')}`)
+        push('out', `           Universal time: ${new Date().toUTCString()}`)
+        push('out', `                Time zone: ${Intl.DateTimeFormat().resolvedOptions().timeZone} (واقعی!)`)
+        push('ok', 'System clock synchronized: بله، با ساعت جهانی')
+        break
+      case 'hostnamectl':
+        push('sys', '   Static hostname: sanjab-os')
+        push('out', '         Icon name: penguin-cute')
+        push('out', '  Operating System: SanjabOS (WebOS)')
+        push('out', '            Kernel: مرورگر-سازگار و بامزه')
+        break
+      case 'useradd':
+        if (args[0]) push('ok', `کاربر «${args[0]}» ساخته شد — حالا passwd ${args[0]} را بزن`)
+        else push('err', 'مثال: sudo useradd pengo2')
+        break
+      case 'passwd':
+        push('out', 'تغییر رمز برای pengo')
+        push('out', 'رمز جدید: ••••••••')
+        push('ok', 'passwd: رمز با موفقیت به‌روزرسانی شد (هیچ‌وقت 123456 نگذار!)')
+        break
+      case 'su':
+        push('out', 'Password: ••••••••')
+        push('ok', 'هویت عوض شد — الان مدیر هستی. «با قدرت بزرگ، مسئولیت بزرگ می‌آید»')
+        break
+      case 'xxd': {
+        const target = args[0]
+        const st5 = useFs.getState()
+        const node5 = target ? getNode(st5.fs, normalizePath(cwd, target)) : null
+        const content5 = node5 && node5.type === 'file' ? node5.content : 'سلام سان‌جاب!'
+        const hex = Array.from(content5.slice(0, 24))
+          .map((ch) => ch.charCodeAt(0).toString(16).padStart(2, '0'))
+          .join(' ')
+        push('out', `00000000:  ${hex}  |${content5.slice(0, 12)}|`)
+        push('dim', 'نمای هگز — زبان مشترک ماشین‌ها!')
+        break
+      }
 
       /* ---------------- پیش‌فرض: غلط تایپی ---------------- */
       default: {

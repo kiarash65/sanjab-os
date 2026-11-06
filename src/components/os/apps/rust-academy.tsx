@@ -1,0 +1,2176 @@
+'use client'
+
+/* آکادمی Rust — دورهٔ تعاملی فارسی با شبیه‌ساز کوچک Rust و زمین بازی */
+
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
+import type { ReactNode } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import {
+  AlertTriangle,
+  BookOpen,
+  Boxes,
+  Check,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Cog,
+  Cpu,
+  FlaskConical,
+  Flame,
+  GraduationCap,
+  KeyRound,
+  Lightbulb,
+  Loader2,
+  Play,
+  Rocket,
+  ShieldCheck,
+  Trophy,
+  X,
+  Zap,
+} from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
+import { useOS } from '@/lib/os/store'
+
+const fa = (n: number) => n.toLocaleString('fa-IR')
+
+/* ================================================================
+   داده‌های آموزشی
+   ================================================================ */
+
+interface Lesson {
+  id: string
+  title: string
+  paragraphs: string[]
+  code: string
+  tip?: string
+  errTitle?: string
+  errCode?: string
+  errWhy?: string
+  terminal?: string
+}
+
+interface Track {
+  id: string
+  title: string
+  desc: string
+  icon: LucideIcon
+  lessons: Lesson[]
+}
+
+const TRACKS: Track[] = [
+  {
+    id: 'start',
+    title: 'شروع',
+    desc: 'نصب، کاگو، متغیرها، تابع‌ها و کنترل جریان',
+    icon: Rocket,
+    lessons: [
+      {
+        id: 'rust-what',
+        title: 'راست چیست؟',
+        paragraphs: [
+          '**Rust** زبان برنامه‌نویسی سیستمی است که سال ۲۰۱۰ در موزیلا متولد شد؛ **سرعتِ C و ++C** را با **امنیت حافظه** ترکیب می‌کند و همهٔ چک‌ها را در زمان کامپایل انجام می‌دهد — نه در زمان اجرا.',
+          'برخلاف Java یا Go، راست **زباله‌روب (GC) ندارد**؛ به‌جای آن سیستم **مالکیت (Ownership)** حافظه را دقیقاً همان‌جا که متغیر از حوزه خارج می‌شود آزاد می‌کند، بدون هیچ هزینه‌ای در زمان اجرا.',
+          'امروز راست همه‌جاست: **هستهٔ لینوکس ۶.۷ به بعد**، موتور مرورگر **فایرفاکس**، اجزای **ویندوز** و ده‌ها سرویس ابری بزرگ. نظرسنجی StackOverflow هم هفت سال پیاپی آن را محبوب‌ترین زبان دنیا اعلام کرده است.',
+        ],
+        code: `// اولین برنامهٔ Rust — همان همیشگی!
+fn main() {
+    println!("Hello, Rust!");
+
+    let year = 2010;
+    println!("Rust since {}", year);
+}`,
+        tip: 'کامپایلر راست سخت‌گیرترین معلم دنیاست، اما پیام‌های خطایش از بهترین‌های دنیای برنامه‌نویسی است — آن‌ها را دشمن ندان، راهنما بدان.',
+      },
+      {
+        id: 'rust-cargo',
+        title: 'کاگو؛ جعبه‌ابزار رسمی',
+        paragraphs: [
+          '**Cargo** ابزار رسمی راست است: کامپایل، مدیریت وابستگی‌ها، تست و انتشار — همه در یک دستور. هر پروژهٔ راست یک فایل **Cargo.toml** دارد که مشخصات و کتابخانه‌ها را نگه می‌دارد.',
+          'مهم‌ترین دستورها: `cargo new` ساخت پروژه، `cargo build` کامپایل، `cargo run` کامپایل و اجرا، و `cargo check` فقط بررسی خطا بدون ساخت خروجی — سریع‌ترین راه حین تمرین.',
+        ],
+        code: `// همین فایل main.rs که cargo new برای تو ساخت
+fn main() {
+    println!("Hello, world!");
+}`,
+        terminal: `$ cargo new hello
+     Created binary (application) hello package
+$ cd hello
+$ cargo check
+    Checking hello v0.1.0
+    Finished dev [unoptimized] target(s) in 0.12s
+$ cargo run
+   Compiling hello v0.1.0
+    Finished dev [unoptimized] target(s) in 0.34s
+     Running target/debug/hello
+Hello, world!`,
+        tip: 'حین تمرین همیشه cargo check را اجرا کن؛ خیلی سریع‌تر از build است و همان خطاها را می‌دهد.',
+      },
+      {
+        id: 'rust-vars',
+        title: 'متغیرها: let و let mut',
+        paragraphs: [
+          'متغیرها با `let` ساخته می‌شوند و به‌طور پیش‌فرض **غیرقابل‌تغییر (immutable)** اند. برای تغییر باید صریحاً بنویسی `let mut` — راست تغییرپذیری را پیش‌فرض نمی‌داند.',
+          '**سایه‌زدن (Shadowing)**: با `let` دوباره می‌توانی متغیر جدیدی با همان نام بسازی؛ متغیر قبلی زیر سایه می‌رود، حتی با نوعی متفاوت. این با `mut` فرق دارد: یک متغیر جدید ساخته می‌شود، نه تغییر قبلی.',
+          '**ثابت‌ها** با `const` تعریف می‌شوند، نوعشان اجباری است و در زمان کامپایل ارزیابی می‌شوند: `const MAX: i32 = 100;`',
+        ],
+        code: `fn main() {
+    let x = 5;
+    let x = x + 1;   // shadowing
+    let x = x * 2;   // باز هم سایه!
+    println!("x = {}", x);
+
+    let mut count = 0;
+    count += 1;      // فقط با mut ممکن است
+    println!("count = {}", count);
+
+    const MAX: i32 = 100;
+    println!("max = {}", MAX);
+}`,
+        tip: 'تفاوت ظریف: shadowing یک متغیر جدید می‌سازد (حتی با نوع دیگر)، ولی mut همان حافظه را عوض می‌کند.',
+      },
+      {
+        id: 'rust-types',
+        title: 'انواع داده',
+        paragraphs: [
+          'چهار نوع **اسکالر** داری: عدد صحیح `i8` تا `i128` و بی‌علامت `u8` تا `u128` (پیش‌فرض `i32`)، اعشاری `f32`/`f64` (پیش‌فرض `f64`)، `bool` و `char` که یونیکد کامل است.',
+          'کامپایلر معمولاً **نوع را حدس می‌زند** (Type Inference) ولی هر وقت خواستی می‌توانی صریح بنویسی: `let x: f64 = 2.5;` — صریح‌نویسی در امضای تابع‌ها اجباری است.',
+        ],
+        code: `fn main() {
+    let age = 25;        // i32
+    let pi = 3.14159;    // f64
+    let ok = true;       // bool
+    let grade = 'A';     // char
+    let big = 12_000;    // جداکنندهٔ خوانایی
+
+    println!("{} {} {} {} {}", age, pi, ok, grade, big);
+}`,
+        tip: 'char در Rust چهار بایت است و هر کاراکتر یونیکدی را نگه می‌دارد — حتی ایموجی 🦀.',
+      },
+      {
+        id: 'rust-fn',
+        title: 'توابع؛ عبارت در برابر دستور',
+        paragraphs: [
+          'توابع با `fn` تعریف می‌شوند، نام‌ها snake_case هستند و نوع پارامترها و خروجی **اجباری** است: `fn add(a: i32, b: i32) -> i32`',
+          'نکتهٔ طلایی راست: بدنه از **عبارت (Expression)** و **دستور (Statement)** ساخته می‌شود. دستور با `;` تمام می‌شود و مقدار ندارد؛ عبارت مقدار دارد. اگر آخرین چیزِ بدنه یک عبارتِ بدون سمی‌کالن باشد، **خودش مقدار بازگشتی است** — بدون `return`!',
+          '`return` برای خروج زودهنگام از وسط تابع است؛ مسیر عادی راست همان «آخرین عبارت» است.',
+        ],
+        code: `fn add(a: i32, b: i32) -> i32 {
+    a + b            // عبارت است؛ سمی‌کالن ندارد!
+}
+
+fn bump(a: i32) -> i32 {
+    return a + 1;    // با return هم می‌شود
+}
+
+fn main() {
+    println!("2 + 3 = {}", add(2, 3));
+    println!("bump  = {}", bump(9));
+}`,
+        tip: 'اگر وسط‌حواس به آخرین عبارت سمی‌کالن بزنی، تابع unit یعنی () برمی‌گرداند و کامپایلر خطای E0308 می‌دهد — رایج‌ترین لغزش تازه‌کارها!',
+      },
+      {
+        id: 'rust-control',
+        title: 'کنترل جریان: if ،loop و for',
+        paragraphs: [
+          '`if` در راست یک **عبارت** است؛ یعنی مقدار برمی‌گرداند: `let y = if x > 2 { 10 } else { 20 };` — آکولاد اجباری است و شرط پرانتز نمی‌خواهد.',
+          'سه حلقه داری: `loop` (بی‌نهایت، با `break value` حتی می‌تواند مقدار برگرداند!)، `while` و `for` روی **بازه‌ها**: `0..5` یعنی پنج‌تا (۰ تا ۴) و `0..=5` یعنی شش‌تا (۰ تا ۵).',
+        ],
+        code: `fn main() {
+    let x = 7;
+    let y = if x > 2 { 10 } else { 20 };
+    println!("y = {}", y);
+
+    for i in 0..=5 {
+        println!("i = {}", i);
+    }
+
+    let mut n = 0;
+    let result = loop {
+        n += 1;
+        if n == 10 {
+            break n * 2;   // loop مقدار برمی‌گرداند!
+        }
+    };
+    println!("loop = {}", result);
+}`,
+        tip: 'بازه‌ها را قاطی نکن: `..` انتهای را شامل نمی‌شود، `..=` می‌شود. این نیم‌بازه بودن سر جای خودش خیلی به‌درد می‌خورد.',
+      },
+    ],
+  },
+  {
+    id: 'own',
+    title: 'مالکیت',
+    desc: 'قلب Rust — move ،borrow ،slices و lifetimeها',
+    icon: KeyRound,
+    lessons: [
+      {
+        id: 'own-what',
+        title: 'مالکیت؛ قلب Rust',
+        paragraphs: [
+          'هر مقدار در راست یک **مالک** دارد و وقتی مالک از حوزه (Scope) خارج شود، حافظه بلافاصله **drop** می‌شود. سه قاعدهٔ طلایی: ۱) هر مقدار دقیقاً یک مالک دارد. ۲) هر لحظه فقط یک مالک. ۳) وقتی مالک از حوزه خارج شود، مقدار آزاد می‌شود.',
+          'کامپایلر این قواعد را در **زمان کامپایل** بررسی می‌کند — نه با GC و نه با free دستی. نتیجه: هیچ dangling pointer و هیچ double-freeای ممکن نیست، بدون هزینهٔ زمان اجرا.',
+        ],
+        code: `fn main() {
+    {
+        let msg = "inner scope";
+        println!("{}", msg);
+    } // msg دقیقاً همین‌جا drop می‌شود
+
+    let n = 42;
+    println!("n = {}", n);
+}`,
+        tip: 'مالکیت را مثل مالکیت خانه ببین: یا صاحب خانه‌ای، یا اجاره‌کرده‌ای (borrow) — هر دو با هم نمی‌شود.',
+      },
+      {
+        id: 'own-move',
+        title: 'Move؛ جابه‌جایی مالکیت',
+        paragraphs: [
+          'انتساب انواع ساده مثل `i32` یک **کپی** ارزان است؛ اما انتسابِ `String` مالکیت حافظهٔ heap را **منتقل (Move)** می‌کند و متغیر قبلی بلافاصله نامعتبر می‌شود.',
+          'این پررنگ‌ترین تفاوت راست با بقیهٔ زبان‌هاست: استفاده از متغیرِ منتقل‌شده اصلاً کامپایل نمی‌شود. برای کپی واقعی باید صریحاً `s.clone()` بزنی.',
+        ],
+        code: `fn main() {
+    let s = String::from("salam");
+    let t = s;             // مالکیت move شد!
+    println!("{}", t);
+    // println!("{}", s);  // ← این خط اصلاً کامپایل نمی‌شود
+}`,
+        tip: 'شبیه‌ساز ما move را شبیه‌سازی نمی‌کند و این کد را اجرا می‌کند؛ رفتار واقعی را در Rust واقعی ببین — همان‌جاست که E0382 را با چشم خودت می‌بینی.',
+        errTitle: 'معروف‌ترین خطای دنیای Rust',
+        errCode: `error[E0382]: borrow of moved value: \`s\`
+ --> src/main.rs:4:20
+  |
+1 |     let s = String::from("salam");
+2 |     let t = s;
+  |             - value moved here
+3 |     println!("{}", s);
+  |                    ^ value borrowed here after move
+  |
+help: consider cloning the value: \`s.clone()\``,
+        errWhy: 'چون String روی heap زندگی می‌کند و انتساب، مالکیت آن حافظه را به t می‌دهد؛ s از آن لحظه «خالی» است و کامپایلر اجازه نمی‌دهد به چیزی اشاره کنی که مالکش نیستی.',
+      },
+      {
+        id: 'own-borrow',
+        title: 'استقراض با &',
+        paragraphs: [
+          'به‌جای دادن مالکیت، فقط **قرض** بگیر: `&s` یک مرجع خواندنی (Reference) است. قرض‌گیرنده مالک نیست، فقط می‌خواند و تمام.',
+          'تابعی که `&String` یا `&str` می‌گیرد بعد از فراخوانی، مالکیت هنوز دست صاحبش است. به این الگو می‌گویند **Borrowing** و در امضای همهٔ APIهای راست می‌بینی‌اش.',
+        ],
+        code: `fn shout(msg: &str) -> i32 {
+    println!(">> {}", msg);
+    1
+}
+
+fn main() {
+    let s = "rust";
+    shout(&s);                     // فقط قرض دادیم
+    println!("s هنوز زنده است: {}", s);
+}`,
+        tip: 'شبیه‌ساز & را به‌عنوان «همان مقدار» می‌بیند؛ در Rust واقعی & یک اشاره‌گر قرضی است که کامپایلر عمرش را چک می‌کند.',
+      },
+      {
+        id: 'own-mutborrow',
+        title: 'قرض قابل‌تغییر',
+        paragraphs: [
+          'قاعدهٔ طلایی استقراض: در هر لحظه **یا یک قرض قابل‌تغییر (`&mut T`)** یا **هر تعداد قرض خواندنی (`&T`)** — هرگز هر دو با هم. همین یک قاعده، data race را در زمان کامپایل می‌کشد.',
+          'با `&mut` می‌توانی مقدار را عوض کنی؛ اما در مدت قرض، حتی خودِ مالک هم اجازهٔ خواندن ندارد. با `*` هم مقدار پشت مرجع را deref می‌کنی.',
+        ],
+        code: `fn bump(n: &mut i32) {
+    *n += 1;         // با * به مقدار پشت مرجع می‌رسیم
+}
+
+fn main() {
+    let mut score = 9;
+    bump(&mut score);
+    println!("score = {}", score);   // 10
+}`,
+        tip: 'این شبیه‌ساز مرجع‌ها را شبیه‌سازی نمی‌کند؛ برای دیدن خروجی واقعی، همین کد را در Rust واقعی اجرا کن.',
+        errTitle: 'خطای قرض دوگانه',
+        errCode: `error[E0502]: cannot borrow \`s\` as mutable
+because it is also borrowed as immutable
+  |
+2 |     let r = &s;
+  |             -- immutable borrow occurs here
+3 |     let w = &mut s;
+  |             ^^^^^^ mutable borrow occurs here`,
+        errWhy: 'یک قرض خواندنی زنده است، پس قرض نوشتنی ممنوع. کافی است r را قبل از ساخت w استفاده و تمام کنی تا حافظه‌ی قرض آزاد شود.',
+      },
+      {
+        id: 'own-slices',
+        title: 'برش‌ها (Slices)',
+        paragraphs: [
+          '**Slice** یک پنجره به بخشی از داده است: `&s[0..5]` پنج بایت اول. برش مالک چیزی نیست، فقط به محل داده اشاره می‌کند — پس کپی سنگین نداریم.',
+          '`&str` خودش دقیقاً یک slice روی بایت‌های UTF-8 است؛ برای همین توابعی که متن می‌گیرند معمولاً `&str` امضا می‌کنند تا هم String و هم literal را بپذیرند.',
+        ],
+        code: `fn main() {
+    let s = "rust language";
+    let head = &s[0..4];    // "rust"
+    let tail = &s[5..];     // "language"
+    println!("head = {}, tail = {}", head, tail);
+}`,
+        tip: 'این شبیه‌ساز برش را اجرا نمی‌کند — مفهوم را همین‌جا یاد بگیر و تمرینش را به Rust واقعی بسپار.',
+      },
+      {
+        id: 'own-lifetime',
+        title: 'عمرها (Lifetimes)',
+        paragraphs: [
+          '**Lifetime** اسمی است که کامپایلر به مدت زنده‌بودن یک مرجع می‌دهد. اکثر مواقع کامپایلر خودش حدس می‌زند و لازم نیست چیزی بنویسی (Lifetime Elision).',
+          'اما وقتی تابعی دو ورودی مرجعی دارد و خروجی هم مرجع است، کامپایلر نمی‌داند خروجی به کدام وصل است. با `\'a` می‌گویی: «خروجی تا وقتی هر دو ورودی زنده‌اند زنده است».',
+        ],
+        code: `fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
+    if x.len() > y.len() {
+        x
+    } else {
+        y
+    }
+}`,
+        tip: 'lifetime متغیری در زمان اجرا نمی‌سازد؛ فقط یک یادداشت برای کامپایلر است تا عمر مرجع‌ها را ثابت کند.',
+      },
+    ],
+  },
+  {
+    id: 'st',
+    title: 'ساختارها',
+    desc: 'struct ،enum ،Option/Result ،trait و کلکسیون‌ها',
+    icon: Boxes,
+    lessons: [
+      {
+        id: 'st-struct',
+        title: 'struct و impl',
+        paragraphs: [
+          'با `struct` نوع خودت را می‌سازی: فیلدهای typed که داده را کنار هم نگه می‌دارند. ساخت نمونه با آکولاد و اگر نام متغیر با فیلد یکی باشد، خلاصه‌نویسی `Point { x, y }` کار می‌کند.',
+          'با بلوک `impl` برای struct **متد** تعریف می‌کنی: توابع بدون `self` مثل سازنده‌ها با `::` صدا زده می‌شوند و توابع با `self`/`&self` با نقطه.',
+        ],
+        code: `struct Point {
+    x: i32,
+    y: i32,
+}
+
+impl Point {
+    fn new(x: i32, y: i32) -> Point {
+        Point { x, y }
+    }
+    fn sum(&self) -> i32 {
+        self.x + self.y
+    }
+}
+
+fn main() {
+    let p = Point::new(3, 4);
+    println!("sum = {}", p.sum());
+}`,
+        tip: 'این شبیه‌ساز struct را اجرا نمی‌کند؛ ولی مفهومش ساده است — داده و رفتار کنار هم، بدون کلاس و ارث‌بری.',
+      },
+      {
+        id: 'st-enum',
+        title: 'enum و قدرت match',
+        paragraphs: [
+          'enum در راست از هر زبان دیگری قوی‌تر است — یک **نوع جبری (ADT)**: هر واریانت می‌تواند داده با خود حمل کند. `Option` و `Result` استاندارد با همین ساز و کار ساخته شده‌اند.',
+          '`match` باید **جامع (Exhaustive)** باشد: اگر حتی یک واریانت را جا بیندازی، برنامه کامپایل نمی‌شود. دیگر forget-case نداریم!',
+        ],
+        code: `enum Shape {
+    Circle(f64),
+    Rect(f64, f64),
+}
+
+fn area(s: Shape) -> f64 {
+    match s {
+        Shape::Circle(r) => 3.14 * r * r,
+        Shape::Rect(w, h) => w * h,
+    }
+}`,
+        tip: 'match هم یک عبارت است — مثل if مقدار برمی‌گرداند. برای همین می‌شود آن را مستقیم در return گذاشت.',
+      },
+      {
+        id: 'st-option',
+        title: 'Option؛ پایانِ null',
+        paragraphs: [
+          'راست **null ندارد**! به‌جایش `Option<T>` داری: یا `Some(value)` یا `None`. کامپایلر مجبورت می‌کند قبل از استفاده، هر دو حالت را بررسی کنی.',
+          '`unwrap` سریع است ولی اگر None باشد برنامه panic می‌زند؛ راه درست، `match` یا `if let` است تا مسیر خالی هم مدیریت شود.',
+        ],
+        code: `fn find(target: i32) -> Option<i32> {
+    let db = 42;
+    if target == db {
+        Some(target)
+    } else {
+        None
+    }
+}
+
+fn main() {
+    match find(7) {
+        Some(v) => println!("found: {}", v),
+        None => println!("not found"),
+    }
+}`,
+        tip: 'هر جا در زبان دیگری میل به «چک کردن null» کردی، در راست یک Option تحویل بگیر.',
+      },
+      {
+        id: 'st-result',
+        title: 'Result و عملگر ؟',
+        paragraphs: [
+          '`Result<T, E>` برای خطاهاست: یا `Ok(value)` یا `Err(error)`. برخلاف exception، خطا بخشی از **نوع خروجی تابع** است — نمی‌شود ندیدش.',
+          'عملگر `?` میان‌بر انتشار خطاست: اگر Err بود همان را از تابع فعلی return کن، اگر Ok بود مقدارش را بده. یک کاراکتر، تمام پترن try/catch را جمع می‌کند.',
+        ],
+        code: `fn divide(a: f64, b: f64) -> Result<f64, String> {
+    if b == 0.0 {
+        Err("divide by zero".to_string())
+    } else {
+        Ok(a / b)
+    }
+}
+
+fn main() -> Result<(), String> {
+    let r = divide(10.0, 4.0)?;
+    println!("r = {}", r);
+    Ok(())
+}`,
+        tip: 'رشته‌ها متد to_string دارند؛ برای خطاهای ساده برگرداندن String در تمرین‌ها کاملاً رایج است.',
+      },
+      {
+        id: 'st-traits',
+        title: 'trait؛ قرارداد رفتار',
+        paragraphs: [
+          '**Trait** مثل interface است ولی قوی‌تر: یک رفتار مشترک تعریف می‌کند و برای هر نوعی می‌توانی `impl` بنویسی — حتی برای نوع‌های استاندارد.',
+          'پیاده‌سازی traitهای استاندارد مثل `Display` یا `Clone` باعث می‌شود نوع تو با کل اکوسیستم حرف بزند؛ مثلاً println! با `{} قشنگ چاپش کند.',
+        ],
+        code: `trait Area {
+    fn area(&self) -> f64;
+}
+
+struct Circle { r: f64 }
+
+impl Area for Circle {
+    fn area(&self) -> f64 {
+        3.14 * self.r * self.r
+    }
+}
+
+fn main() {
+    let c = Circle { r: 2.0 };
+    println!("area = {}", c.area());
+}`,
+        tip: 'traitها با genericها ترکیب می‌شوند: `fn print_all(items: &[impl Display])` یعنی هر چیزی که قابل چاپ است.',
+      },
+      {
+        id: 'st-collections',
+        title: 'Vec ،HashMap و iteratorها',
+        paragraphs: [
+          '`Vec<T>` آرایهٔ رشدکنندهٔ روی heap است و `HashMap<K, V>` نگاشت کلید-مقدار. هر دو بعد از اتمام مالک، محتوایشان را هم آزاد می‌کنند.',
+          '**Iteratorها** تنبل (Lazy) اند: `iter().map(...).filter(...).collect()` یک زنجیره از closureهاست که کامپایلر آن را هم‌سطح حلقهٔ دستی بهینه می‌کند — صفر هزینهٔ انتزاع.',
+        ],
+        code: `fn main() {
+    let v = vec![1, 2, 3, 4, 5];
+
+    let doubled: Vec<i32> = v.iter().map(|x| x * 2).collect();
+    let evens: Vec<&i32> = v.iter().filter(|x| *x % 2 == 0).collect();
+
+    println!("{:?}", doubled);
+    println!("{:?}", evens);
+}`,
+        tip: 'closureها `|x| ...` محیطشان را می‌گیرند (capture)؛ اگر مالکیت لازم شد، با move بگیرشان.',
+      },
+    ],
+  },
+  {
+    id: 'conc',
+    title: 'همزمانی',
+    desc: 'thread ،Mutex ،async/await و دنیای unsafe',
+    icon: Cpu,
+    lessons: [
+      {
+        id: 'conc-thread',
+        title: 'thread و move',
+        paragraphs: [
+          '`thread::spawn` یک نخ جدید می‌سازد و closure را همان‌جا اجرا می‌کند؛ دستهٔ برگشتی با `join` منتظر پایان نخ می‌شود.',
+          'چون closure ممکن است به داده‌ای روی stackِ نخِ دیگر اشاره کند، معمولاً با کلیدواژهٔ `move` مالکیت داده را کامل به نخ جدید منتقل می‌کنیم — بدون move، کامپایلر اجازه نمی‌دهد.',
+        ],
+        code: `use std::thread;
+
+fn main() {
+    let data = vec![1, 2, 3];
+
+    let handle = thread::spawn(move || {
+        println!("child sees: {:?}", data);
+    });
+
+    handle.join().unwrap();
+    println!("parent done");
+}`,
+        tip: 'راست «ترسناک‌ترین» بخش همزمانی را امن کرده: data race اصلاً کامپایل نمی‌شود، نه اینکه فقط گاهی کرش کند.',
+      },
+      {
+        id: 'conc-mutex',
+        title: 'Mutex و Arc',
+        paragraphs: [
+          '`Mutex<T>` قفل است: هر لحظه فقط یک نخ می‌تواند به داده برسد و بقیه منتظر می‌مانند. آزادسازی قفل خودکار است — با پایان scope.',
+          '`Arc<T>` شمارش مرجع اتمیک است تا چند نخ به یک داده مشترک برسند. ترکیب `Arc<Mutex<T>>` الگوی استاندارد شمارندهٔ مشترک است؛ بدون هیچ data raceای.',
+        ],
+        code: `use std::sync::{Arc, Mutex};
+use std::thread;
+
+fn main() {
+    let counter = Arc::new(Mutex::new(0));
+
+    let mut handles = vec![];
+    for _ in 0..10 {
+        let c = Arc::clone(&counter);
+        handles.push(thread::spawn(move || {
+            let mut n = c.lock().unwrap();
+            *n += 1;
+        }));
+    }
+    for h in handles {
+        h.join().unwrap();
+    }
+    println!("count = {}", *counter.lock().unwrap());
+}`,
+        tip: 'Mutex در راست داده را «داخل خودش» نگه می‌دارد؛ یعنی اصلاً نمی‌شود بدون قفل به داده دست زد.',
+      },
+      {
+        id: 'conc-async',
+        title: 'async/await و tokio',
+        paragraphs: [
+          'async برای کارهای **پرِانتظار** است (شبکه، فایل، دیتابیس): با یک نخ، هزاران کار موازی. `async fn` به‌جای نتیجه، یک **Future** برمی‌گرداند که با `.await` تا آماده شدن صبر می‌کنی — بدون بلاک‌کردن نخ.',
+          'زبان فقط async را می‌فهمد؛ زمان‌بندی با **runtime** است و محبوب‌ترینش **tokio** است. taskها چند کیلوبایتی‌اند در برابر threadهای چندمگابایتی OS.',
+        ],
+        code: `async fn fetch(id: u32) -> String {
+    format!("data-{}", id)
+}
+
+async fn main_async() {
+    let a = fetch(1).await;
+    let b = fetch(2).await;
+    println!("{} {}", a, b);
+}`,
+        tip: 'ترکیب async + مالکیت یعنی حتی در کد ناهمگام هم use-after-free و race نداری — «fearless concurrency».',
+      },
+      {
+        id: 'conc-unsafe',
+        title: 'دنیای unsafe',
+        paragraphs: [
+          'همهٔ تضمین‌ها هزینه دارند؛ گاهی (FFI، درایور، سیستم‌عامل) باید از آن‌ها گذشت. بلوک `unsafe` یعنی: «اینجا من خودم مسئول صحت حافظه‌ام».',
+          'unsafe فقط چند بررسی خاص را خاموش می‌کند، نه کل قواعد را. در پروژه‌های بزرگ سهم unsafe معمولاً زیر ۱٪ کد است و اکثرش پشت wrapperهای امن پنهان شده است.',
+        ],
+        code: `fn main() {
+    let arr = [1u8, 2, 3, 4];
+
+    let slice = unsafe {
+        std::slice::from_raw_parts(arr.as_ptr(), arr.len())
+    };
+
+    println!("{:?}", slice);
+}`,
+        tip: 'قاعدهٔ حرفه‌ای‌ها: کمترین unsafe ممکن، ایزوله‌شده در پشت API امن، با کامنتی که چرا امن است توضیح می‌دهد.',
+      },
+    ],
+  },
+]
+
+/* ================================================================
+   آزمون و نمونه‌ها
+   ================================================================ */
+
+interface QuizQ {
+  id: string
+  q: string
+  o: string[]
+  a: number
+  ex: string
+}
+
+const QUIZ: QuizQ[] = [
+  {
+    id: 'q1',
+    q: 'خروجی این کد چیست؟ let x = 5; let x = x + 1; println!("{}", x);',
+    o: ['۵', '۶', '۷', 'خطای کامپایل'],
+    a: 1,
+    ex: 'این shadowing است: با let دومی، یک متغیر جدید با همان نام ساخته می‌شود و مقدار ۶ می‌گیرد.',
+  },
+  {
+    id: 'q2',
+    q: 'متغیرهای Rust به‌طور پیش‌فرض چه‌اند؟',
+    o: ['قابل‌تغییر (mutable)', 'غیرقابل‌تغییر (immutable)', 'ثابت مثل const', 'سراسری'],
+    a: 1,
+    ex: 'پیش‌فرض immutable است؛ برای تغییر باید صریحاً let mut بنویسی.',
+  },
+  {
+    id: 'q3',
+    q: 'حلقهٔ for i in 0..3 چند بار اجرا می‌شود؟',
+    o: ['۲ بار', '۳ بار', '۴ بار', 'بی‌نهایت'],
+    a: 1,
+    ex: 'بازهٔ 0..3 نیم‌بازه است: ۰ و ۱ و ۲ — بدون خودِ ۳. برای شامل‌شدن انتها از 0..=3 استفاده کن.',
+  },
+  {
+    id: 'q4',
+    q: 'وقتی یک String به متغیر دیگری منتسب می‌شود چه رخ می‌دهد؟',
+    o: ['کپی کامل می‌شود', 'مالکیت move می‌شود و متغیر قبلی نامعتبر است', 'هر دو به یک داده اشاره می‌کنند', 'خطای کامپایل می‌گیریم'],
+    a: 1,
+    ex: 'انتساب String مالکیت را منتقل (move) می‌کند؛ استفاده از متغیر قبلی خطای E0382 می‌دهد.',
+  },
+  {
+    id: 'q5',
+    q: 'قرض `&T` چه نوع قرضی است و چندتایش ممکن است؟',
+    o: ['نوشتنی — فقط یکی', 'خواندنی — هر تعداد که بخواهی', 'خواندنی — فقط یکی', 'نوشتنی — هر تعداد'],
+    a: 1,
+    ex: '&T قرض خواندنی است و هر تعدادش می‌تواند هم‌زمان زنده باشد؛ اما &mut فقط یکی و بدون هیچ قرض خواندنی دیگری.',
+  },
+  {
+    id: 'q6',
+    q: 'Option<T> جای چه چیزی ایستاده؟',
+    o: ['exceptionها', 'مفهوم null و مقدار تهی', 'آرایه‌ها', 'حلقه‌های بی‌نهایت'],
+    a: 1,
+    ex: 'راست null ندارد؛ Option یعنی یا Some(value) یا None و کامپایلر بررسی هر دو حالت را اجباری می‌کند.',
+  },
+  {
+    id: 'q7',
+    q: 'اگر به آخرین عبارت بدنهٔ تابع سمی‌کالن بزنیم چه می‌شود؟',
+    o: ['هیچ‌thing', 'تابع unit یعنی () برمی‌گرداند و نوع خروجی نمی‌خواند', 'برنامه panic می‌زند', 'سمی‌کالن نادیده گرفته می‌شود'],
+    a: 1,
+    ex: 'سمی‌کالن عبارت را به دستور تبدیل می‌کند که مقدار ندارد؛ نتیجه unit است و با نوع بازگشتی اعلام‌شده خطای E0308 می‌گیریم.',
+  },
+  {
+    id: 'q8',
+    q: 'چرا در همزمانی از Arc<Mutex<T>> استفاده می‌کنیم؟',
+    o: ['برای سرعت بیشتر', 'چون Arc اشتراک بین نخ‌ها را ممکن می‌کند و Mutex دسترسی یک‌باره می‌دهد', 'چون GC لازم است', 'فقط برای خواندن'],
+    a: 1,
+    ex: 'Arc شمارش مرجع اتمیک برای اشتراک داده بین نخ‌هاست و Mutex تضمین می‌کند هر لحظه فقط یک نخ بنویسد.',
+  },
+]
+
+interface Example {
+  label: string
+  code: string
+}
+
+const EXAMPLES: Example[] = [
+  {
+    label: 'سلام دنیا',
+    code: `fn main() {
+    let who = "world";
+    let mut n = 0;
+    n = n + 1;
+    println!("Hello, {}!", who);
+    println!("n = {}", n);
+}`,
+  },
+  {
+    label: 'فیبوناچی بازگشتی',
+    code: `fn fib(n: i64) -> i64 {
+    if n < 2 {
+        n
+    } else {
+        fib(n - 1) + fib(n - 2)
+    }
+}
+
+fn main() {
+    for i in 0..=10 {
+        println!("fib({}) = {}", i, fib(i));
+    }
+}`,
+  },
+  {
+    label: 'FizzBuzz',
+    code: `fn main() {
+    for i in 1..=15 {
+        if i % 15 == 0 {
+            println!("FizzBuzz");
+        } else if i % 3 == 0 {
+            println!("Fizz");
+        } else if i % 5 == 0 {
+            println!("Buzz");
+        } else {
+            println!("{}", i);
+        }
+    }
+}`,
+  },
+  {
+    label: 'اعداد اول با while',
+    code: `fn is_prime(n: i64) -> bool {
+    if n < 2 {
+        return false;
+    }
+    let mut d = 2;
+    while d * d <= n {
+        if n % d == 0 {
+            return false;
+        }
+        d = d + 1;
+    }
+    true
+}
+
+fn main() {
+    let mut n = 2;
+    let mut found = 0;
+    while found < 5 {
+        if is_prime(n) {
+            println!("{} is prime", n);
+            found = found + 1;
+        }
+        n = n + 1;
+    }
+}`,
+  },
+  {
+    label: 'مقدارِ break در loop',
+    code: `fn main() {
+    let mut counter = 0;
+    let result = loop {
+        counter += 1;
+        if counter == 10 {
+            break counter * 2;
+        }
+    };
+    println!("result = {}", result);
+}`,
+  },
+  {
+    label: 'تبدیل دما',
+    code: `fn to_f(c: i64) -> i64 {
+    c * 9 / 5 + 32
+}
+
+fn main() {
+    for c in 0..=100 {
+        if c % 25 == 0 {
+            println!("{}C = {}F", c, to_f(c));
+        }
+    }
+}`,
+  },
+]
+
+/* ================================================================
+   شبیه‌ساز کوچک Rust
+   ================================================================ */
+
+type RValue = number | string | boolean | null // null = unit
+
+interface Tok {
+  t: 'num' | 'str' | 'kw' | 'ident' | 'op' | 'punct' | 'eof'
+  v: string
+  line: number
+}
+
+class RustError extends Error {
+  constructor(
+    public code: string,
+    public message: string,
+    public line: number | null,
+    public hint: string,
+  ) {
+    super(message)
+  }
+}
+
+const KEYWORDS = new Set([
+  'let', 'mut', 'fn', 'return', 'if', 'else', 'while', 'for', 'in',
+  'loop', 'break', 'continue', 'true', 'false',
+])
+
+const UNSUPPORTED_KW = new Set([
+  'struct', 'enum', 'trait', 'impl', 'match', 'use', 'mod', 'pub',
+  'unsafe', 'async', 'await', 'dyn', 'where', 'type', 'extern', 'static',
+  'move', 'macro_rules',
+])
+
+const SIM_HINT =
+  'این شبیه‌ساز آموزشی زیرمجموعهٔ کوچکی از Rust را اجرا می‌کند — متغیر، تابع، if، حلقه و println! کافی است برای تمرین!'
+
+function unsupported(what: string, line: number): RustError {
+  return new RustError('E9999', `unsupported feature: ${what}`, line, SIM_HINT)
+}
+
+function lex(src: string): Tok[] {
+  const toks: Tok[] = []
+  let i = 0
+  let line = 1
+  const two = ['==', '!=', '<=', '>=', '&&', '||', '+=', '-=', '*=', '/=', '%=', '->', '..=', '..']
+  while (i < src.length) {
+    const c = src[i]
+    if (c === '\n') { line++; i++; continue }
+    if (c === ' ' || c === '\t' || c === '\r') { i++; continue }
+    if (c === '/' && src[i + 1] === '/') { while (i < src.length && src[i] !== '\n') i++; continue }
+    if (c === '/' && src[i + 1] === '*') {
+      i += 2
+      while (i < src.length && !(src[i] === '*' && src[i + 1] === '/')) { if (src[i] === '\n') line++; i++ }
+      i += 2
+      continue
+    }
+    if (c >= '0' && c <= '9') {
+      let j = i
+      while (j < src.length && ((src[j] >= '0' && src[j] <= '9') || src[j] === '_')) j++
+      if (src[j] === '.' && src[j + 1] !== '.' && src[j + 1] !== undefined && src[j + 1] >= '0' && src[j + 1] <= '9') {
+        j++
+        while (j < src.length && ((src[j] >= '0' && src[j] <= '9') || src[j] === '_')) j++
+      }
+      toks.push({ t: 'num', v: src.slice(i, j).replace(/_/g, ''), line })
+      i = j
+      continue
+    }
+    if (/[A-Za-z_]/.test(c)) {
+      let j = i
+      while (j < src.length && /[A-Za-z0-9_]/.test(src[j])) j++
+      let word = src.slice(i, j)
+      if (src[j] === '!') { word += '!'; j++ }
+      toks.push({ t: KEYWORDS.has(word) ? 'kw' : 'ident', v: word, line })
+      i = j
+      continue
+    }
+    if (c === '"') {
+      let j = i + 1
+      let s = ''
+      let closed = false
+      while (j < src.length) {
+        if (src[j] === '"') { closed = true; j++; break }
+        if (src[j] === '\\') {
+          const e = src[j + 1]
+          s += e === 'n' ? '\n' : e === 't' ? '\t' : e === 'r' ? '\r' : (e ?? '')
+          j += 2
+          continue
+        }
+        if (src[j] === '\n') line++
+        s += src[j]
+        j++
+      }
+      if (!closed) throw new RustError('E0001', 'unterminated string literal', line, 'رشته بسته نشده — یک علامت " جا افتاده است')
+      toks.push({ t: 'str', v: s, line })
+      i = j
+      continue
+    }
+    if (c === "'") {
+      if (src[i + 1] === '\\' && src[i + 3] === "'") {
+        const e = src[i + 2]
+        toks.push({ t: 'str', v: e === 'n' ? '\n' : e === 't' ? '\t' : e, line })
+        i += 4
+        continue
+      }
+      if (src[i + 2] === "'") { toks.push({ t: 'str', v: src[i + 1], line }); i += 3; continue }
+      let j = i + 1
+      while (j < src.length && /[A-Za-z0-9_]/.test(src[j])) j++
+      i = j // lifetime «'a» حذف می‌شود
+      continue
+    }
+    let op = ''
+    for (const o of two) {
+      if (src.startsWith(o, i)) { op = o; break }
+    }
+    if (op) { toks.push({ t: 'op', v: op, line }); i += op.length; continue }
+    if ('+-*/%<>!=&'.includes(c)) { toks.push({ t: 'op', v: c, line }); i++; continue }
+    if ('(){}[],;:.?'.includes(c)) { toks.push({ t: 'punct', v: c, line }); i++; continue }
+    throw new RustError('E0001', `unexpected character '${c}'`, line, `کاراکتر «${c}» در Rust مجاز نیست`)
+  }
+  toks.push({ t: 'eof', v: 'eof', line })
+  return toks
+}
+
+type Expr =
+  | { k: 'num'; v: number; line: number }
+  | { k: 'str'; v: string; line: number }
+  | { k: 'bool'; v: boolean; line: number }
+  | { k: 'var'; name: string; line: number }
+  | { k: 'call'; name: string; args: Expr[]; line: number }
+  | { k: 'macro'; name: string; args: Expr[]; line: number }
+  | { k: 'un'; op: string; e: Expr; line: number }
+  | { k: 'bin'; op: string; l: Expr; r: Expr; line: number }
+  | { k: 'if'; cond: Expr; then: Block; els: Expr | null; line: number }
+  | { k: 'loop'; body: Block; line: number }
+  | { k: 'block'; body: Block; line: number }
+
+interface Block {
+  stmts: Stmt[]
+  tail: Expr | null
+}
+
+type Stmt =
+  | { k: 'let'; name: string; init: Expr | null; line: number }
+  | { k: 'assign'; name: string; op: string; e: Expr; line: number }
+  | { k: 'expr'; e: Expr; tail: boolean; line: number }
+  | { k: 'return'; e: Expr | null; line: number }
+  | { k: 'for'; name: string; from: Expr; to: Expr; inclusive: boolean; body: Block; line: number }
+  | { k: 'forin'; e: Expr; body: Block; line: number }
+  | { k: 'while'; cond: Expr; body: Block; line: number }
+  | { k: 'break'; e: Expr | null; line: number }
+  | { k: 'continue'; line: number }
+
+interface FnDef {
+  name: string
+  params: string[]
+  body: Block
+  line: number
+}
+
+class Parser {
+  private pos = 0
+
+  constructor(private toks: Tok[]) {}
+
+  private peek(off = 0): Tok {
+    return this.toks[Math.min(this.pos + off, this.toks.length - 1)]
+  }
+
+  private next(): Tok {
+    return this.toks[this.pos++] ?? this.toks[this.toks.length - 1]
+  }
+
+  private is(t: Tok['t'], v?: string): boolean {
+    const tk = this.peek()
+    return tk.t === t && (v === undefined || tk.v === v)
+  }
+
+  private eat(t: Tok['t'], v?: string): boolean {
+    if (this.is(t, v)) { this.pos++; return true }
+    return false
+  }
+
+  private expect(t: Tok['t'], v?: string): Tok {
+    if (!this.is(t, v)) {
+      this.err(`expected ${v ? `'${v}'` : t} but found '${this.peek().v === 'eof' ? 'end of file' : this.peek().v}'`)
+    }
+    return this.next()
+  }
+
+  private err(msg: string): never {
+    throw new RustError('E0001', msg, this.peek().line, 'خطای نگارشی — آکولاد، پرانتز یا سمی‌کالن‌ها را بشمار')
+  }
+
+  parseProgram(): FnDef[] {
+    const fns: FnDef[] = []
+    while (!this.is('eof')) {
+      if (this.is('kw', 'fn')) fns.push(this.parseFn())
+      else if (this.is('ident') && UNSUPPORTED_KW.has(this.peek().v)) {
+        throw unsupported(`'${this.peek().v}' definitions`, this.peek().line)
+      } else this.err(`expected 'fn' but found '${this.peek().v}'`)
+    }
+    if (fns.length === 0) {
+      throw new RustError('E0001', 'no function found', 1, 'هیچ تابعی تعریف نشده — برنامه را با fn main() شروع کن')
+    }
+    return fns
+  }
+
+  private parseFn(): FnDef {
+    const line = this.next().line // fn
+    const nameTok = this.next()
+    if (nameTok.t !== 'ident' || nameTok.v.endsWith('!')) this.err('invalid function name')
+    this.expect('punct', '(')
+    const params: string[] = []
+    while (!this.is('punct', ')')) {
+      const p = this.next()
+      if (p.t !== 'ident') this.err('invalid parameter name')
+      if (this.is('punct', ':')) { this.next(); this.skipType() }
+      params.push(p.v)
+      if (!this.eat('punct', ',')) break
+    }
+    this.expect('punct', ')')
+    if (this.eat('op', '->')) this.skipType()
+    const body = this.parseBlock()
+    return { name: nameTok.v, params, body, line }
+  }
+
+  private skipType(): void {
+    if (this.eat('op', '&')) this.eat('kw', 'mut')
+    if (this.is('punct', '(') || this.is('punct', '[')) {
+      const open = this.next().v
+      const close = open === '(' ? ')' : ']'
+      let d = 1
+      while (d > 0) {
+        const tk = this.next()
+        if (tk.t === 'eof') this.err('unterminated type')
+        if (tk.t === 'punct' && tk.v === open) d++
+        if (tk.t === 'punct' && tk.v === close) d--
+      }
+      return
+    }
+    if (!this.is('ident')) this.err('expected a type')
+    this.next()
+    while (this.eat('punct', ':')) { this.expect('punct', ':'); this.skipType() }
+    if (this.eat('punct', '<')) {
+      let d = 1
+      while (d > 0) {
+        const tk = this.next()
+        if (tk.t === 'eof') this.err('unterminated generic type')
+        if (tk.t === 'punct' && tk.v === '<') d++
+        else if (tk.t === 'punct' && tk.v === '>') d--
+      }
+    }
+  }
+
+  private parseBlock(): Block {
+    this.expect('punct', '{')
+    const stmts: Stmt[] = []
+    let tail: Expr | null = null
+    while (!this.is('punct', '}')) {
+      if (this.is('eof')) this.err("expected '}'")
+      const st = this.parseStmt()
+      if (st.k === 'expr' && st.tail && this.is('punct', '}')) tail = st.e
+      else stmts.push(st)
+    }
+    this.next() // }
+    return { stmts, tail }
+  }
+
+  private parseStmt(): Stmt {
+    const tk = this.peek()
+    const line = tk.line
+    if (tk.t === 'kw') {
+      switch (tk.v) {
+        case 'let': {
+          this.next()
+          this.eat('kw', 'mut')
+          const nameTok = this.expect('ident')
+          if (this.eat('punct', ':')) this.skipType()
+          const init = this.eat('op', '=') ? this.parseExpr() : null
+          this.expect('punct', ';')
+          return { k: 'let', name: nameTok.v, init, line }
+        }
+        case 'return': {
+          this.next()
+          const e = this.is('punct', ';') ? null : this.parseExpr()
+          this.eat('punct', ';')
+          return { k: 'return', e, line }
+        }
+        case 'for': {
+          this.next()
+          const nameTok = this.expect('ident')
+          this.expect('kw', 'in')
+          const from = this.parseExpr()
+          if (this.is('op', '..') || this.is('op', '..=')) {
+            const inclusive = this.next().v === '..='
+            const to = this.parseExpr()
+            const body = this.parseBlock()
+            return { k: 'for', name: nameTok.v, from, to, inclusive, body, line }
+          }
+          const body = this.parseBlock()
+          return { k: 'forin', e: from, body, line }
+        }
+        case 'while': {
+          this.next()
+          const cond = this.parseExpr()
+          const body = this.parseBlock()
+          return { k: 'while', cond, body, line }
+        }
+        case 'loop': {
+          this.next()
+          const e: Expr = { k: 'loop', body: this.parseBlock(), line }
+          const semi = this.eat('punct', ';')
+          return { k: 'expr', e, tail: !semi, line }
+        }
+        case 'break': {
+          this.next()
+          const e = this.is('punct', ';') || this.is('punct', '}') ? null : this.parseExpr()
+          this.eat('punct', ';')
+          return { k: 'break', e, line }
+        }
+        case 'continue': {
+          this.next()
+          this.eat('punct', ';')
+          return { k: 'continue', line }
+        }
+        case 'if': {
+          const e = this.parseIf()
+          const semi = this.eat('punct', ';')
+          return { k: 'expr', e, tail: !semi, line }
+        }
+        default:
+          this.err(`unexpected keyword '${tk.v}'`)
+      }
+    }
+    if (tk.t === 'ident') {
+      if (tk.v === 'const') {
+        this.next()
+        const nameTok = this.expect('ident')
+        this.expect('punct', ':')
+        this.skipType()
+        this.expect('op', '=')
+        const init = this.parseExpr()
+        this.expect('punct', ';')
+        return { k: 'let', name: nameTok.v, init, line }
+      }
+      if (UNSUPPORTED_KW.has(tk.v)) throw unsupported(`'${tk.v}'`, line)
+      const nx = this.peek(1)
+      if (!tk.v.endsWith('!') && nx.t === 'op' && ['=', '+=', '-=', '*=', '/=', '%='].includes(nx.v)) {
+        this.next()
+        const op = this.next().v
+        const e = this.parseExpr()
+        this.expect('punct', ';')
+        return { k: 'assign', name: tk.v, op, e, line }
+      }
+    }
+    const e = this.parseExpr()
+    const semi = this.eat('punct', ';')
+    return { k: 'expr', e, tail: !semi, line }
+  }
+
+  private parseIf(): Expr {
+    const line = this.expect('kw', 'if').line
+    const cond = this.parseExpr()
+    const then = this.parseBlock()
+    if (this.eat('kw', 'else')) {
+      if (this.is('kw', 'if')) return { k: 'if', cond, then, els: this.parseIf(), line }
+      const b = this.parseBlock()
+      return { k: 'if', cond, then, els: { k: 'block', body: b, line }, line }
+    }
+    return { k: 'if', cond, then, els: null, line }
+  }
+
+  parseExpr(): Expr {
+    return this.parseOr()
+  }
+
+  private parseOr(): Expr {
+    let l = this.parseAnd()
+    while (this.is('op', '||')) {
+      const line = this.next().line
+      l = { k: 'bin', op: '||', l, r: this.parseAnd(), line }
+    }
+    return l
+  }
+
+  private parseAnd(): Expr {
+    let l = this.parseEq()
+    while (this.is('op', '&&')) {
+      const line = this.next().line
+      l = { k: 'bin', op: '&&', l, r: this.parseEq(), line }
+    }
+    return l
+  }
+
+  private parseEq(): Expr {
+    let l = this.parseCmp()
+    while (this.is('op', '==') || this.is('op', '!=')) {
+      const line = this.next().line
+      l = { k: 'bin', op: this.toks[this.pos - 1].v, l, r: this.parseCmp(), line }
+    }
+    return l
+  }
+
+  private parseCmp(): Expr {
+    let l = this.parseAdd()
+    while (this.is('op', '<') || this.is('op', '<=') || this.is('op', '>') || this.is('op', '>=')) {
+      const line = this.next().line
+      l = { k: 'bin', op: this.toks[this.pos - 1].v, l, r: this.parseAdd(), line }
+    }
+    return l
+  }
+
+  private parseAdd(): Expr {
+    let l = this.parseMul()
+    while (this.is('op', '+') || this.is('op', '-')) {
+      const line = this.next().line
+      l = { k: 'bin', op: this.toks[this.pos - 1].v, l, r: this.parseMul(), line }
+    }
+    return l
+  }
+
+  private parseMul(): Expr {
+    let l = this.parseUnary()
+    while (this.is('op', '*') || this.is('op', '/') || this.is('op', '%')) {
+      const line = this.next().line
+      l = { k: 'bin', op: this.toks[this.pos - 1].v, l, r: this.parseUnary(), line }
+    }
+    return l
+  }
+
+  private parseUnary(): Expr {
+    const tk = this.peek()
+    if (tk.t === 'op' && (tk.v === '-' || tk.v === '!')) {
+      this.next()
+      return { k: 'un', op: tk.v, e: this.parseUnary(), line: tk.line }
+    }
+    if (tk.t === 'op' && tk.v === '&') {
+      this.next()
+      this.eat('kw', 'mut')
+      return { k: 'un', op: '&', e: this.parseUnary(), line: tk.line }
+    }
+    if (tk.t === 'op' && tk.v === '*') throw unsupported('dereference (*)', tk.line)
+    return this.parsePostfix(this.parsePrimary())
+  }
+
+  private parsePostfix(e: Expr): Expr {
+    const tk = this.peek()
+    if (tk.t === 'punct' && tk.v === '.') throw unsupported('methods / field access (.)', tk.line)
+    if (tk.t === 'punct' && tk.v === ':' && this.peek(1).v === ':') throw unsupported('paths (::)', tk.line)
+    if (tk.t === 'punct' && tk.v === '[') throw unsupported('indexing (…[…])', tk.line)
+    if (tk.t === 'punct' && tk.v === '?') throw unsupported("the '?' operator", tk.line)
+    return e
+  }
+
+  private parseArgs(): Expr[] {
+    const args: Expr[] = []
+    while (!this.is('punct', ')')) {
+      args.push(this.parseExpr())
+      if (!this.eat('punct', ',')) break
+    }
+    this.expect('punct', ')')
+    return args
+  }
+
+  private parsePrimary(): Expr {
+    const tk = this.peek()
+    if (tk.t === 'num') { this.next(); return { k: 'num', v: parseFloat(tk.v), line: tk.line } }
+    if (tk.t === 'str') { this.next(); return { k: 'str', v: tk.v, line: tk.line } }
+    if (tk.t === 'kw') {
+      if (tk.v === 'true') { this.next(); return { k: 'bool', v: true, line: tk.line } }
+      if (tk.v === 'false') { this.next(); return { k: 'bool', v: false, line: tk.line } }
+      if (tk.v === 'if') return this.parseIf()
+      if (tk.v === 'loop') { this.next(); return { k: 'loop', body: this.parseBlock(), line: tk.line } }
+      this.err(`unexpected keyword '${tk.v}'`)
+    }
+    if (tk.t === 'punct' && tk.v === '(') {
+      this.next()
+      const e = this.parseExpr()
+      if (this.is('punct', ',')) throw unsupported('tuples', tk.line)
+      this.expect('punct', ')')
+      return e
+    }
+    if (tk.t === 'punct' && tk.v === '{') {
+      const body = this.parseBlock()
+      return { k: 'block', body, line: tk.line }
+    }
+    if (tk.t === 'punct' && tk.v === '[') throw unsupported('arrays', tk.line)
+    if (tk.t === 'ident') {
+      if (UNSUPPORTED_KW.has(tk.v)) throw unsupported(`'${tk.v}'`, tk.line)
+      this.next()
+      if (tk.v.endsWith('!')) {
+        this.expect('punct', '(')
+        const args = this.parseArgs()
+        return { k: 'macro', name: tk.v, args, line: tk.line }
+      }
+      if (this.is('punct', '(')) {
+        this.next()
+        const args = this.parseArgs()
+        return { k: 'call', name: tk.v, args, line: tk.line }
+      }
+      return { k: 'var', name: tk.v, line: tk.line }
+    }
+    this.err(`unexpected token '${tk.v === 'eof' ? 'end of file' : tk.v}'`)
+  }
+}
+
+class BreakSig {
+  constructor(public value: RValue) {}
+}
+class ContinueSig {}
+class ReturnSig {
+  constructor(public value: RValue) {}
+}
+
+class Interp {
+  private steps = 0
+  cur = ''
+
+  constructor(private fns: Map<string, FnDef>, private out: string[]) {}
+
+  private tick(line: number): void {
+    if (++this.steps > 200000) {
+      throw new RustError('PANIC', 'step limit exceeded (200000)', line, 'حلقهٔ بی‌نهایت؟ برنامهٔ تو از سقف ۲۰۰٬۰۰۰ گام شبیه‌ساز گذشت')
+    }
+  }
+
+  run(): void {
+    const main = this.fns.get('main')
+    if (!main) {
+      throw new RustError('E0425', 'main function not found', null, 'تابع main پیدا نشد — هر برنامهٔ Rust با fn main() شروع می‌شود')
+    }
+    if (main.params.length !== 0) {
+      throw new RustError('E0061', 'main takes no arguments', main.line, 'تابع main نباید پارامتر داشته باشد')
+    }
+    this.callFn(main, [])
+    if (this.cur) { this.out.push(this.cur); this.cur = '' }
+  }
+
+  private callFn(fn: FnDef, args: RValue[]): RValue {
+    const scope = new Map<string, RValue>()
+    fn.params.forEach((p, idx) => scope.set(p, args[idx]))
+    try {
+      return this.execBlock(fn.body, [scope])
+    } catch (e) {
+      if (e instanceof ReturnSig) return e.value
+      throw e
+    }
+  }
+
+  private execBlock(b: Block, env: Map<string, RValue>[]): RValue {
+    env.push(new Map())
+    try {
+      for (const st of b.stmts) this.execStmt(st, env)
+      return b.tail ? this.evalExpr(b.tail, env) : null
+    } finally {
+      env.pop()
+    }
+  }
+
+  private findScope(name: string, env: Map<string, RValue>[], line: number): number {
+    for (let i = env.length - 1; i >= 0; i--) {
+      if (env[i].has(name)) return i
+    }
+    throw new RustError('E0425', `cannot find value \`${name}\` in this scope`, line, `متغیر «${name}» در این حوزه تعریف نشده است`)
+  }
+
+  private typeErr(line: number, what: string): RustError {
+    return new RustError('E0308', `mismatched types (operator ${what})`, line, 'نوع داده‌ها هم‌خوان نیست — مثلاً عدد با متن جمع شده است')
+  }
+
+  private execStmt(st: Stmt, env: Map<string, RValue>[]): void {
+    this.tick(st.line)
+    switch (st.k) {
+      case 'let':
+        env[env.length - 1].set(st.name, st.init ? this.evalExpr(st.init, env) : null)
+        return
+      case 'assign': {
+        const idx = this.findScope(st.name, env, st.line)
+        const cur = env[idx].get(st.name) as RValue
+        const next = st.op === '=' ? this.evalExpr(st.e, env) : this.applyBin(st.op[0], cur, this.evalExpr(st.e, env), st.line)
+        env[idx].set(st.name, next)
+        return
+      }
+      case 'expr':
+        this.evalExpr(st.e, env)
+        return
+      case 'return':
+        throw new ReturnSig(st.e ? this.evalExpr(st.e, env) : null)
+      case 'for': {
+        const from = this.evalExpr(st.from, env)
+        const to = this.evalExpr(st.to, env)
+        if (typeof from !== 'number' || typeof to !== 'number') {
+          throw new RustError('E0308', 'mismatched types in range', st.line, 'دو سر بازهٔ for باید عدد باشند')
+        }
+        for (let i = from; st.inclusive ? i <= to : i < to; i++) {
+          this.tick(st.line)
+          env.push(new Map([[st.name, i]]))
+          let brk = false
+          try {
+            this.execBlock(st.body, env)
+          } catch (e) {
+            if (e instanceof BreakSig) brk = true
+            else if (!(e instanceof ContinueSig)) { env.pop(); throw e }
+          }
+          env.pop()
+          if (brk) return
+        }
+        return
+      }
+      case 'forin':
+        throw unsupported('for over a non-range value', st.line)
+      case 'while': {
+        for (;;) {
+          this.tick(st.line)
+          const c = this.evalExpr(st.cond, env)
+          if (typeof c !== 'boolean') {
+            throw new RustError('E0308', 'mismatched types: expected bool', st.line, 'شرط while باید boolean باشد')
+          }
+          if (!c) return
+          let brk = false
+          try {
+            this.execBlock(st.body, env)
+          } catch (e) {
+            if (e instanceof BreakSig) brk = true
+            else if (!(e instanceof ContinueSig)) throw e
+          }
+          if (brk) return
+        }
+      }
+      case 'break':
+        throw new BreakSig(st.e ? this.evalExpr(st.e, env) : null)
+      case 'continue':
+        throw new ContinueSig()
+    }
+  }
+
+  private evalExpr(e: Expr, env: Map<string, RValue>[]): RValue {
+    this.tick(e.line)
+    switch (e.k) {
+      case 'num':
+        return e.v
+      case 'str':
+        return e.v
+      case 'bool':
+        return e.v
+      case 'var':
+        return env[this.findScope(e.name, env, e.line)].get(e.name) as RValue
+      case 'un': {
+        const v = this.evalExpr(e.e, env)
+        if (e.op === '&') return v
+        if (e.op === '-') {
+          if (typeof v !== 'number') throw this.typeErr(e.line, '`-`')
+          return -v
+        }
+        if (typeof v !== 'boolean') throw this.typeErr(e.line, '`!`')
+        return !v
+      }
+      case 'bin': {
+        if (e.op === '&&' || e.op === '||') {
+          const l = this.evalExpr(e.l, env)
+          if (typeof l !== 'boolean') throw this.typeErr(e.line, e.op)
+          if (e.op === '&&' && !l) return false
+          if (e.op === '||' && l) return true
+          const r = this.evalExpr(e.r, env)
+          if (typeof r !== 'boolean') throw this.typeErr(e.line, e.op)
+          return r
+        }
+        return this.applyBin(e.op, this.evalExpr(e.l, env), this.evalExpr(e.r, env), e.line)
+      }
+      case 'if': {
+        const c = this.evalExpr(e.cond, env)
+        if (typeof c !== 'boolean') throw this.typeErr(e.line, 'if condition')
+        if (c) return this.execBlock(e.then, env)
+        return e.els ? this.evalExpr(e.els, env) : null
+      }
+      case 'loop': {
+        for (;;) {
+          this.tick(e.line)
+          try {
+            this.execBlock(e.body, env)
+          } catch (err) {
+            if (err instanceof BreakSig) return err.value
+            if (!(err instanceof ContinueSig)) throw err
+          }
+        }
+      }
+      case 'block':
+        return this.execBlock(e.body, env)
+      case 'call': {
+        const fn = this.fns.get(e.name)
+        if (!fn) {
+          throw new RustError('E0425', `cannot find function \`${e.name}\` in this scope`, e.line, `تابع «${e.name}» تعریف نشده است`)
+        }
+        const args = e.args.map((a) => this.evalExpr(a, env))
+        if (args.length !== fn.params.length) {
+          throw new RustError(
+            'E0061',
+            `this function takes ${fn.params.length} argument(s) but ${args.length} were supplied`,
+            e.line,
+            `تابع «${e.name}» ${fa(fn.params.length)} پارامتر دارد ولی ${fa(args.length)} آرگومان داده شد`,
+          )
+        }
+        return this.callFn(fn, args)
+      }
+      case 'macro': {
+        if (e.name === 'println!' || e.name === 'print!') {
+          const args = e.args.map((a) => this.evalExpr(a, env))
+          let text = ''
+          if (args.length > 0) {
+            text = typeof args[0] === 'string' ? formatLn(args[0], args.slice(1), e.line) : fmtValue(args[0])
+          }
+          if (e.name === 'println!') {
+            this.out.push(this.cur + text)
+            this.cur = ''
+          } else {
+            this.cur += text
+          }
+          return null
+        }
+        throw unsupported(`macro ${e.name}`, e.line)
+      }
+    }
+  }
+
+  private applyBin(op: string, l: RValue, r: RValue, line: number): RValue {
+    if (op === '==') return this.eq(l, r, line)
+    if (op === '!=') return !this.eq(l, r, line)
+    if (op === '+' || op === '-' || op === '*' || op === '/' || op === '%') {
+      if (op === '+' && typeof l === 'string' && typeof r === 'string') return l + r
+      if (typeof l !== 'number' || typeof r !== 'number') throw this.typeErr(line, `\`${op}\``)
+      switch (op) {
+        case '+': return l + r
+        case '-': return l - r
+        case '*': return l * r
+        case '/': {
+          if (r === 0) throw new RustError('PANIC', 'attempt to divide by zero', line, 'panic: تقسیم بر صفر! در Rust این برنامه را متوقف می‌کند')
+          return Number.isInteger(l) && Number.isInteger(r) ? Math.trunc(l / r) : l / r
+        }
+        default: {
+          if (r === 0) throw new RustError('PANIC', 'attempt to calculate the remainder with a divisor of zero', line, 'panic: باقیمانده بر صفر!')
+          return l % r
+        }
+      }
+    }
+    if (op === '<' || op === '<=' || op === '>' || op === '>=') {
+      if (typeof l === 'string' && typeof r === 'string') {
+        return op === '<' ? l < r : op === '<=' ? l <= r : op === '>' ? l > r : l >= r
+      }
+      if (typeof l !== 'number' || typeof r !== 'number') throw this.typeErr(line, `\`${op}\``)
+      return op === '<' ? l < r : op === '<=' ? l <= r : op === '>' ? l > r : l >= r
+    }
+    throw this.typeErr(line, `\`${op}\``)
+  }
+
+  private eq(l: RValue, r: RValue, line: number): boolean {
+    if (typeof l !== typeof r) throw this.typeErr(line, '==')
+    return l === r
+  }
+}
+
+function fmtValue(v: RValue, debug = false): string {
+  if (v === null) return '()'
+  if (typeof v === 'number') return v.toString()
+  if (typeof v === 'boolean') return v ? 'true' : 'false'
+  return debug ? JSON.stringify(v) : v
+}
+
+function formatLn(fmt: string, args: RValue[], line: number): string {
+  let out = ''
+  let ai = 0
+  let i = 0
+  while (i < fmt.length) {
+    if (fmt[i] === '{' && fmt[i + 1] === '{') { out += '{'; i += 2; continue }
+    if (fmt[i] === '}' && fmt[i + 1] === '}') { out += '}'; i += 2; continue }
+    if (fmt[i] === '{') {
+      const close = fmt.indexOf('}', i)
+      if (close < 0) { out += fmt[i]; i++; continue }
+      if (ai >= args.length) {
+        throw new RustError('E0001', 'not enough arguments for format string', line, 'تعداد {} داخل رشته با آرگومان‌های println! نمی‌خواند')
+      }
+      const spec = fmt.slice(i + 1, close)
+      out += spec.includes('?') ? fmtValue(args[ai], true) : fmtValue(args[ai])
+      ai++
+      i = close + 1
+      continue
+    }
+    out += fmt[i]
+    i++
+  }
+  return out
+}
+
+interface RunError {
+  code: string
+  message: string
+  hint: string
+  line?: number
+}
+
+type RunResult = { ok: true; out: string[]; ms: number } | { ok: false; out: string[]; ms: number; err: RunError }
+
+function runRust(src: string): RunResult {
+  const out: string[] = []
+  const t0 = performance.now()
+  let interp: Interp | null = null
+  try {
+    const fns = new Map<string, FnDef>()
+    for (const f of new Parser(lex(src)).parseProgram()) fns.set(f.name, f)
+    interp = new Interp(fns, out)
+    interp.run()
+    return { ok: true, out, ms: performance.now() - t0 }
+  } catch (e) {
+    const ms = performance.now() - t0
+    const fail = (err: RunError): RunResult => ({ ok: false, out, ms, err })
+    if (e instanceof RustError) return fail({ code: e.code, message: e.message, hint: e.hint, line: e.line ?? undefined })
+    if (e instanceof BreakSig) return fail({ code: 'E0268', message: '`break` outside of a loop', hint: 'break فقط داخل حلقه معنا دارد' })
+    if (e instanceof ContinueSig) return fail({ code: 'E0268', message: '`continue` outside of a loop', hint: 'continue فقط داخل حلقه معنا دارد' })
+    if (e instanceof ReturnSig) return fail({ code: 'E0572', message: '`return` outside of a function', hint: 'return فقط داخل تابع معنا دارد' })
+    if (e instanceof RangeError) return fail({ code: 'PANIC', message: 'stack overflow', hint: 'سرریز پشته! بازگشت (recursion) بی‌پایان داری' })
+    return fail({ code: 'PANIC', message: e instanceof Error ? e.message : 'unknown error', hint: 'یک خطای غیرمنتظره در شبیه‌ساز رخ داد' })
+  } finally {
+    if (interp && interp.cur) out.push(interp.cur)
+  }
+}
+
+/* ================================================================
+   رابط کاربری
+   ================================================================ */
+
+type View = 'home' | 'track' | 'play' | 'quiz'
+
+const STORE_KEY = 'sunjob-rust-v1'
+
+function mono(text: string): ReactNode[] {
+  return text.split('`').map((seg, i) =>
+    i % 2 === 1 ? (
+      <code key={i} dir="ltr" className="mx-0.5 inline-block rounded-md bg-white/10 px-1.5 font-mono text-[0.85em] text-[#f7931e]">
+        {seg}
+      </code>
+    ) : (
+      <Fragment key={i}>{seg}</Fragment>
+    ),
+  )
+}
+
+function rich(text: string): ReactNode[] {
+  return text.split('**').map((seg, i) =>
+    i % 2 === 1 ? (
+      <strong key={i} className="font-bold text-zinc-100">
+        {mono(seg)}
+      </strong>
+    ) : (
+      <Fragment key={i}>{mono(seg)}</Fragment>
+    ),
+  )
+}
+
+function CodeBlock({ code, tone = 'rust' }: { code: string; tone?: 'rust' | 'term' }) {
+  return (
+    <pre
+      dir="ltr"
+      className={`os-scroll max-h-72 overflow-auto rounded-xl border p-3 text-left font-mono text-[11.5px] leading-6 ${
+        tone === 'term' ? 'border-white/10 bg-black text-zinc-300' : 'border-emerald-500/15 bg-zinc-950 text-emerald-300'
+      }`}
+    >
+      <code>{code}</code>
+    </pre>
+  )
+}
+
+function TipBox({ text }: { text: string }) {
+  return (
+    <div className="flex gap-2 rounded-xl border border-[#f7931e]/25 bg-[#f7931e]/10 p-3">
+      <Lightbulb className="mt-0.5 h-4 w-4 shrink-0 text-[#f7931e]" aria-hidden />
+      <p className="text-[12px] leading-6 text-amber-100/90">{rich(text)}</p>
+    </div>
+  )
+}
+
+function ErrBox({ title, code, why }: { title: string; code: string; why: string }) {
+  return (
+    <div className="space-y-2 rounded-xl border border-red-500/25 bg-red-500/10 p-3">
+      <p className="flex items-center gap-1.5 text-[12px] font-bold text-red-300">
+        <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden /> {title}
+      </p>
+      <pre dir="ltr" className="os-scroll max-h-44 overflow-auto rounded-lg border border-red-500/20 bg-zinc-950 p-2.5 text-left font-mono text-[11px] leading-5 text-red-200">
+        <code>{code}</code>
+      </pre>
+      <p className="text-[12px] leading-6 text-red-100/80">{rich(why)}</p>
+    </div>
+  )
+}
+
+function SideItem({ icon: Icon, label, active, onClick }: { icon: LucideIcon; label: string; active: boolean; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      aria-label={label}
+      aria-current={active ? 'page' : undefined}
+      className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-[11.5px] transition-colors ${
+        active ? 'bg-[#f7931e]/10 text-[#f7931e]' : 'text-zinc-300 hover:bg-white/5 hover:text-zinc-100'
+      }`}
+    >
+      <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden />
+      <span className="min-w-0 flex-1 truncate text-right">{label}</span>
+    </button>
+  )
+}
+
+export default function RustAcademyApp() {
+  const pushToast = useOS((s) => s.pushToast)
+  const [view, setView] = useState<View>('home')
+  const [trackId, setTrackId] = useState(TRACKS[0].id)
+  const [lessonId, setLessonId] = useState(TRACKS[0].lessons[0].id)
+  const [done, setDone] = useState<string[]>([])
+  const [quizBest, setQuizBest] = useState(0)
+  const [loaded, setLoaded] = useState(false)
+  const [code, setCode] = useState(EXAMPLES[0].code)
+  const [out, setOut] = useState<string[]>([])
+  const [runErr, setRunErr] = useState<RunError | null>(null)
+  const [runMs, setRunMs] = useState(0)
+  const [running, setRunning] = useState(false)
+  const [answers, setAnswers] = useState<(number | null)[]>(() => Array(QUIZ.length).fill(null))
+  const [submitted, setSubmitted] = useState(false)
+
+  /* ---------- ذخیره‌سازی ---------- */
+  useEffect(() => {
+    const t = setTimeout(() => {
+      try {
+        const raw = localStorage.getItem(STORE_KEY)
+        if (raw) {
+          const d = JSON.parse(raw) as { done?: string[]; quizBest?: number }
+          if (Array.isArray(d.done)) setDone(d.done)
+          if (typeof d.quizBest === 'number') setQuizBest(d.quizBest)
+        }
+      } catch {
+        /* ignore */
+      }
+      setLoaded(true)
+    }, 0)
+    return () => clearTimeout(t)
+  }, [])
+
+  useEffect(() => {
+    if (!loaded) return
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify({ done, quizBest }))
+    } catch {
+      /* ignore */
+    }
+  }, [done, quizBest, loaded])
+
+  /* ---------- محاسبات ---------- */
+  const flat = useMemo(() => TRACKS.flatMap((t) => t.lessons.map((l) => ({ track: t, lesson: l }))), [])
+  const total = flat.length
+  const doneCount = flat.filter((x) => done.includes(x.lesson.id)).length
+  const pct = total ? Math.round((doneCount / total) * 100) : 0
+  const nextUnread = flat.find((x) => !done.includes(x.lesson.id)) ?? flat[0]
+  const track = TRACKS.find((t) => t.id === trackId) ?? TRACKS[0]
+  const lessonIdx = Math.max(0, track.lessons.findIndex((l) => l.id === lessonId))
+  const lesson = track.lessons[lessonIdx] ?? track.lessons[0]
+  const score = QUIZ.reduce((acc, q, i) => acc + (answers[i] === q.a ? 1 : 0), 0)
+
+  /* ---------- عملکردها ---------- */
+  const runIt = useCallback((src: string) => {
+    setRunning(true)
+    window.setTimeout(() => {
+      const res = runRust(src)
+      setOut(res.out)
+      setRunErr(res.ok ? null : res.err)
+      setRunMs(res.ms)
+      setRunning(false)
+    }, 120)
+  }, [])
+
+  const openLesson = useCallback((t: Track, l: Lesson) => {
+    setTrackId(t.id)
+    setLessonId(l.id)
+    setView('track')
+  }, [])
+
+  const openTrack = useCallback(
+    (t: Track) => {
+      setTrackId(t.id)
+      const first = t.lessons.find((l) => !done.includes(l.id)) ?? t.lessons[0]
+      setLessonId(first.id)
+      setView('track')
+    },
+    [done],
+  )
+
+  const tryIt = (src: string) => {
+    setCode(src)
+    setView('play')
+    runIt(src)
+  }
+
+  const markDone = () => {
+    if (!done.includes(lesson.id)) {
+      setDone([...done, lesson.id])
+      pushToast({ title: 'درس ثبت شد', body: `«${lesson.title}» به خوانده‌شده‌ها اضافه شد`, icon: CheckCircle2 })
+    }
+  }
+
+  const pick = (qi: number, oi: number) => {
+    if (submitted) return
+    setAnswers((prev) => prev.map((a, i) => (i === qi ? oi : a)))
+  }
+
+  const submitQuiz = () => {
+    setSubmitted(true)
+    if (score > quizBest) setQuizBest(score)
+    pushToast({
+      title: score >= 6 ? 'قبول شدی!' : 'نمره ثبت شد',
+      body: `نمرهٔ تو ${fa(score)} از ${fa(QUIZ.length)} بود`,
+      icon: score >= 6 ? Trophy : GraduationCap,
+    })
+  }
+
+  const resetQuiz = () => {
+    setAnswers(Array(QUIZ.length).fill(null))
+    setSubmitted(false)
+  }
+
+  /* ---------- ناوبری ---------- */
+  const navChips: { key: string; label: string; active: boolean; go: () => void }[] = [
+    { key: 'home', label: 'خانه', active: view === 'home', go: () => setView('home') },
+    ...TRACKS.map((t) => ({
+      key: t.id,
+      label: t.title,
+      active: view === 'track' && trackId === t.id,
+      go: () => openTrack(t),
+    })),
+    { key: 'play', label: 'زمین بازی', active: view === 'play', go: () => setView('play') },
+    { key: 'quiz', label: 'آزمون', active: view === 'quiz', go: () => setView('quiz') },
+  ]
+
+  return (
+    <div className="flex h-full w-full flex-col bg-zinc-950/70" dir="rtl">
+      {/* هدر */}
+      <header className="flex shrink-0 items-center gap-3 border-b border-white/10 bg-black/25 px-4 py-2.5">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-[#f7931e]/30 bg-gradient-to-br from-[#b7410e]/40 to-[#f7931e]/20 text-[#f7931e]">
+          <Cog className="h-5 w-5" aria-hidden />
+        </span>
+        <div className="min-w-0 flex-1">
+          <h1 className="truncate text-sm font-black text-zinc-50">
+            آکادمی Rust <span className="text-[10px] font-bold text-[#f7931e]">— دورهٔ تعاملی فارسی</span>
+          </h1>
+          <p className="hidden text-[10.5px] text-zinc-400 sm:block">سرعت C و ++C، امنیت حافظه بدون GC — با شبیه‌ساز داخلی Rust</p>
+        </div>
+        <div className="flex w-24 shrink-0 items-center gap-2 sm:w-32">
+          <Progress value={pct} className="h-1.5 flex-1" aria-label="پیشرفت کل دوره" />
+          <span className="text-[10px] font-black text-[#f7931e]">{fa(pct)}٪</span>
+        </div>
+      </header>
+
+      {/* تب‌های موبایل */}
+      <div className="flex shrink-0 gap-1.5 overflow-x-auto border-b border-white/10 bg-black/25 px-2 py-1.5 md:hidden" role="tablist" aria-label="ناوبری موبایل">
+        {navChips.map((c) => (
+          <button
+            key={c.key}
+            role="tab"
+            aria-selected={c.active}
+            onClick={c.go}
+            className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-bold transition-colors ${
+              c.active ? 'border-transparent bg-[#f7931e] text-white' : 'border-white/10 bg-zinc-800/80 text-zinc-300 hover:text-zinc-100'
+            }`}
+          >
+            {c.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="flex min-h-0 flex-1">
+        {/* سایدبار */}
+        <nav className="os-scroll hidden w-52 shrink-0 space-y-0.5 overflow-y-auto border-l border-white/10 bg-black/25 p-2 md:block" aria-label="بخش‌های آکادمی Rust">
+          <SideItem icon={Cog} label="خانه" active={view === 'home'} onClick={() => setView('home')} />
+          <p className="px-2 pb-1 pt-2 text-[9px] font-bold text-zinc-500">مسیرهای آموزشی</p>
+          {TRACKS.map((t) => {
+            const Icon = t.icon
+            const active = view === 'track' && trackId === t.id
+            const tDone = t.lessons.filter((l) => done.includes(l.id)).length
+            return (
+              <Fragment key={t.id}>
+                <button
+                  onClick={() => openTrack(t)}
+                  aria-label={`مسیر ${t.title}`}
+                  className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-[11.5px] transition-colors ${
+                    active ? 'bg-[#f7931e]/10 text-[#f7931e]' : 'text-zinc-300 hover:bg-white/5 hover:text-zinc-100'
+                  }`}
+                >
+                  <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                  <span className="min-w-0 flex-1 truncate text-right">{t.title}</span>
+                  <span className="text-[9px] text-zinc-500">
+                    {fa(tDone)}/{fa(t.lessons.length)}
+                  </span>
+                </button>
+                {active &&
+                  t.lessons.map((l, i) => (
+                    <button
+                      key={l.id}
+                      onClick={() => openLesson(t, l)}
+                      aria-label={`درس ${l.title}`}
+                      className={`flex w-full items-center gap-1.5 rounded-lg py-1 pe-2 ps-4 text-[10.5px] transition-colors ${
+                        lessonId === l.id ? 'bg-[#f7931e]/10 text-[#f7931e]' : 'text-zinc-400 hover:bg-white/5 hover:text-zinc-200'
+                      }`}
+                    >
+                      <span className="min-w-0 flex-1 truncate text-right">
+                        {fa(i + 1)}. {l.title}
+                      </span>
+                      {done.includes(l.id) && <CheckCircle2 className="h-3 w-3 shrink-0 text-emerald-400" aria-hidden />}
+                    </button>
+                  ))}
+              </Fragment>
+            )
+          })}
+          <p className="px-2 pb-1 pt-2 text-[9px] font-bold text-zinc-500">ابزارها</p>
+          <SideItem icon={FlaskConical} label="زمین بازی" active={view === 'play'} onClick={() => setView('play')} />
+          <SideItem icon={GraduationCap} label="آزمون" active={view === 'quiz'} onClick={() => setView('quiz')} />
+        </nav>
+
+        {/* محتوا */}
+        <main className="os-scroll min-w-0 flex-1 overflow-y-auto p-4">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`${view}:${view === 'track' ? lessonId : ''}`}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.16 }}
+              className="mx-auto max-w-3xl space-y-3"
+            >
+              {/* ---------------- خانه ---------------- */}
+              {view === 'home' && (
+                <>
+                  <div className="relative overflow-hidden rounded-2xl border border-[#f7931e]/20 bg-gradient-to-bl from-[#b7410e]/35 via-[#f7931e]/10 to-transparent p-5">
+                    <Cog className="absolute -bottom-8 -left-8 h-36 w-36 text-[#f7931e]/10" aria-hidden />
+                    <div className="relative space-y-2.5">
+                      <p className="text-[10px] font-bold tracking-wide text-[#f7931e]">زبان سیستمیِ محبوب دنیا</p>
+                      <h2 className="text-xl font-black text-zinc-50 sm:text-2xl">Rust را با آتش یاد بگیر</h2>
+                      <p className="max-w-xl text-[12px] leading-6 text-zinc-300">
+                        {fa(total)} درس کوتاه فارسی، شبیه‌ساز Rust داخلی، زمین بازی و آزمون — از متغیر تا مالکیت و همزمانی.
+                      </p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {['هستهٔ لینوکس ۶.۷+', 'فایرفاکس', 'ویندوز', 'بدون GC'].map((t) => (
+                          <Badge key={t} variant="outline" className="border-white/15 bg-black/30 text-[10px] font-normal text-zinc-300">
+                            {t}
+                          </Badge>
+                        ))}
+                      </div>
+                      <Button size="sm" onClick={() => openLesson(nextUnread.track, nextUnread.lesson)} className="gap-1.5">
+                        <BookOpen className="h-3.5 w-3.5" aria-hidden />
+                        ادامهٔ یادگیری از «{nextUnread.lesson.title}»
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+                    {[
+                      { l: 'درس‌ها', v: fa(total) },
+                      { l: 'خوانده‌شده', v: fa(doneCount) },
+                      { l: 'مسیرها', v: fa(TRACKS.length) },
+                      { l: 'بهترین نمرهٔ آزمون', v: fa(quizBest) },
+                    ].map((s) => (
+                      <div key={s.l} className="rounded-2xl border border-white/10 bg-zinc-900/60 p-3">
+                        <p className="text-[10.5px] text-zinc-400">{s.l}</p>
+                        <p className="mt-1 text-lg font-black text-zinc-50">{s.v}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-4">
+                    <h3 className="text-[13px] font-bold text-zinc-100">چرا Rust؟</h3>
+                    <ul className="mt-2.5 space-y-2.5">
+                      {[
+                        { i: Zap, t: 'سرعت هم‌تراز C و ++C — بدون زباله‌روب و با صفر هزینهٔ زمان اجرا.' },
+                        { i: ShieldCheck, t: 'امنیت حافظه در زمان کامپایل: نه data race، نه dangling pointer، نه double-free.' },
+                        { i: Flame, t: 'از نسخهٔ ۶.۷ بخشی از هستهٔ لینوکس است و در فایرفاکس و ویندوز نفس می‌کشد.' },
+                        { i: BookOpen, t: 'پیام‌های کامپایلر مثل یک معلم خصوصی‌اند — بهترین تجربهٔ یادگیری بین زبان‌ها.' },
+                      ].map((r) => (
+                        <li key={r.t} className="flex items-start gap-2 text-[12px] leading-6 text-zinc-300">
+                          <r.i className="mt-1 h-3.5 w-3.5 shrink-0 text-[#f7931e]" aria-hidden />
+                          <span>{r.t}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {TRACKS.map((t) => {
+                      const Icon = t.icon
+                      const tDone = t.lessons.filter((l) => done.includes(l.id)).length
+                      return (
+                        <button
+                          key={t.id}
+                          onClick={() => openTrack(t)}
+                          aria-label={`ورود به مسیر ${t.title}`}
+                          className="rounded-2xl border border-white/10 bg-zinc-900/60 p-3 text-right transition-colors hover:border-[#f7931e]/40 hover:bg-zinc-900"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-[#b7410e]/20 text-[#f7931e]">
+                              <Icon className="h-4 w-4" aria-hidden />
+                            </span>
+                            <span className="text-[13px] font-bold text-zinc-100">{t.title}</span>
+                            <Badge variant="outline" className="ms-auto border-white/10 text-[10px] font-normal text-zinc-400">
+                              {fa(tDone)}/{fa(t.lessons.length)} درس
+                            </Badge>
+                          </div>
+                          <p className="mt-1.5 text-[11px] leading-5 text-zinc-400">{t.desc}</p>
+                          <Progress value={Math.round((tDone / t.lessons.length) * 100)} className="mt-2.5 h-1" aria-label={`پیشرفت مسیر ${t.title}`} />
+                        </button>
+                      )
+                    })}
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <button
+                      onClick={() => setView('play')}
+                      aria-label="باز کردن زمین بازی"
+                      className="rounded-2xl border border-white/10 bg-zinc-900/60 p-4 text-right transition-colors hover:border-[#f7931e]/40 hover:bg-zinc-900"
+                    >
+                      <div className="flex items-center gap-2 text-[13px] font-bold text-zinc-100">
+                        <FlaskConical className="h-4 w-4 text-[#f7931e]" aria-hidden /> زمین بازی
+                      </div>
+                      <p className="mt-1.5 text-[11px] leading-5 text-zinc-400">کد Rust را همین‌جا بنویس و با شبیه‌ساز داخلی اجرا کن — {fa(EXAMPLES.length)} نمونهٔ آماده هم دارد.</p>
+                    </button>
+                    <button
+                      onClick={() => setView('quiz')}
+                      aria-label="ورود به آزمون"
+                      className="rounded-2xl border border-white/10 bg-zinc-900/60 p-4 text-right transition-colors hover:border-[#f7931e]/40 hover:bg-zinc-900"
+                    >
+                      <div className="flex items-center gap-2 text-[13px] font-bold text-zinc-100">
+                        <GraduationCap className="h-4 w-4 text-[#f7931e]" aria-hidden /> آزمون نهایی
+                      </div>
+                      <p className="mt-1.5 text-[11px] leading-5 text-zinc-400">{fa(QUIZ.length)} سؤال چهارگزینه‌ای با توضیح فارسی؛ قبولی از {fa(6)} و بالاتر. {quizBest > 0 ? `بهترین نمرهٔ تو: ${fa(quizBest)}` : ''}</p>
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {/* ---------------- درس ---------------- */}
+              {view === 'track' && (
+                <>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="shrink-0 border-[#f7931e]/30 text-[10px] font-normal text-[#f7931e]">
+                      {track.title} · درس {fa(lessonIdx + 1)} از {fa(track.lessons.length)}
+                    </Badge>
+                    <h2 className="min-w-0 flex-1 truncate text-sm font-bold text-zinc-100">{lesson.title}</h2>
+                  </div>
+                  <div className="space-y-2.5 rounded-2xl border border-white/10 bg-zinc-900/60 p-4">
+                    {lesson.paragraphs.map((p, i) => (
+                      <p key={i} className="text-[13px] leading-7 text-zinc-300">
+                        {rich(p)}
+                      </p>
+                    ))}
+                  </div>
+                  {lesson.terminal && <CodeBlock code={lesson.terminal} tone="term" />}
+                  <CodeBlock code={lesson.code} />
+                  {lesson.tip && <TipBox text={lesson.tip} />}
+                  {lesson.errTitle && lesson.errCode && lesson.errWhy && <ErrBox title={lesson.errTitle} code={lesson.errCode} why={lesson.errWhy} />}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Button size="sm" variant="outline" onClick={() => tryIt(lesson.code)} className="gap-1.5">
+                      <FlaskConical className="h-3.5 w-3.5" aria-hidden /> امتحانش کن
+                    </Button>
+                    <Button size="sm" onClick={markDone} disabled={done.includes(lesson.id)} className="gap-1.5">
+                      <Check className="h-3.5 w-3.5" aria-hidden /> {done.includes(lesson.id) ? 'خوانده شد' : 'خواندم!'}
+                    </Button>
+                    <div className="ms-auto flex gap-1.5">
+                      <Button size="sm" variant="ghost" disabled={lessonIdx === 0} onClick={() => openLesson(track, track.lessons[lessonIdx - 1])} className="gap-0.5">
+                        <ChevronRight className="h-4 w-4" aria-hidden /> قبلی
+                      </Button>
+                      <Button size="sm" variant="ghost" disabled={lessonIdx >= track.lessons.length - 1} onClick={() => openLesson(track, track.lessons[lessonIdx + 1])} className="gap-0.5">
+                        بعدی <ChevronLeft className="h-4 w-4" aria-hidden />
+                      </Button>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* ---------------- زمین بازی ---------------- */}
+              {view === 'play' && (
+                <>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="flex items-center gap-2 text-sm font-bold text-zinc-100">
+                      <FlaskConical className="h-4 w-4 text-[#f7931e]" aria-hidden /> زمین بازی Rust
+                    </h2>
+                    <Badge variant="outline" className="border-white/10 text-[10px] font-normal text-zinc-400">Ctrl+Enter</Badge>
+                    <Button size="sm" onClick={() => runIt(code)} disabled={running} className="ms-auto gap-1.5">
+                      {running ? <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden /> : <Play className="h-3.5 w-3.5" aria-hidden />} اجرا
+                    </Button>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {EXAMPLES.map((ex) => (
+                      <button
+                        key={ex.label}
+                        onClick={() => {
+                          setCode(ex.code)
+                          runIt(ex.code)
+                        }}
+                        aria-label={`نمونهٔ ${ex.label}`}
+                        className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10.5px] text-zinc-300 transition-colors hover:border-[#f7931e]/40 hover:text-[#f7931e]"
+                      >
+                        {ex.label}
+                      </button>
+                    ))}
+                  </div>
+                  <textarea
+                    dir="ltr"
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                        e.preventDefault()
+                        runIt(code)
+                      }
+                    }}
+                    spellCheck={false}
+                    aria-label="ویرایشگر کد Rust"
+                    className="os-scroll h-64 w-full resize-none rounded-xl border border-white/10 bg-zinc-950 p-3 text-left font-mono text-[12px] leading-6 text-emerald-200 outline-none transition-colors focus:border-[#f7931e]/40"
+                  />
+                  <p className="text-[10.5px] text-zinc-500">
+                    مدت اجرا: {fa(Math.round(runMs))} میلی‌ثانیه · {fa(out.length)} خط خروجی
+                  </p>
+                  {runErr && (
+                    <div className="rounded-xl border border-red-500/30 bg-red-950/40 p-3">
+                      <p dir="ltr" className="text-left font-mono text-[11.5px] text-red-300">
+                        error[{runErr.code}]: {runErr.message}
+                      </p>
+                      {runErr.line != null && (
+                        <p dir="ltr" className="mt-1 text-left font-mono text-[10.5px] text-red-400/70">
+                          {'-->'} main.rs:{runErr.line}
+                        </p>
+                      )}
+                      <p className="mt-2 text-[12px] leading-6 text-red-100/85">{runErr.hint}</p>
+                    </div>
+                  )}
+                  <pre
+                    dir="ltr"
+                    className={`os-scroll min-h-14 max-h-56 overflow-y-auto rounded-xl border border-white/10 bg-zinc-950 p-3 text-left font-mono text-[11.5px] leading-6 ${
+                      out.length ? 'text-emerald-300' : 'text-zinc-600'
+                    }`}
+                  >
+                    <code>{out.length ? out.join('\n') : '— output appears here —'}</code>
+                  </pre>
+                </>
+              )}
+
+              {/* ---------------- آزمون ---------------- */}
+              {view === 'quiz' && (
+                <>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="flex items-center gap-2 text-sm font-bold text-zinc-100">
+                      <GraduationCap className="h-4 w-4 text-[#f7931e]" aria-hidden /> آزمون نهایی
+                    </h2>
+                    <Badge variant="outline" className="border-white/10 text-[10px] font-normal text-zinc-400">بهترین نمره: {fa(quizBest)}</Badge>
+                  </div>
+                  {submitted && (
+                    <motion.div
+                      initial={{ scale: 0.96, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      className={`rounded-2xl border p-4 text-center ${score >= 6 ? 'border-emerald-500/30 bg-emerald-500/10' : 'border-[#f7931e]/30 bg-[#f7931e]/10'}`}
+                    >
+                      {score >= 6 && <Trophy className="mx-auto h-8 w-8 text-amber-300" aria-hidden />}
+                      <p className={`mt-1 text-base font-black ${score >= 6 ? 'text-emerald-300' : 'text-[#f7931e]'}`}>
+                        {fa(score)} از {fa(QUIZ.length)} — {score >= 6 ? 'آفرین، قبول شدی!' : 'نزدیک بودی؛ یک دور دیگر مرور کن'}
+                      </p>
+                    </motion.div>
+                  )}
+                  {QUIZ.map((q, qi) => (
+                    <div key={q.id} className="rounded-2xl border border-white/10 bg-zinc-900/60 p-3">
+                      <p className="text-[13px] font-bold leading-6 text-zinc-100">
+                        {fa(qi + 1)}. {q.q}
+                      </p>
+                      <div className="mt-2 grid gap-1.5">
+                        {q.o.map((opt, oi) => {
+                          const selected = answers[qi] === oi
+                          const correct = submitted && oi === q.a
+                          const wrong = submitted && selected && oi !== q.a
+                          return (
+                            <button
+                              key={oi}
+                              disabled={submitted}
+                              onClick={() => pick(qi, oi)}
+                              aria-label={`گزینهٔ ${fa(oi + 1)}: ${opt}`}
+                              className={`flex w-full items-center justify-between gap-2 rounded-xl border px-3 py-2 text-right text-[12px] transition-colors ${
+                                correct
+                                  ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-300'
+                                  : wrong
+                                    ? 'border-red-500/50 bg-red-500/10 text-red-300'
+                                    : selected
+                                      ? 'border-[#f7931e]/50 bg-[#f7931e]/10 text-[#f7931e]'
+                                      : 'border-white/10 bg-white/[0.03] text-zinc-300 hover:border-white/25'
+                              }`}
+                            >
+                              <span>{opt}</span>
+                              {correct && <Check className="h-4 w-4 shrink-0" aria-hidden />}
+                              {wrong && <X className="h-4 w-4 shrink-0" aria-hidden />}
+                            </button>
+                          )
+                        })}
+                      </div>
+                      {submitted && <p className="mt-2 rounded-lg bg-white/5 p-2 text-[11.5px] leading-6 text-zinc-400">{q.ex}</p>}
+                    </div>
+                  ))}
+                  <div className="flex justify-center">
+                    {!submitted ? (
+                      <Button size="sm" onClick={submitQuiz} disabled={answers.some((a) => a === null)}>
+                        ثبت پاسخ‌ها
+                      </Button>
+                    ) : (
+                      <Button size="sm" variant="outline" onClick={resetQuiz}>
+                        شروع دوباره
+                      </Button>
+                    )}
+                  </div>
+                </>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </main>
+      </div>
+
+      <footer className="shrink-0 border-t border-white/10 bg-black/20 px-4 py-1.5 text-center text-[10px] text-zinc-500">
+        آکادمی Rust — با اسپانسری سان‌جاب
+      </footer>
+    </div>
+  )
+}

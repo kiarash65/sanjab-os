@@ -30,6 +30,7 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { BRAND, SUNJOB_PALETTE } from '@/lib/os/brand'
 import { useOS } from '@/lib/os/store'
+import { DEEP_CHAPTERS, DEEP_IDS, DeepChapterView } from '@/components/os/academy/deep'
 import {
   CHEATSHEET,
   DISTROS,
@@ -56,6 +57,9 @@ interface AcademyProgress {
 
 const PROGRESS_KEY = 'sunjob-academy-v1'
 const EMPTY_PROGRESS: AcademyProgress = { done: [], missions: [], quizBest: 0, certName: '' }
+
+/** حد نصاب قبولی آزمون — ۷۰٪ سؤال‌ها */
+const PASS_SCORE = Math.ceil(QUIZ.length * 0.7)
 
 function loadProgress(): AcademyProgress {
   try {
@@ -97,7 +101,8 @@ const CHAPTERS: ChapterDef[] = [
   { id: 'terminal', title: 'ترمینال', subtitle: 'قلب تپندهٔ لینوکس + تمرین عملی', icon: SquareTerminal, tint: '#14b8a6' },
   { id: 'permissions', title: 'دسترسی‌ها', subtitle: 'rwx ،sudo و هنوز حفاظت', icon: ShieldCheck, tint: SUNJOB_PALETTE.violet },
   { id: 'procs', title: 'فرآیندها و بسته‌ها', subtitle: 'ps ،kill و apt/dnf/pacman', icon: Cpu, tint: SUNJOB_PALETTE.teal },
-  { id: 'quiz', title: 'آزمون و گواهی', subtitle: '۱۰ سؤال، یک گواهی باحال', icon: Award, tint: SUNJOB_PALETTE.orange },
+  { id: 'quiz', title: 'آزمون و گواهی', subtitle: 'آزمون جامع، یک گواهی باحال', icon: Award, tint: SUNJOB_PALETTE.orange },
+  ...DEEP_CHAPTERS,
 ]
 
 type ViewId = 'home' | 'cheats' | (typeof CHAPTERS)[number]['id']
@@ -905,7 +910,7 @@ function FinalQuiz({ progress, onScore, onCertName }: { progress: AcademyProgres
   const [score, setScore] = useState(0)
   const [finished, setFinished] = useState(false)
   const [name, setName] = useState(progress.certName)
-  const passed = score >= 7
+  const passed = score >= PASS_SCORE
 
   const q = QUIZ[idx]
 
@@ -976,7 +981,7 @@ function FinalQuiz({ progress, onScore, onCertName }: { progress: AcademyProgres
               <p className="text-[11px] leading-5 text-zinc-300">
                 دورهٔ جامع «آکادمی لینوکس» را با نمرهٔ {fa(score)} از {fa(QUIZ.length)} با موفقیت به پایان رساند —
                 <br />
-                شامل ترمینال تعاملی، توزیع‌ها، نصب و دسترسی‌ها
+                شامل ترمینال تعاملی، هسته، شبکه، بش، امنیت و توزیع‌ها
               </p>
               <div className="mt-1 flex items-center gap-4 text-[9.5px] text-zinc-500">
                 <span>{today}</span>
@@ -1159,8 +1164,8 @@ export default function LinuxAcademyApp() {
 
   const onScore = useCallback(
     (s: number) => {
-      update((p) => ({ ...p, quizBest: Math.max(p.quizBest, s), done: s >= 7 && !p.done.includes('quiz') ? [...p.done, 'quiz'] : p.done }))
-      if (s >= 7) {
+      update((p) => ({ ...p, quizBest: Math.max(p.quizBest, s), done: s >= PASS_SCORE && !p.done.includes('quiz') ? [...p.done, 'quiz'] : p.done }))
+      if (s >= PASS_SCORE) {
         pushToast({ title: 'مبارک! گواهی آکادمی فعال شد', body: 'اسم داخل گواهی را می‌توانی همان‌جا وارد کنی.', icon: Award })
       }
     },
@@ -1267,7 +1272,7 @@ export default function LinuxAcademyApp() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" aria-hidden />
                     <div className="absolute bottom-3 right-4 left-4">
                       <p className="text-sm font-black text-white sm:text-base">سفرت را همین‌جا شروع کن، پنگوئن معلم صبور است!</p>
-                      <p className="mt-0.5 text-[11px] leading-4 text-zinc-300">۸ فصل کوتاه، یک ترمینال امن برای تمرین، آزمون و گواهی پایانی — همه‌چیز آفلاین و بامزه.</p>
+                      <p className="mt-0.5 text-[11px] leading-4 text-zinc-300">۱۳ فصل کوتاه، یک ترمینال امن برای تمرین، انیمیشن‌های زندهٔ هسته، آزمون و گواهی پایانی — همه‌چیز آفلاین و بامزه.</p>
                     </div>
                   </div>
 
@@ -1584,11 +1589,20 @@ export default function LinuxAcademyApp() {
                 <Chapter def={CHAPTERS[7]} done={progress.done.includes('quiz')} onToggleDone={() => toggleDone('quiz', 'آزمون و گواهی')}>
                   <div className="text-xs leading-6 text-zinc-300">
                     <p className="mb-3">
-                      ۱۰ سؤال از تمام فصل‌ها. ۷ و بالاتر یعنی قبول و صاحب گواهی «آکادمی لینوکس سان‌جاب‌او‌اس». بهترین نمرهٔ فعلی تو: <b className="text-amber-300">{fa(progress.quizBest)}</b>
+                      {fa(QUIZ.length)} سؤال از تمام فصل‌ها (حتی فصل‌های عمیق). {fa(PASS_SCORE)} و بالاتر یعنی قبول و صاحب گواهی «آکادمی لینوکس سان‌جاب‌او‌اس». بهترین نمرهٔ فعلی تو: <b className="text-amber-300">{fa(progress.quizBest)}</b>
                     </p>
                     <FinalQuiz progress={progress} onScore={onScore} onCertName={onCertName} />
                   </div>
                 </Chapter>
+              )}
+
+              {/* ---------------- فصل‌های عمیق ---------------- */}
+              {DEEP_IDS.has(view) && (
+                <DeepChapterView
+                  id={view}
+                  done={progress.done.includes(view)}
+                  onToggleDone={() => toggleDone(view, CHAPTERS.find((c) => c.id === view)?.title ?? '')}
+                />
               )}
 
               {/* ---------------- برگه تقلب ---------------- */}
