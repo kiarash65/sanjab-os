@@ -21,17 +21,30 @@
     "copyright": "© SunJob — SanjabOS",
     "shortDescription": "سیستم‌عامل آموزشی فارسی",
     "longDescription": "SanjabOS — a Persian educational operating-system environment with Python (real CPython via Pyodide), Rust academy, Linux (real kernel via v86), PowerShell academy, AI academy and Persian writing tools.",
-    "targets": ["nsis", "msi"],
-    "icon": ["icons/icon.ico", "icons/32x32.png", "icons/128x128.png"],
-    "externalBin": ["binaries/node"],
-    "resources": ["server-dist/*"],
+    "targets": [
+      "nsis",
+      "msi"
+    ],
+    "icon": [
+      "icons/icon.ico",
+      "icons/32x32.png",
+      "icons/128x128.png"
+    ],
+    "externalBin": [
+      "binaries/node"
+    ],
+    "resources": [
+      "server-dist/*"
+    ],
     "windows": {
       "webviewInstallMode": {
         "type": "downloadBootstrapper"
       },
       "nsis": {
         "installMode": "currentUser",
-        "languages": ["Persian", "English"]
+        "languages": [
+          "English"
+        ]
       }
     }
   }
