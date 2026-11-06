@@ -1,5 +1,6 @@
 # SanjabOS — سیستم‌عامل وب فارسی — با اسپانسری سان‌جاب
-# این فایل نمونه است؛ install.sh آن را با مسیرهای واقعی می‌نویسد.
+# یونیت نمونهٔ سیستمی — install.sh نسخهٔ واقعی را با مسیرهای runtime می‌نویسد.
+# امنیت: کاربر/گروه اختصاصی، فایل‌سیستم فقط-خواندنی به‌جز مسیرهای state، گوش‌دادن loopback.
 [Unit]
 Description=SanjabOS — Persian RTL WebOS (sunjob.ir)
 After=network-online.target
@@ -7,19 +8,39 @@ Wants=network-online.target
 
 [Service]
 Type=simple
+# کاربر اختصاصی کم‌دسترسی (install.sh با useradd --system می‌سازد)
 User=sanjabos
+Group=sanjabos
 WorkingDirectory=/opt/sanjabos
 Environment=NODE_ENV=production
 Environment=PORT=4310
-Environment=HOSTNAME=0.0.0.0
+# پیش‌فرض: فقط loopback — expose کردن روی LAN باید تصمیم صریح اپراتور باشد
+Environment=HOSTNAME=127.0.0.1
+# precheck: اگر standalone ساخته نشده، سریع و واضح شکست بخورد
+ExecStartPre=/usr/bin/test -f /opt/sanjabos/.next/standalone/server.js
 ExecStart=/usr/bin/bun .next/standalone/server.js
 Restart=on-failure
 RestartSec=3
-# امن‌تر:
+
+# --- Hardening (systemd sandboxing) ---
 NoNewPrivileges=true
+PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
-PrivateTmp=true
+ProtectHostname=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictRealtime=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+# فقط مسیرهای state واقعاً قابل‌نوشتن باشند (خروجی standalone + دیتابیس SQLite)
+ReadWritePaths=/opt/sanjabos/.next /opt/sanjabos/db
+
+# --- Resource limits معقول ---
+MemoryMax=1G
+CPUQuota=80%
 
 [Install]
 WantedBy=multi-user.target

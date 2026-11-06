@@ -10,6 +10,11 @@
 #    SANJABOS_PORT=8080 ./install.sh
 #    SANJABOS_DRY_RUN=1 ./install.sh   # فقط نمایش اقدامات (بدون اجرا)
 #
+#  Release policy (docs/RELEASES.md):
+#    - بیلد هرگز به‌عنوان root اجرا نمی‌شود — در --system با کاربر سرویس بیلد می‌شود
+#    - آپدیت فقط با git pull --ff-only — هرگز git reset --hard برای کاربر زده نمی‌شود
+#    - قبل از هر migration از دادهٔ قبلی بکاپ گرفته می‌شود
+#
 #  Repo: https://github.com/kiarash65/sanjab-os
 #  با اسپانسری سان‌جاب — sunjob.ir
 # ============================================================================
@@ -123,41 +128,110 @@ case "$PKG" in
   *)      warn "نصب خودکار وابستگی‌ها رد شد" ;;
 esac
 
-step "۳/۷‌ب نصب Bun (runtime فوق‌سریع جاوااسکریپت)"
-if command -v bun >/dev/null 2>&1; then
-  ok "Bun از قبل نصب است: $(bun --version)"
-else
-  if [ "$DRY_RUN" = "1" ]; then
-    info "(dry-run) curl -fsSL https://bun.sh/install | bash"
+# ----------------------------------------------------------------------------
+# ۳ب) کاربر سرویس (فقط حالت سراسری) — قبل از بیلد ساخته می‌شود تا بیلد با او اجرا شود
+# ----------------------------------------------------------------------------
+SVC_USER=""
+if [ "$SYSTEM_MODE" -eq 1 ]; then
+  step "۳ب ساخت کاربر اختصاصی sanjabos (--system)"
+  SVC_USER="sanjabos"
+  if id "$SVC_USER" >/dev/null 2>&1; then
+    ok "کاربر از قبل وجود دارد: $SVC_USER"
   else
-    curl -fsSL https://bun.sh/install | bash
-    export BUN_INSTALL="$HOME/.bun"
-    export PATH="$BUN_INSTALL/bin:$PATH"
-    ok "Bun نصب شد: $(bun --version)"
+    run useradd --system --home-dir "$INSTALL_DIR" --shell /usr/sbin/nologin "$SVC_USER"
+    ok "کاربر سیستم ساخته شد: $SVC_USER"
   fi
 fi
-command -v bun >/dev/null 2>&1 || [ "$DRY_RUN" = "1" ] || \
-  warn "Bun در PATH نیست — بعد از بازکردن دوباره ترمینال دوباره اجرا کن"
 
 # ----------------------------------------------------------------------------
-# ۴) دریافت کد
+# ۳ت) نصب Bun — در حالت سراسری داخل INSTALL_DIR (مالک کاربر سرویس)، نه root home
 # ----------------------------------------------------------------------------
-step "۴/۷ دریافت سان‌جاب‌او‌اس"
+step "۳ت نصب Bun (runtime فوق‌سریع جاوااسکریپت)"
+if [ "$SYSTEM_MODE" -eq 1 ]; then
+  BUN_INSTALL_DIR="$INSTALL_DIR/.bun"
+  if [ -x "$BUN_INSTALL_DIR/bin/bun" ]; then
+    ok "Bun از قبل نصب است: $("$BUN_INSTALL_DIR/bin/bun" --version)"
+  elif [ "$DRY_RUN" = "1" ]; then
+    info "(dry-run) BUN_INSTALL=$BUN_INSTALL_DIR curl -fsSL https://bun.sh/install | bash"
+  else
+    BUN_INSTALL="$BUN_INSTALL_DIR" curl -fsSL https://bun.sh/install | bash
+    ok "Bun نصب شد (مسیر سرویس): $BUN_INSTALL_DIR/bin/bun ($("$BUN_INSTALL_DIR/bin/bun" --version))"
+  fi
+  BUN_BIN="$BUN_INSTALL_DIR/bin/bun"
+else
+  if command -v bun >/dev/null 2>&1; then
+    ok "Bun از قبل نصب است: $(bun --version)"
+    BUN_BIN="$(command -v bun)"
+  else
+    if [ "$DRY_RUN" = "1" ]; then
+      info "(dry-run) curl -fsSL https://bun.sh/install | bash"
+    else
+      curl -fsSL https://bun.sh/install | bash
+      export BUN_INSTALL="$HOME/.bun"
+      export PATH="$BUN_INSTALL/bin:$PATH"
+      ok "Bun نصب شد: $(bun --version)"
+    fi
+    BUN_BIN="$(command -v bun || echo "$HOME/.bun/bin/bun")"
+  fi
+  command -v bun >/dev/null 2>&1 || [ "$DRY_RUN" = "1" ] || \
+    warn "Bun در PATH نیست — بعد از بازکردن دوباره ترمینال دوباره اجرا کن"
+fi
+
+# ----------------------------------------------------------------------------
+# ۴) بکاپ دادهٔ قبلی + دریافت کد
+#    سیاست: قبل از هر migration بکاپ؛ حذف دادهٔ کاربر هرگز بدون فلگ صریح انجام نمی‌شود
+# ----------------------------------------------------------------------------
+step "۴/۷ بکاپ دادهٔ قبلی و دریافت سان‌جاب‌او‌اس"
+if [ -d "$INSTALL_DIR" ]; then
+  BACKUP_DIR="${INSTALL_DIR}-backup-$(date +%Y%m%d-%H%M%S)"
+  mkdir -p "$BACKUP_DIR"
+  [ -f "$INSTALL_DIR/.env" ]  && { cp -a "$INSTALL_DIR/.env" "$BACKUP_DIR/" && info "بکاپ: .env"; } || true
+  [ -d "$INSTALL_DIR/db" ]    && { cp -a "$INSTALL_DIR/db"  "$BACKUP_DIR/" && info "بکاپ: db/"; } || true
+  [ -d "$INSTALL_DIR/.next" ] && { cp -a "$INSTALL_DIR/.next" "$BACKUP_DIR/" 2>/dev/null; } || true
+  ok "بکاپ دادهٔ قبلی: $BACKUP_DIR (چیزی حذف نمی‌شود)"
+fi
+
 if [ -d "$INSTALL_DIR/.git" ]; then
   info "نسخهٔ قبلی پیدا شد — آپدیت می‌کنم…"
-  run git -C "$INSTALL_DIR" fetch --all
-  run git -C "$INSTALL_DIR" reset --hard "origin/$BRANCH"
+  run git -C "$INSTALL_DIR" fetch --all --prune
+  # سیاست انتشار (docs/RELEASES.md): هرگز git reset --hard برای کاربر زده نمی‌شود
+  if [ "$DRY_RUN" = "1" ]; then
+    info "(dry-run) git -C '$INSTALL_DIR' pull --ff-only origin '$BRANCH'"
+  else
+    if git -C "$INSTALL_DIR" pull --ff-only "origin" "$BRANCH"; then
+      ok "کد با ff-only آپدیت شد"
+    else
+      warn "git pull --ff-only نشد — احتمالاً تغییرات محلی داری."
+      info "دستی حل کن: cd '$INSTALL_DIR' && git stash && git pull --ff-only"
+      fail "آپدیت بدون از بین بردن تغییرات محلی ممکن نشد (reset --hard اجرا نمی‌شود)"
+    fi
+  fi
 else
   run git clone --depth 1 --branch "$BRANCH" "$REPO_URL" "$INSTALL_DIR"
 fi
 ok "کد آماده است: $INSTALL_DIR"
 
 # ----------------------------------------------------------------------------
-# ۵) بیلد
+# ۵) بیلد — هرگز به‌عنوان root
+#    - کاربری: با کاربر فراخوان
+#    - سراسری: با کاربر سرویس (sanjabos) از داخل INSTALL_DIR
 # ----------------------------------------------------------------------------
 step "۵/۷ نصب وابستگی‌های پروژه و بیلد (۱ تا ۳ دقیقه)"
-run bash -c "cd '$INSTALL_DIR' && bun install --frozen-lockfile"
-run bash -c "cd '$INSTALL_DIR' && bun run build"
+if [ "$SYSTEM_MODE" -eq 1 ]; then
+  run chown -R "$SVC_USER:$SVC_USER" "$INSTALL_DIR"
+  if [ "$DRY_RUN" = "1" ]; then
+    info "(dry-run) sudo -u $SVC_USER env HOME=$INSTALL_DIR PATH=$INSTALL_DIR/.bun/bin:\$PATH bash -c 'bun install && bun run build'"
+  else
+    sudo -u "$SVC_USER" env \
+      HOME="$INSTALL_DIR" \
+      BUN_INSTALL="$INSTALL_DIR/.bun" \
+      PATH="$INSTALL_DIR/.bun/bin:/usr/local/bin:/usr/bin:/bin" \
+      bash -c "cd '$INSTALL_DIR' && bun install --frozen-lockfile && bun run build"
+  fi
+  info "بیلد با کاربر سرویس انجام شد (نه root)"
+else
+  run bash -c "cd '$INSTALL_DIR' && bun install --frozen-lockfile && bun run build"
+fi
 ok "بیلد کامل شد → .next/standalone"
 
 # ----------------------------------------------------------------------------
@@ -180,7 +254,7 @@ case "\${1:-open}" in
   logs)    journalctl \$( [ "${SYSTEM_MODE}" -eq 1 ] || echo "--user" ) -u sanjabos.service -f ;;
   open)    xdg-open "http://localhost:\$PORT" 2>/dev/null || echo "مرورگر را باز کن: http://localhost:\$PORT" ;;
   kiosk)   exec "$INSTALL_DIR/linux-edition/kiosk.sh" ;;
-  update)  cd "\$INSTALL_DIR" && git pull && bun install --frozen-lockfile && bun run build && \$SVC restart sanjabos.service ;;
+  update)  cd "\$INSTALL_DIR" && git pull --ff-only && bun install --frozen-lockfile && bun run build && \$SVC restart sanjabos.service ;;
   *)       echo "sanjabos <start|stop|restart|status|logs|open|kiosk|update>" ;;
 esac
 EOF
@@ -191,10 +265,10 @@ ok "فرمان sanjabos نصب شد (start/stop/logs/kiosk/update)"
 
 # ----------------------------------------------------------------------------
 # ۷) سرویس systemd + میان‌بر دسکتاپ
+#    سرویس: کاربر اختصاصی، hardening، گوش‌دادن loopback (LAN باید صریح باشد)
 # ----------------------------------------------------------------------------
 step "۷/۷ سرویس systemd"
 SERVICE_FILE="$SERVICE_DIR/$SVC_NAME"
-BUN_BIN="$(command -v bun || echo "$HOME/.bun/bin/bun")"
 write_service() {
   cat > "$SERVICE_FILE" <<EOF
 # SanjabOS — سیستم‌عامل وب فارسی — با اسپانسری سان‌جاب
@@ -205,14 +279,27 @@ Wants=network-online.target
 
 [Service]
 Type=simple
+$( [ "$SYSTEM_MODE" -eq 1 ] && echo "User=$SVC_USER" && echo "Group=$SVC_USER" )
 WorkingDirectory=$INSTALL_DIR
 Environment=NODE_ENV=production
 Environment=PORT=$PORT
-Environment=HOSTNAME=0.0.0.0
-Environment=PATH=/usr/local/bin:/usr/bin:/bin:$HOME/.bun/bin
+# پیش‌فرض loopback — expose کردن روی LAN تصمیم صریح اپراتور است
+Environment=HOSTNAME=127.0.0.1
+Environment=PATH=/usr/local/bin:/usr/bin:/bin:$INSTALL_DIR/.bun/bin
+ExecStartPre=/usr/bin/test -f $INSTALL_DIR/.next/standalone/server.js
 ExecStart=$BUN_BIN .next/standalone/server.js
 Restart=on-failure
 RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadWritePaths=$INSTALL_DIR/.next $INSTALL_DIR/db
+MemoryMax=1G
+CPUQuota=80%
 
 [Install]
 WantedBy=$( [ "$SYSTEM_MODE" -eq 1 ] && echo "multi-user.target" || echo "default.target" )
@@ -235,7 +322,7 @@ else
     ok "سرویس فعال شد → http://localhost:$PORT"
   else
     warn "systemd در دسترس نیست — اجرای دستی:"
-    info "  cd $INSTALL_DIR && PORT=$PORT bun .next/standalone/server.js"
+    info "  cd $INSTALL_DIR && PORT=$PORT HOSTNAME=127.0.0.1 bun .next/standalone/server.js"
   fi
 fi
 
@@ -270,7 +357,7 @@ cat <<DONE
 
      آدرس:    ${C_ORANGE}http://localhost:$PORT${C_OFF}
      فرمان:   ${C_TEAL}sanjabos${C_OFF}  ← start / stop / logs / kiosk / update
-     حذف:     ${C_DIM}./uninstall.sh${C_OFF}
+     حذف:     ${C_DIM}./uninstall.sh${C_OFF}   (داده‌ها حفظ می‌شوند؛ حذف کامل: --purge)
 
      ${C_DIM}با اسپانسری سان‌جاب — sunjob.ir 🐿️${C_OFF}
 

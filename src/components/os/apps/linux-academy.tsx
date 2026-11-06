@@ -30,6 +30,7 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { BRAND, SUNJOB_PALETTE } from '@/lib/os/brand'
 import { useOS } from '@/lib/os/store'
+import { useGame } from '@/lib/gamification/engine'
 import { DEEP_CHAPTERS, DEEP_IDS, DeepChapterView } from '@/components/os/academy/deep'
 import {
   CHEATSHEET,
@@ -927,6 +928,7 @@ function FinalQuiz({ progress, onScore, onCertName }: { progress: AcademyProgres
     } else {
       setFinished(true)
       onScore(score)
+      useGame.getState().registerQuiz('linux', 'final', score === QUIZ.length, score >= PASS_SCORE ? 30 : 10)
     }
   }
 
@@ -1132,6 +1134,7 @@ export default function LinuxAcademyApp() {
         const willBeDone = !p.done.includes(id)
         const done = willBeDone ? [...p.done, id] : p.done.filter((d) => d !== id)
         if (willBeDone) {
+          useGame.getState().completeLesson('linux', id, 20)
           pushToast({
             title: `فصل «${title}» تمام شد!`,
             body:
@@ -1150,6 +1153,7 @@ export default function LinuxAcademyApp() {
   const onMissionDone = useCallback(
     (id: string) => {
       update((p) => (p.missions.includes(id) ? p : { ...p, missions: [...p.missions, id] }))
+      useGame.getState().award(`mission:linux:${id}`, 25, 'مأموریت ترمینال انجام شد', { track: 'linux' })
       if (progress.missions.length + 1 >= TERMINAL_MISSIONS.length) {
         update((p) => ({ ...p, done: p.done.includes('terminal') ? p.done : [...p.done, 'terminal'] }))
         pushToast({

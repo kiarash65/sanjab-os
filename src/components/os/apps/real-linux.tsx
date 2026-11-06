@@ -17,6 +17,7 @@ import {
 } from 'react'
 import {
   AlertTriangle,
+  ArchiveRestore,
   CircleStop,
   Cpu,
   Eraser,
@@ -24,12 +25,14 @@ import {
   Monitor,
   Play,
   RotateCcw,
+  Save,
   Send,
   Wifi,
   Zap,
 } from 'lucide-react'
 import { Switch } from '@/components/ui/switch'
 import { useOS } from '@/lib/os/store'
+import { idbGet, idbPut } from '@/lib/os/idb'
 
 declare global {
   interface Window {
@@ -42,7 +45,11 @@ interface V86Instance {
   serial0_send: (data: string) => void
   destroy?: () => void
   stop?: () => void
+  save_state?: () => Promise<ArrayBuffer>
+  restore_state?: (buf: ArrayBuffer) => Promise<void>
 }
+
+const VM_STATE_KEY = 'v86-alpine-state-v1'
 
 type Phase = 'idle' | 'starting' | 'running' | 'error'
 
@@ -512,6 +519,59 @@ export default function RealLinuxApp() {
     setTimeout(() => void start(), 80)
   }, [shutdown, start])
 
+  /* ── ذخیره/بازیابی وضعیت ماشین مجازی (snapshot در IndexedDB) ── */
+  const [hasSnapshot, setHasSnapshot] = useState(false)
+  const [snapshotBusy, setSnapshotBusy] = useState(false)
+
+  useEffect(() => {
+    void idbGet(VM_STATE_KEY).then((v) => setHasSnapshot(!!v))
+  }, [])
+
+  const saveSnapshot = useCallback(async () => {
+    const emu = emuRef.current
+    if (!emu || phaseRef.current !== 'running' || typeof emu.save_state !== 'function') {
+      pushToast({ icon: '⚠️', title: 'فعلاً نمی‌شود', body: 'باید ماشین بوت‌شده باشد تا snapshot بگیریم' })
+      return
+    }
+    setSnapshotBusy(true)
+    try {
+      const buf = await emu.save_state()
+      await idbPut(VM_STATE_KEY, buf)
+      setHasSnapshot(true)
+      pushToast({
+        icon: '💾',
+        title: 'وضعیت ماشین ذخیره شد',
+        body: `حجم snapshot: ${(buf.byteLength / 1024 / 1024).toFixed(1)} MB در IndexedDB مرورگر`,
+      })
+    } catch (e) {
+      pushToast({ icon: '❌', title: 'ذخیره snapshot ناموفق بود', body: e instanceof Error ? e.message : 'خطای ناشناخته' })
+    } finally {
+      setSnapshotBusy(false)
+    }
+  }, [pushToast])
+
+  const restoreSnapshot = useCallback(async () => {
+    const emu = emuRef.current
+    if (!emu || phaseRef.current !== 'running' || typeof emu.restore_state !== 'function') {
+      pushToast({ icon: '⚠️', title: 'اول بوت کن', body: 'بازیابی snapshot به یک ماشین در حال اجرا نیاز دارد' })
+      return
+    }
+    setSnapshotBusy(true)
+    try {
+      const buf = await idbGet<ArrayBuffer>(VM_STATE_KEY)
+      if (!buf) {
+        pushToast({ icon: '⚠️', title: 'snapshot پیدا نشد', body: 'اول ذخیره کن' })
+        return
+      }
+      await emu.restore_state(buf)
+      pushToast({ icon: '⏪', title: 'وضعیت بازیابی شد', body: 'ماشین به لحظه‌ی snapshot برگشت' })
+    } catch (e) {
+      pushToast({ icon: '❌', title: 'بازیابی ناموفق بود', body: e instanceof Error ? e.message : 'احتمالاً snapshot از نسخه‌ی دیگری از ایمیج‌هاست — دوباره ذخیره کن' })
+    } finally {
+      setSnapshotBusy(false)
+    }
+  }, [pushToast])
+
   const send = useCallback((s: string) => {
     if (!emuRef.current || phaseRef.current !== 'running') {
       pushToast({ icon: '⚠️', title: 'هنوز بوت نشده', body: 'اول دکمهٔ «بوت هستهٔ واقعی» را بزن' })
@@ -592,6 +652,30 @@ export default function RealLinuxApp() {
           )}
           {phase !== 'idle' && (
             <>
+              {phase === 'running' && (
+                <>
+                  <button
+                    onClick={() => void saveSnapshot()}
+                    disabled={snapshotBusy}
+                    className={`grid size-8 place-items-center rounded-lg border border-white/10 transition active:scale-95 ${
+                      hasSnapshot ? 'bg-emerald-400/10 text-emerald-300' : 'bg-zinc-900 text-zinc-400 hover:bg-zinc-800'
+                    } disabled:opacity-50`}
+                    title="ذخیره وضعیت ماشین (snapshot در IndexedDB)"
+                    aria-label="ذخیره وضعیت ماشین مجازی"
+                  >
+                    <Save size={14} aria-hidden />
+                  </button>
+                  <button
+                    onClick={() => void restoreSnapshot()}
+                    disabled={snapshotBusy || !hasSnapshot}
+                    className="grid size-8 place-items-center rounded-lg border border-white/10 bg-zinc-900 text-zinc-400 transition hover:bg-zinc-800 active:scale-95 disabled:opacity-40"
+                    title="بازیابی وضعیت ذخیره‌شده"
+                    aria-label="بازیابی وضعیت ماشین مجازی"
+                  >
+                    <ArchiveRestore size={14} aria-hidden />
+                  </button>
+                </>
+              )}
               <button
                 onClick={() => setShowScreen((v) => !v)}
                 className={`grid size-8 place-items-center rounded-lg border transition active:scale-95 ${

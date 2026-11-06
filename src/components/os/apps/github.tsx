@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useOS } from '@/lib/os/store'
-import { ghApi, loadGhToken, saveGhToken, clearGhToken } from '@/lib/os/integrations'
+import { ghApi, loadGhToken, saveGhToken, clearGhToken, isGhTokenSessionOnly } from '@/lib/os/integrations'
 
 /* ------------------------------- انواع ------------------------------- */
 
@@ -162,6 +162,7 @@ export default function GitHubApp() {
   const [tokenInput, setTokenInput] = useState<string>(() => loadGhToken())
   const [showToken, setShowToken] = useState(false)
   const [barOpen, setBarOpen] = useState<boolean>(() => !loadGhToken())
+  const [sessionOnly, setSessionOnly] = useState<boolean>(() => isGhTokenSessionOnly())
   const tokenRef = useRef<HTMLInputElement | null>(null)
   const connectedOnce = useRef(false)
   const [profile, setProfile] = useState<GhUser | null>(null)
@@ -216,9 +217,13 @@ export default function GitHubApp() {
   const saveToken = () => {
     const t = tokenInput.trim()
     if (!t) return
-    saveGhToken(t)
+    saveGhToken(t, sessionOnly)
     setToken(t)
-    pushToast({ icon: '🔑', title: 'گیت‌هاب', body: 'توکن ذخیره شد.' })
+    pushToast({
+      icon: '🔑',
+      title: 'گیت‌هاب',
+      body: sessionOnly ? 'توکن فقط برای همین نشست ذخیره شد (با بستن تب پاک می‌شود).' : 'توکن ذخیره شد — پیشنهاد: حداقل‌دسترسی (فقط repo یا public_repo) بده.',
+    })
   }
   const clearToken = () => {
     clearGhToken()
@@ -233,7 +238,7 @@ export default function GitHubApp() {
     setProfileErr('')
     try {
       const u = await ghApi<GhUser>('/user', t)
-      saveGhToken(t)
+      saveGhToken(t, sessionOnly)
       setToken(t)
       setProfile(u)
       setBarOpen(false)
@@ -449,7 +454,17 @@ export default function GitHubApp() {
           <div className="border-t border-white/10 p-3">
             <p className="mb-2 text-[11px] leading-5 text-zinc-500">
               بدون توکن هم ریپوهای عمومی را می‌بینی (۶۰ درخواست/ساعت)؛ با توکن (fine-grained یا classic با scope repo) ریپوهای خودت و ساخت ایسو باز می‌شود.
+              امنیت: حداقل‌دسترسی بده و بعد از کار <b>revoke</b> کن — ذخیره در مرورگر (localStorage/sessionStorage) در برابر XSS هم‌مبدا محافظت کامل نیست.
             </p>
+            <label className="mb-2 flex w-fit cursor-pointer items-center gap-1.5 text-[11px] text-zinc-300">
+              <input
+                type="checkbox"
+                checked={sessionOnly}
+                onChange={(e) => setSessionOnly(e.target.checked)}
+                className="size-3.5 accent-[#f7931e]"
+              />
+              فقط این نشست (با بستن تب پاک شود — امن‌تر)
+            </label>
             <div className="flex flex-wrap items-center gap-1.5">
               <div className="relative min-w-40 flex-1">
                 <Input ref={tokenRef} type={showToken ? 'text' : 'password'} value={tokenInput} onChange={(e) => setTokenInput(e.target.value)}

@@ -7,6 +7,16 @@
 
 ---
 
+> ## 🟠 وضعیت انتشار (Status box — صادقانه)
+>
+> - **ISO/دبین پکیج‌ها طراحی شده‌اند ولی هنوز boot-test رسمی نشده‌اند** — قبل از استفاده در محیط جدی، روی توزیع خودتان تست کنید (`docs/ROADMAP.md` فاز 10).
+> - سرویس systemd با hardening کامل و کاربر اختصاصی `sanjabos` ارائه می‌شود؛ پیش‌فرض گوش‌دادن فقط روی **loopback** است (expose کردن روی LAN تصمیم صریح شماست).
+> - Docker compose پورت را فقط روی `127.0.0.1:4310` مپ می‌کند.
+> - نصب‌کننده هرگز `git reset --hard` برای کاربر اجرا نمی‌کند و قبل از آپدیت از داده‌ها بکاپ می‌گیرد؛ حذف کامل داده فقط با `uninstall.sh --purge`.
+> - راهنمای کامل: [`docs/PLATFORM_SUPPORT.md`](../docs/PLATFORM_SUPPORT.md) · [`docs/RELEASES.md`](../docs/RELEASES.md)
+
+---
+
 ## ⚡ نصب سریع (یک فرمان)
 
 ```bash
@@ -30,10 +40,38 @@ curl -fsSL https://raw.githubusercontent.com/kiarash65/sanjab-os/main/linux-edit
 |-----|-------|-------|
 | اسکریپت جهانی | همه | `./install.sh` |
 | نصب سراسری | همه | `sudo ./install.sh --system` → `/opt/sanjabos` |
-| بستهٔ deb | Debian/Ubuntu/Mint | `./packaging/build-deb.sh && sudo apt install ./sanjabos_1.0.0_all.deb` |
+| بستهٔ deb | Debian/Ubuntu/Mint | `./packaging/build-deb.sh && sudo apt install ./sanjabos_2.0.0_all.deb` |
 | PKGBUILD | Arch/Manjaro | `cd arch && makepkg -si` |
 | Docker | همه | `docker compose -f docker-compose.yml up -d` |
 | کیوسک | همه | `./install.sh --kiosk` |
+
+---
+
+## 🪟 WSL2 (راهنمای سریع)
+
+```bash
+# در /etc/wsl.conf داخل توزیع WSL2 (Windows 11+):
+#   [boot]
+#   systemd=true
+# سپس در PowerShell:  wsl --shutdown  و دوباره باز کردن توزیع
+sudo apt update && sudo apt install -y curl git ca-certificates
+curl -fsSL https://raw.githubusercontent.com/kiarash65/sanjab-os/main/linux-edition/install.sh | bash
+# در ویندوز: http://localhost:4310
+```
+
+> وضعیت صادقانه: این مسیر مستند است ولی هنوز روی سخت‌افزار واقعی تست نشده (فاز 7).
+
+## 📱 Termux / Android (راهنمای سریع)
+
+```bash
+pkg install git curl nodejs-lts
+git clone https://github.com/kiarash65/sanjab-os && cd sanjab-os
+npm install --no-audit --no-fund
+npm run build && npx next start -p 4310
+# یا مسیر proot-distro با Debian داخل Termux
+```
+
+> Bun در Termux رسمی نیست؛ با Node 18+ یا داخل proot-distro اجرا کنید.
 
 ---
 

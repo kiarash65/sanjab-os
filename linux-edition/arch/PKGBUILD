@@ -2,7 +2,7 @@
 # 🐧 SanjabOS — سیستم‌عامل وب فارسی برای لینوکس واقعی
 # نصب:  makepkg -si   (از پوشهٔ linux-edition/arch)
 pkgname=sanjabos
-pkgver=1.0.0
+pkgver=2.0.0
 pkgrel=1
 pkgdesc="سیستم‌عامل وب بامزه و رنگی فارسی (RTL) — نسخهٔ لینوکس واقعی | Cute Persian RTL WebOS for real Linux"
 arch=('any')
@@ -13,7 +13,7 @@ makedepends=('git')
 optdepends=('chromium: برای حالت کیوسک'
             'docker: برای اجرای کانتینری')
 source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
-sha256sums=('SKIP')
+sha256sums=('SKIP')  # TODO: پس از انتشار tag رسمی v2.0.0 مقدار واقعی sha256 قرار داده شود
 install="sanjabos.install"
 backup=('etc/sanjabos/sanjabos.env')
 

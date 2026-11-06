@@ -1,0 +1,81 @@
+name: Release
+
+# انتشار روی push تگ v*: بیلد وب، بسته‌بندی، checksum، GitHub Release.
+# ساده و صادقانه: signing و SBOM هنوز نداریم (docs/ROADMAP.md فاز 9).
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and publish release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Read version
+        id: version
+        run: echo "version=$(cat VERSION | tr -d '[:space:]')" >> "$GITHUB_OUTPUT"
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build web (standalone)
+        run: bun run build
+
+      - name: Package web standalone
+        run: |
+          mkdir -p dist
+          tar -czf "dist/sanjabos-web-${{ steps.version.outputs.version }}-standalone.tar.gz" -C .next/standalone .
+
+      - name: Package CLI (if present)
+        # CLI محصول جداگانه است و در این ریپو ممکن است نباشد — شرطی بسته‌بندی می‌شود
+        run: |
+          if [ -d cli ]; then
+            tar -czf "dist/sanjab-cli-${{ steps.version.outputs.version }}.tar.gz" cli
+          else
+            echo "cli/ not present in this repository — skipping CLI artifact (honest skip)"
+          fi
+
+      - name: Collect metadata
+        run: cp VERSION dist/VERSION
+
+      - name: Generate SHA256SUMS
+        working-directory: dist
+        run: sha256sum * > SHA256SUMS.txt
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: SanjabOS ${{ steps.version.outputs.version }}
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.version, '-') }}
+          generate_release_notes: true
+          body: |
+            ## سان‌جاب‌او‌اس ${{ steps.version.outputs.version }}
+
+            ### Artifacts
+            - `sanjabos-web-${{ steps.version.outputs.version }}-standalone.tar.gz` — بیلد Next.js standalone (اجرا: `bun server.js`)
+            - `sanjab-cli-${{ steps.version.outputs.version }}.tar.gz` — فقط اگر CLI در این tag موجود باشد
+            - `SHA256SUMS.txt` — checksum همهٔ فایل‌ها: `sha256sum -c SHA256SUMS.txt --ignore-missing`
+
+            ### Known limitations (صادقانه)
+            - ISO بوت‌تست رسمی ندارد (`docs/ROADMAP.md` فاز 10)
+            - امتیازهای جهانی ضد-spoof نیستند (`docs/AUDIT.md` AUDIT-005)
+            - وزن‌های face-api روی ref `master` پین‌اند (`docs/AUDIT.md` AUDIT-009)
+            - سیاست آپدیت: هرگز `git reset --hard` نزنید — `docs/RELEASES.md`
+
+            ### Docs
+            - `docs/SECURITY.md` · `docs/AUDIT.md` · `docs/RELEASES.md` · `THIRD_PARTY_LICENSES.md`
+          files: |
+            dist/*

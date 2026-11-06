@@ -24,12 +24,17 @@ import {
 import { useOS } from '@/lib/os/store'
 import { HOME, getNode, useFs } from '@/lib/os/fs'
 import { LANG_INFO, runScript, type ScriptLang } from '@/lib/os/interpreter'
+import { PyodideRunner, type PyOutKind } from '@/lib/os/pyodide'
+import { useGame } from '@/lib/gamification/engine'
 
 /* ------------------------------------------------------------------ */
 /* کداستودیو سان‌جاب — پایتونِ کوچک + سنجابی + جاوااسکریپت + HTML       */
 /* ------------------------------------------------------------------ */
 
 type Lang = ScriptLang | 'js' | 'html'
+
+/** حالت اجرای پایتون — مینی‌مترپرتر آفلاین یا CPython واقعی (Pyodide) */
+type PyMode = 'mini' | 'real'
 
 interface LangMeta {
   id: Lang
@@ -44,7 +49,7 @@ const LANGS: LangMeta[] = [
   {
     id: 'python',
     name: 'پایتون',
-    desc: 'پایتونِ کوچک سان‌جاب — برای آموزش',
+    desc: 'پایتون واقعی CPython (Pyodide) یا پایتونِ کوچک آموزشی — با انتخابگر حالت اجرا',
     ext: 'py',
     icon: Code2,
     color: '#f7931e',
@@ -221,10 +226,13 @@ export default function CodeStudioApp() {
   const [lastMs, setLastMs] = useState<number | null>(null)
   const [fileName, setFileName] = useState('برنامه_من')
   const [showCheat, setShowCheat] = useState(false)
+  const [pyMode, setPyMode] = useState<PyMode>('mini')
+  const [pyStatus, setPyStatus] = useState<string>('')
 
   const editorRef = useRef<HTMLTextAreaElement>(null)
   const gutterRef = useRef<HTMLDivElement>(null)
   const workerRef = useRef<Worker | null>(null)
+  const pyRef = useRef<PyodideRunner | null>(null)
 
   const meta = useMemo(() => LANGS.find((l) => l.id === lang)!, [lang])
   const lineCount = useMemo(() => code.split('\n').length, [code])
@@ -233,10 +241,11 @@ export default function CodeStudioApp() {
     setOutput((o) => [...o.slice(-300), { kind, text }])
   }, [])
 
-  // آزادسازی وورکر
+  // آزادسازی وورکرها
   useEffect(() => {
     return () => {
       workerRef.current?.terminate()
+      pyRef.current?.terminate()
     }
   }, [])
 
@@ -250,9 +259,43 @@ export default function CodeStudioApp() {
       } else {
         setLastMs(res.ms)
         push('sys', `✓ اجرا شد در ${res.ms.toFixed(1)} میلی‌ثانیه — آفرین!`)
+        useGame.getState().registerCodeRun('mini-run')
       }
     },
     [push]
+  )
+
+  const pushPy = useCallback(
+    (kind: PyOutKind, text: string) => {
+      if (kind === 'stdout') push('out', text)
+      else if (kind === 'stderr') push('err', text)
+      else if (kind === 'fatal') push('err', `✗ ${text}`)
+      else push('sys', text)
+      if (kind === 'status' || kind === 'fatal') setPyStatus(text)
+    },
+    [push]
+  )
+
+  const runRealPython = useCallback(
+    async (src: string) => {
+      if (!pyRef.current) pyRef.current = new PyodideRunner()
+      const runner = pyRef.current
+      runner.onOut = pushPy
+      try {
+        push('sys', 'در حال آماده‌سازی CPython… (بار اول اینترنت و کمی صبر لازم دارد)')
+        await runner.ensure()
+        const r = await runner.run(src, 15000)
+        setLastMs(r.ms > 0 ? r.ms : null)
+        if (r.ok) {
+          push('sys', `✓ CPython اجرا شد در ${r.ms.toFixed(0)} میلی‌ثانیه — پایتون واقعی!`)
+          useGame.getState().registerCodeRun('real-run')
+        }
+      } catch (e) {
+        push('err', `✗ ${e instanceof Error ? e.message : 'بارگذاری پایتون واقعی ناموفق بود — اینترنت را چک کن'}`)
+        push('sys', 'نکته: می‌توانی با حالت «مینی» بدون اینترنت ادامه بدهی')
+      }
+    },
+    [push, pushPy]
   )
 
   const runJs = useCallback(
@@ -316,12 +359,17 @@ export default function CodeStudioApp() {
     setRunning(true)
     setOutput([])
     setLastMs(null)
-    if (lang === 'python') runPythonOrSquirrel(code, 'python')
-    else if (lang === 'squirrel') runPythonOrSquirrel(code, 'squirrel')
+    if (lang === 'python') {
+      if (pyMode === 'real') {
+        runRealPython(code).finally(() => setRunning(false))
+        return
+      }
+      runPythonOrSquirrel(code, 'python')
+    } else if (lang === 'squirrel') runPythonOrSquirrel(code, 'squirrel')
     else if (lang === 'js') runJs(code)
     else push('sys', 'HTML اجرا نمی‌خواد — پیش‌نمایش کنتراهه!')
     if (lang === 'python' || lang === 'squirrel') setRunning(false)
-  }, [code, lang, runJs, runPythonOrSquirrel, push])
+  }, [code, lang, pyMode, runJs, runPythonOrSquirrel, runRealPython, push])
 
   // اعداد خط
   const gutter = useMemo(
@@ -423,6 +471,40 @@ export default function CodeStudioApp() {
           {meta.desc}
         </span>
       </div>
+
+      {/* انتخابگر موتور پایتون — فقط برای زبان پایتون */}
+      {lang === 'python' && (
+        <div className="flex flex-wrap items-center gap-1.5 border-b border-white/10 bg-zinc-900/40 px-2 py-1.5">
+          <span className="text-[10px] font-bold text-zinc-500">موتور اجرا:</span>
+          <button
+            onClick={() => setPyMode('mini')}
+            className={`rounded-md border px-2 py-0.5 text-[10px] font-bold transition active:scale-95 ${
+              pyMode === 'mini'
+                ? 'border-[#f7931e]/60 bg-[#f7931e]/15 text-[#f7931e]'
+                : 'border-white/10 bg-zinc-800/70 text-zinc-400 hover:bg-zinc-700'
+            }`}
+            title="مترپرتر آموزشی کوچک — آفلاین و فوری؛ زیرمجموعه‌ای از پایتون"
+          >
+            مینی (آفلاین)
+          </button>
+          <button
+            onClick={() => setPyMode('real')}
+            className={`rounded-md border px-2 py-0.5 text-[10px] font-bold transition active:scale-95 ${
+              pyMode === 'real'
+                ? 'border-emerald-500/60 bg-emerald-500/15 text-emerald-400'
+                : 'border-white/10 bg-zinc-800/70 text-zinc-400 hover:bg-zinc-700'
+            }`}
+            title="CPython کامل از طریق Pyodide — نیاز به اینترنت و ~۱۰MB دانلود دارد"
+          >
+            پایتون واقعی CPython (اینترنت)
+          </button>
+          <span className="text-[9px] text-zinc-600">
+            {pyMode === 'mini'
+              ? 'زیرمجموعه آموزشی — همه دستورهای پایتون را ندارد'
+              : 'CPython کامل — ۱۵ ثانیه محدودیت اجرا و سقف خروجی'}
+          </span>
+        </div>
+      )}
 
       {/* نوار مثال‌ها و فایل */}
       <div className="flex flex-wrap items-center gap-1.5 border-b border-white/10 bg-zinc-900/40 px-2 py-1.5">
@@ -574,6 +656,11 @@ export default function CodeStudioApp() {
             آخرین اجرا: {lastMs.toFixed(1)}ms
           </span>
         )}
+        {pyStatus && lang === 'python' && pyMode === 'real' && (
+          <span className="max-w-[220px] truncate text-[10px] text-violet-300" title={pyStatus}>
+            {pyStatus}
+          </span>
+        )}
         <span className="mr-auto hidden items-center gap-1 text-[10px] text-zinc-600 sm:flex">
           <RotateCcw size={10} /> Tab = تورفتگی · بعد از «:» خودش می‌پیچد
         </span>
@@ -607,8 +694,10 @@ export default function CodeStudioApp() {
       {/* امضای پایین */}
       <div className="flex items-center justify-between border-t border-white/10 bg-zinc-900/60 px-3 py-1">
         <span className="text-[9px] text-zinc-600">
-          {lang === 'python' || lang === 'squirrel'
-            ? 'پایتونِ کوچک سان‌جاب — بدون نیاز به اینترنت، ۱۰۰٪ مرورگری'
+          {lang === 'python'
+            ? pyMode === 'real'
+              ? 'CPython واقعی از طریق Pyodide v0.26.4 — اجرای کامل پایتون در Worker جدا'
+              : 'پایتونِ کوچک سان‌جاب — مترپرتر آموزشی آفلاین؛ پایتون کامل را با حالت «CPython» امتحان کن'
             : 'کداستودیو سان‌جاب'}
         </span>
         <span className="flex items-center gap-1 text-[9px] font-bold text-amber-400/80">

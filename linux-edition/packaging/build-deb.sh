@@ -7,7 +7,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/../../.."   # ریشهٔ ریپو
 
-VERSION="1.0.0"
+VERSION="2.0.0"
 STAGE="$(mktemp -d)/sanjabos-$VERSION"
 PKG_DIR="linux-edition/packaging/debian"
 
