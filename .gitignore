@@ -44,3 +44,4 @@ __pycache__/
 *.db
 db/*.db
 .zscripts/dev.pid
+tsconfig.tsbuildinfo
