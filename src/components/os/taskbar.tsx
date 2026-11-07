@@ -48,8 +48,12 @@ export default function Taskbar() {
   const accent = useOS((s) => s.settings.accent)
 
   return (
-    <footer className="os-taskbar fixed inset-x-0 bottom-0 z-[8000] flex h-12 items-center gap-1 border-t border-white/10 bg-black/70 px-2 backdrop-blur-md">
+    <footer
+      data-tour="taskbar"
+      className="os-taskbar fixed inset-x-0 bottom-0 z-[8000] flex h-12 items-center gap-1 border-t border-white/10 bg-black/70 px-2 backdrop-blur-md"
+    >
       <button
+        data-tour="start"
         onClick={() => toggleStart()}
         className="flex h-9 shrink-0 items-center gap-1.5 rounded-lg px-2.5 text-sm font-black transition hover:bg-white/10 active:scale-95"
         style={{ color: accent }}

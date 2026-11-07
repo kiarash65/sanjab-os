@@ -1250,6 +1250,16 @@ function DeveloperSection() {
 /* ---------------- درباره ---------------- */
 
 function AboutSection() {
+  const setSetting = useOS((s) => s.setSetting)
+  const pushToast = useOS((s) => s.pushToast)
+  const replayTour = () => {
+    setSetting('tourDone', false)
+    pushToast({
+      icon: Info,
+      title: 'تور خوش‌آمدگویی',
+      body: 'تور همین الان از اول شروع می‌شه — برو و یه گشت بزن!',
+    })
+  }
   return (
     <>
       <SectionCard title="سان‌جاب‌اواس" icon={Info} tone="#f7931e">
@@ -1279,6 +1289,18 @@ function AboutSection() {
             با اسپانسری سان‌جاب
           </a>
         </div>
+      </SectionCard>
+      <SectionCard
+        title="تور خوش‌آمدگویی"
+        icon={Sparkles}
+        tone="#f7931e"
+        desc="بار اول که سیستم بالا می‌آید، یک تور کوتاه همه‌چیز را نشان می‌دهد — میزکار، منوی شروع، آکادمی و هوش‌یار."
+      >
+        <Row title="دیدن دوبارهٔ تور" desc="راهنمای گشتن در سان‌جاب‌اواس، از اول">
+          <Button size="sm" className="h-8 rounded-lg bg-[#f7931e] px-3 text-[11px] font-black text-zinc-950 hover:bg-[#f7931e]/85" onClick={replayTour}>
+            شروع تور
+          </Button>
+        </Row>
       </SectionCard>
       <SectionCard title="اعتبار فونت‌ها" icon={Type} tone="#a855f7" desc="همهٔ فونت‌ها محلی باندل شده‌اند و با مجوز آزاد SIL OFL 1.1 منتشر شده‌اند — جزئیات کامل در public/fonts و docs/TYPOGRAPHY-SETTINGS-UPGRADE.md">
         {FONT_OPTIONS.filter((f) => f.key !== 'system').map((f) => (

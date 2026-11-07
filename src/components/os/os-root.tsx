@@ -25,6 +25,7 @@ import LockScreen from './lock-screen'
 import StartMenu from './start-menu'
 import Taskbar from './taskbar'
 import Toasts from './toasts'
+import WelcomeTour from './welcome-tour'
 import Sanjabak from './sanjabak/Sanjabak'
 import WindowFrame from './window'
 import { SanjabakAvatar } from './sanjabak/Sanjabak'
@@ -281,7 +282,7 @@ export default function OSRoot() {
         href="https://sunjob.ir"
         target="_blank"
         rel="noreferrer"
-        className="pengo-fadein pointer-events-auto fixed bottom-14 left-3 z-[100] hidden items-center gap-2 rounded-full border border-white/10 bg-black/35 px-2.5 py-1.5 backdrop-blur-md transition hover:border-[#f7931e]/50 sm:flex"
+        className="pengo-fadein pointer-events-auto fixed bottom-14 left-3 z-[5] hidden items-center gap-2 rounded-full border border-white/10 bg-black/35 px-2.5 py-1.5 backdrop-blur-md transition hover:border-[#f7931e]/50 sm:flex"
         title="اسپانسیر سیستم: سان‌جاب — sunjob.ir"
       >
         <img
@@ -307,6 +308,7 @@ export default function OSRoot() {
       <StartMenu />
       <Toasts />
       {locked && <LockScreen />}
+      {!settings.tourDone && !locked && <WelcomeTour />}
       {menu && <ContextMenu at={menu} onClose={() => setMenu(null)} />}
     </div>
   )

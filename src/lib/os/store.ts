@@ -57,6 +57,8 @@ export interface OSSettings {
   coachEnabled: boolean
   /* ---- توسعه‌دهنده ---- */
   devMode: boolean
+  /** تور خوش‌آمدگویی دیده شده؟ (فقط بار اول نمایش داده می‌شود) */
+  tourDone: boolean
 }
 
 export const DEFAULT_SETTINGS: OSSettings = {
@@ -83,6 +85,7 @@ export const DEFAULT_SETTINGS: OSSettings = {
   dailyGoalMin: 20,
   coachEnabled: true,
   devMode: false,
+  tourDone: false,
 }
 
 export interface OSToast {
