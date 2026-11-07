@@ -133,6 +133,7 @@ const PowerShellAcademyApp = d(() => import('@/components/os/apps/powershell-aca
 const NeveshtYarApp = d(() => import('@/components/os/apps/neveshtyar'))
 const RuntimeManagerApp = d(() => import('@/components/os/apps/runtime-manager'))
 const DownloadsApp = d(() => import('@/components/os/apps/downloads'))
+const GuideApp = d(() => import('@/components/os/apps/guide'))
 
 const SnakeGame = d(() => import('@/components/os/games/snake'))
 const Game2048 = d(() => import('@/components/os/games/g2048'))
@@ -628,7 +629,7 @@ export const APPS: AppMeta[] = [
   },
   {
     id: 'downloads',
-    name: 'دانلود و به‌روزرسانی',
+    name: 'مرکز انتشار',
     icon: Download,
     category: 'app',
     component: DownloadsApp,
@@ -637,6 +638,18 @@ export const APPS: AppMeta[] = [
     desktop: true,
     tint: G.teal,
     keywords: ['download', 'release', 'update', 'installer', 'دانلود', 'نسخه', 'به‌روزرسانی', 'نصب', 'ویندوز'],
+  },
+  {
+    id: 'guide',
+    name: 'راهنمای سنجابک',
+    icon: Compass,
+    category: 'app',
+    component: GuideApp,
+    w: 680,
+    h: 580,
+    desktop: true,
+    tint: G.grape,
+    keywords: ['help', 'guide', 'راهنما', 'کمک', 'چطور', 'این چیه', 'درباره اپ‌ها'],
   },
   {
     id: 'browser',

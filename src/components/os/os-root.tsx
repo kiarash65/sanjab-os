@@ -27,6 +27,7 @@ import Taskbar from './taskbar'
 import Toasts from './toasts'
 import Sanjabak from './sanjabak/Sanjabak'
 import WindowFrame from './window'
+import CommandCenter from './command-center'
 import { SanjabakAvatar } from './sanjabak/Sanjabak'
 
 const NOTIFS: { icon: LucideIcon; title: string; body: string }[] = [
@@ -192,6 +193,7 @@ export default function OSRoot() {
   const setBooted = useOS((s) => s.setBooted)
 
   const [menu, setMenu] = useState<{ x: number; y: number } | null>(null)
+  const [cmdOpen, setCmdOpen] = useState(false)
 
   // ثبت زنجیره روزهای فعال (استریک) هنگام بوت دسکتاپ
   useEffect(() => {
@@ -224,6 +226,13 @@ export default function OSRoot() {
       if (e.key === 'Escape') {
         setMenu(null)
         useOS.getState().toggleStart(false)
+        setCmdOpen(false)
+        return
+      }
+      /* مرکز فرمان — Ctrl+K (مثل همهٔ اپ‌های حرفه‌ای) */
+      if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        setCmdOpen((o) => !o)
         return
       }
       /* میان‌برهای Ctrl+Alt مثل لینوکس واقعی */
@@ -262,6 +271,7 @@ export default function OSRoot() {
   return (
     <div
       className="pengo-noselect fixed inset-0 overflow-hidden"
+      data-help-id="os-desktop"
       style={{
         backgroundImage: wallpaperCss(settings.wallpaper),
         backgroundSize: 'cover',
@@ -281,6 +291,7 @@ export default function OSRoot() {
         href="https://sunjob.ir"
         target="_blank"
         rel="noreferrer"
+        data-help-id="os-sponsor"
         className="pengo-fadein pointer-events-auto fixed bottom-14 left-3 z-[100] hidden items-center gap-2 rounded-full border border-white/10 bg-black/35 px-2.5 py-1.5 backdrop-blur-md transition hover:border-[#f7931e]/50 sm:flex"
         title="اسپانسیر سیستم: سان‌جاب — sunjob.ir"
       >
@@ -306,6 +317,7 @@ export default function OSRoot() {
       <Taskbar />
       <StartMenu />
       <Toasts />
+      <CommandCenter open={cmdOpen} onClose={() => setCmdOpen(false)} />
       {locked && <LockScreen />}
       {menu && <ContextMenu at={menu} onClose={() => setMenu(null)} />}
     </div>

@@ -137,16 +137,19 @@ export default function WindowFrame({
         <div className="flex items-center gap-1.5" data-nodrag>
           <button
             aria-label="بستن پنجره"
+            data-help-id="os-win-close"
             onClick={() => closeWindow(win.id)}
             className="h-3.5 w-3.5 rounded-full bg-red-500 transition hover:brightness-125"
           />
           <button
             aria-label="بزرگ کردن یا برگرداندن پنجره"
+            data-help-id="os-win-maximize"
             onClick={() => toggleMaximize(win.id)}
             className="h-3.5 w-3.5 rounded-full bg-amber-400 transition hover:brightness-125"
           />
           <button
             aria-label="کوچک کردن پنجره"
+            data-help-id="os-win-minimize"
             onClick={() => minimizeWindow(win.id)}
             className="h-3.5 w-3.5 rounded-full bg-emerald-500 transition hover:brightness-125"
           />
