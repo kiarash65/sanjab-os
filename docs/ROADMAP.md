@@ -1,12 +1,12 @@
 # نقشهٔ راه — Roadmap (فازهای 1 تا 10)
 
-> وضعیت هر فاز با خواندن مستقیم کد در snapshot 2.0.0 بازبینی شده است. ستون «وضعیت» صادقانه است: چیزی که در کد نیست، «done» نمی‌شود.
+> وضعیت هر فاز با خواندن مستقیم کد بازبینی شده است (آخرین بازبینی: ریلیز ۴.۰ «سنجابک»). ستون «وضعیت» صادقانه است: چیزی که در کد نیست، «done» نمی‌شود.
 
 | فاز | عنوان | وضعیت کلی | انجام‌شده | باقی‌مانده |
 |-----|-------|-----------|-----------|------------|
 | 1 | امنیت (Security) | In Progress | ممیزی کامل (`docs/AUDIT.md`)، مدل تهدید (`docs/SECURITY.md`)، hardening سرویس linux-edition، پورت loopback در compose، CI با gate تایپ‌چک، مستندات اعتبارنامه‌ها | untrack کردن `.env` و `db/custom.db` از گیت، حذف `ignoreBuildErrors` در کد، rate limit ها، **پاک‌سازی تاریخچهٔ گیت (AUDIT-010)**، pentest خارجی |
 | 2 | هستهٔ OS (Core) | In Progress | رجیستری 50 مدخل (39 اپ + 10 بازی + about)، پنجره‌ها/کوکاسزون، fs مجازی `pengo-fs-v2`، تنظیمات `sunjob-os-v1`، سفربُر با بوکمارک/تاریخچه، PDF ساز | lazy-loading رجیستری با `next/dynamic` (فعلاً import استاتیک)، بکاپ/بازیابی با IndexedDB، مهاجرت fs به IndexedDB |
-| 3 | Python / Rust | In Progress | مفسر mini-python آفلاین + زبان سنجابی + JS Worker + HTML preview؛ آکادمی Rust با شبیه‌ساز زیرمجموعهٔ Rust (lexer/parser/evaluator، E0382 به سبک rustc) | Pyodide 0.26.x (CPython واقعی در Worker) — هنوز ادغام نشده؛ `rustc` واقعی نیتیو از طریق toolchain محلی (CLI وجود `rustc` را تشخیص می‌دهد) |
+| 3 | Python / Rust | In Progress | مفسر mini-python آفلاین + زبان سنجابی + JS Worker + HTML preview؛ آکادمی Rust با شبیه‌ساز زیرمجموعهٔ Rust (lexer/parser/evaluator، E0382 به سبک rustc) | Pyodide 0.26.x (CPython واقعی در Worker) — ادغام شده (PyodideRunner)؛ `rustc` واقعی نیتیو از طریق toolchain محلی (CLI وجود `rustc` را تشخیص می‌دهد) |
 | 4 | هوش مصنوعی | In Progress | هوش‌یار با 6 preset (شامل GLM)، آکادمی AI با ۷ آزمایش تعاملی (پرسپترون، نزول گرادیان، فعال‌سازها، شبکهٔ عصبی، بایگرام، بیش‌برازش، اخلاق — سبک micrograd)، مولد ایده | Transformers.js / WebLLM با opt-in صریح (بدون دانلود خودکار مدل) |
 | 5 | بازی‌وارسازی (Gamification) | In Progress | رکورد محلی هر بازی (`pengo-best-*`)، اسم بازیکن، پنل «رکوردهای جهانی» روی `/api/scores` | موتور XP/سطح/مدال و «مرکز پیشرفت»، جدول‌های server-side جامع با رجیستری بازی‌ها + rate limit |
 | 6 | Face AI | In Progress | تشخیص چهره/سن/حالت محلی با face-api.js 0.22.2، قدسنج/وزن‌یاب با برچسب «تخمین»، ماشین زمان چهره با برچسب «synthetic»، حریم خصوصی ۱۰۰٪ محلی | مدل‌های کلاس SAM/GFPGAN نیازمند سرویس native جداگانه — **Blocked** (ملاحظات GPU، مجوز و consent) |

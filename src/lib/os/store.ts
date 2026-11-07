@@ -53,6 +53,8 @@ export interface OSSettings {
   showGuides: boolean
   /** هدف روزانه مطالعه (دقیقه) */
   dailyGoalMin: number
+  /** مربی سنجاب (AI Tutor) — خاموش‌کردن کامل */
+  coachEnabled: boolean
   /* ---- توسعه‌دهنده ---- */
   devMode: boolean
 }
@@ -79,6 +81,7 @@ export const DEFAULT_SETTINGS: OSSettings = {
   animations: true,
   showGuides: true,
   dailyGoalMin: 20,
+  coachEnabled: true,
   devMode: false,
 }
 

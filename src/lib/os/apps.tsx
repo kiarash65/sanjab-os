@@ -59,6 +59,9 @@ import {
   Feather,
   Boxes,
   Download,
+  Compass,
+  Squirrel,
+  Zap,
 } from 'lucide-react'
 import { useOS } from '@/lib/os/store'
 
@@ -116,12 +119,15 @@ const FaceDetectApp = d(() => import('@/components/os/apps/face-detect'))
 const LinuxEditionApp = d(() => import('@/components/os/apps/linux-edition'))
 const RealLinuxApp = d(() => import('@/components/os/apps/real-linux'))
 const BodyMetricsApp = d(() => import('@/components/os/apps/body-metrics'))
-const AgeMachineApp = d(() => import('@/components/os/apps/age-machine'))
 const BrowserApp = d(() => import('@/components/os/apps/browser'))
 const PdfEditorApp = d(() => import('@/components/os/apps/pdf-editor'))
 const RustAcademyApp = d(() => import('@/components/os/apps/rust-academy'))
 const AIAcademyApp = d(() => import('@/components/os/apps/ai-academy'))
-const ProgressCenterApp = d(() => import('@/components/os/apps/progress-center'))
+const LearningHubApp = d(() => import('@/components/os/apps/learning-hub'))
+const AlgorithmAcademyApp = d(() => import('@/components/os/apps/algorithm-academy'))
+const CoachApp = d(() => import('@/components/os/apps/coach'))
+const ProjectLabApp = d(() => import('@/components/os/apps/project-lab'))
+const SanjabakStudioApp = d(() => import('@/components/os/apps/sanjabak-studio'))
 const PythonAcademyApp = d(() => import('@/components/os/apps/python-academy'))
 const PowerShellAcademyApp = d(() => import('@/components/os/apps/powershell-academy'))
 const NeveshtYarApp = d(() => import('@/components/os/apps/neveshtyar'))
@@ -670,27 +676,63 @@ export const APPS: AppMeta[] = [
   },
   {
     id: 'progress',
-    name: 'مرکز پیشرفت',
-    icon: Trophy,
+    name: 'مرکز یادگیری',
+    icon: Compass,
     category: 'app',
-    component: ProgressCenterApp,
-    w: 620,
-    h: 580,
+    component: LearningHubApp,
+    w: 900,
+    h: 640,
     desktop: true,
     tint: G.sun,
-    keywords: ['xp', 'progress', 'achievement', 'امتیاز', 'دستاورد', 'پیشرفت', 'گیمیفیکیشن', 'مرکز پیشرفت', 'مأموریت'],
+    keywords: ['learning', 'progress', 'xp', 'review', 'mastery', 'skill', 'یادگیری', 'پیشرفت', 'مرور', 'مهارت', 'تسلط', 'برنامه روزانه', 'داشبورد', 'مرکز یادگیری'],
   },
   {
-    id: 'age-machine',
-    name: 'ماشین زمان چهره',
-    icon: Hourglass,
+    id: 'algorithm-academy',
+    name: 'آکادمی الگوریتم',
+    icon: Zap,
     category: 'app',
-    component: AgeMachineApp,
-    w: 640,
-    h: 660,
+    component: AlgorithmAcademyApp,
+    w: 900,
+    h: 640,
     desktop: true,
-    tint: G.grape,
-    keywords: ['age', 'face', 'old', 'young', 'camera', 'سن', 'پیر', 'جوان', 'چهره', 'دوربین'],
+    tint: '#ec4899',
+    keywords: ['algorithm', 'sorting', 'big o', 'visualizer', 'الگوریتم', 'مرتب‌سازی', 'پیچیدگی', 'شبیه‌ساز', 'دیتا استراکچر'],
+  },
+  {
+    id: 'project-lab',
+    name: 'کارگاه پروژه',
+    icon: Hammer,
+    category: 'app',
+    component: ProjectLabApp,
+    w: 900,
+    h: 640,
+    desktop: true,
+    tint: G.forest,
+    keywords: ['project', 'build', 'portfolio', 'پروژه', 'ساخت', 'پورتفولیو', 'کارگاه'],
+  },
+  {
+    id: 'coach',
+    name: 'مربی سنجاب',
+    icon: GraduationCap,
+    category: 'app',
+    component: CoachApp,
+    w: 560,
+    h: 620,
+    desktop: true,
+    tint: G.teal,
+    keywords: ['ai', 'tutor', 'coach', 'socratic', 'مربی', 'توتور', 'سقراطی', 'راهنما', 'یادگیری با AI'],
+  },
+  {
+    id: 'sanjabak-studio',
+    name: 'استودیو سنجابک',
+    icon: Squirrel,
+    category: 'app',
+    component: SanjabakStudioApp,
+    w: 720,
+    h: 560,
+    desktop: true,
+    tint: G.sun,
+    keywords: ['mascot', 'sanjabak', 'avatar', 'customize', 'سنجابک', 'ماسکوت', 'شخصی‌سازی', 'ظاهر'],
   },
   // ---------- بازی‌ها ----------
   {

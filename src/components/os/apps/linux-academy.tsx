@@ -32,6 +32,7 @@ import { Progress } from '@/components/ui/progress'
 import { BRAND, SUNJOB_PALETTE } from '@/lib/os/brand'
 import { useOS } from '@/lib/os/store'
 import { useGame } from '@/lib/gamification/engine'
+import { useLearning } from '@/lib/learning/store'
 import { DEEP_CHAPTERS, DEEP_IDS, DeepChapterView } from '@/components/os/academy/deep'
 import LearningReader, { ReadingShell, ReadProgress, rememberView, lastView, type ReaderSection } from '@/components/os/academy/reader'
 import {
@@ -931,6 +932,7 @@ function FinalQuiz({ progress, onScore, onCertName }: { progress: AcademyProgres
       setFinished(true)
       onScore(score)
       useGame.getState().registerQuiz('linux', 'final', score === QUIZ.length, score >= PASS_SCORE ? 30 : 10)
+      useLearning.getState().noteQuizResult('linux', 'quiz', score, QUIZ.length)
     }
   }
 
@@ -1179,6 +1181,13 @@ export default function LinuxAcademyApp() {
     if (view !== 'home' && view !== 'cheats') rememberView('linux-academy', view)
   }, [view])
 
+  /* ثبت باز کردن فصل در لایهٔ یادگیری (منبع یگانهٔ حقیقت پیشرفت) */
+  useEffect(() => {
+    if (view !== 'home' && view !== 'cheats' && view !== 'quiz') {
+      useLearning.getState().noteLessonOpened('linux', view)
+    }
+  }, [view])
+
   const update = useCallback((fn: (p: AcademyProgress) => AcademyProgress) => {
     setProgress((prev) => {
       const next = fn(prev)
@@ -1194,6 +1203,7 @@ export default function LinuxAcademyApp() {
         const done = willBeDone ? [...p.done, id] : p.done.filter((d) => d !== id)
         if (willBeDone) {
           useGame.getState().completeLesson('linux', id, 20)
+          useLearning.getState().noteLessonCompleted('linux', id)
           pushToast({
             title: `فصل «${title}» تمام شد!`,
             body:

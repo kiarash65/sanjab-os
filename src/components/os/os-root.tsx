@@ -25,8 +25,9 @@ import LockScreen from './lock-screen'
 import StartMenu from './start-menu'
 import Taskbar from './taskbar'
 import Toasts from './toasts'
-import TuxPet from './tux-pet'
+import Sanjabak from './sanjabak/Sanjabak'
 import WindowFrame from './window'
+import { SanjabakAvatar } from './sanjabak/Sanjabak'
 
 const NOTIFS: { icon: LucideIcon; title: string; body: string }[] = [
   {
@@ -162,11 +163,9 @@ function PowerOffScreen() {
   return (
     <div className="fixed inset-0 z-[9999] grid place-items-center bg-black p-6 text-center">
       <div className="flex flex-col items-center gap-4">
-        <img
-          src="/tux-avatar.png"
-          alt="پنگوئن خاموش"
-          className="h-20 w-20 rounded-full border border-white/15 object-cover opacity-70"
-        />
+        <div aria-hidden className="opacity-70">
+          <SanjabakAvatar size={80} mood="idle" />
+        </div>
         <h1 className="text-xl font-black text-zinc-200">
           سیستم خاموش شد.
         </h1>
@@ -276,7 +275,7 @@ export default function OSRoot() {
       <style>{`:root{--pengo-accent:${settings.accent}}`}</style>
       <div className="absolute inset-0 bg-black/10" aria-hidden />
       <DesktopIcons />
-      <TuxPet />
+      <Sanjabak />
       {/* واترمارک اسپانسری — لوگوی رسمی سان‌جاب */}
       <a
         href="https://sunjob.ir"

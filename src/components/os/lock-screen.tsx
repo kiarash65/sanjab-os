@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { Unlock } from 'lucide-react'
 import { useOS } from '@/lib/os/store'
+import { SanjabakAvatar } from './sanjabak/Sanjabak'
 
 export default function LockScreen() {
   const unlock = useOS((s) => s.unlockScreen)
@@ -40,12 +41,9 @@ export default function LockScreen() {
       role="button"
       aria-label="برای باز کردن قفل کلیک کن"
     >
-      <img
-        src="/tux-avatar.png"
-        alt=""
-        aria-hidden
-        className="pengo-float h-24 w-24 rounded-full border-2 border-white/20 object-cover shadow-2xl"
-      />
+      <div className="pengo-float" aria-hidden>
+        <SanjabakAvatar size={96} mood="happy" />
+      </div>
       <div
         className="text-6xl font-black tracking-tight text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)] tabular-nums sm:text-8xl"
         dir="ltr"

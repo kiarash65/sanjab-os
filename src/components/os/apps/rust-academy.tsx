@@ -38,6 +38,7 @@ import { Progress } from '@/components/ui/progress'
 import { ReadProgress, rememberView } from '@/components/os/academy/reader'
 import { useOS } from '@/lib/os/store'
 import { useGame } from '@/lib/gamification/engine'
+import { useLearning } from '@/lib/learning/store'
 
 const fa = (n: number) => n.toLocaleString('fa-IR')
 
@@ -1902,6 +1903,7 @@ export default function RustAcademyApp() {
     setTrackId(t.id)
     setLessonId(l.id)
     setView('track')
+    useLearning.getState().noteLessonOpened('rust', l.id)
   }, [])
 
   const openTrack = useCallback(
@@ -1924,6 +1926,7 @@ export default function RustAcademyApp() {
     if (!done.includes(lesson.id)) {
       setDone([...done, lesson.id])
       useGame.getState().completeLesson('rust', lesson.id, 20)
+      useLearning.getState().noteLessonCompleted('rust', lesson.id)
       pushToast({ title: 'درس ثبت شد', body: `«${lesson.title}» به خوانده‌شده‌ها اضافه شد`, icon: CheckCircle2 })
     }
   }
@@ -1937,6 +1940,7 @@ export default function RustAcademyApp() {
     setSubmitted(true)
     if (score > quizBest) setQuizBest(score)
     useGame.getState().registerQuiz('rust', 'quiz', score === QUIZ.length, score >= 6 ? 25 : 10)
+    useLearning.getState().noteQuizResult('rust', 'quiz', score, QUIZ.length)
     pushToast({
       title: score >= 6 ? 'قبول شدی!' : 'نمره ثبت شد',
       body: `نمرهٔ تو ${fa(score)} از ${fa(QUIZ.length)} بود`,

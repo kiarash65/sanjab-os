@@ -23,6 +23,7 @@ import {
   ExternalLink,
   Eye,
   Gauge,
+  GraduationCap,
   HardDrive,
   Info,
   Keyboard,
@@ -684,6 +685,14 @@ function LearningSection() {
         </Row>
         <p className="text-[11px] leading-5 text-zinc-500">
           اندازهٔ قلم و عرض مطالعهٔ درس‌ها در بخش «تایپوگرافی و مطالعه» تنظیم می‌شود و روی همهٔ آکادمی‌ها اعمال است.
+        </p>
+      </SectionCard>
+      <SectionCard title="مربی سنجاب" icon={GraduationCap} tone="#14b8a6" desc="دستیار هوشمند یادگیری با حالت‌های توضیح، سقراطی، سرنخ، دیباگ و آزمون. کلید API هرگز ارسال نمی‌شود و خاموش‌کردن کامل ممکن است.">
+        <Row title="مربی فعال باشد؟" desc="اپ «مربی سنجاب» در منو ظاهر شود — همهٔ بخش‌های آموزشی بدون مربی هم کامل کار می‌کنند">
+          <Switch checked={settings.coachEnabled} onCheckedChange={(v) => setSetting('coachEnabled', v)} aria-label="فعال بودن مربی سنجاب" />
+        </Row>
+        <p className="text-[11px] leading-5 text-zinc-500">
+          سقف مصرف: ۴۰ پیام در روز. حالت Quiz Me مربی کاملاً آفلاین است و حتی بدون هوش‌یار کار می‌کند.
         </p>
       </SectionCard>
     </>

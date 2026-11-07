@@ -40,6 +40,7 @@ import {
 } from '@/lib/academy/python-curriculum'
 import { PyodideRunner, type PyOutKind } from '@/lib/os/pyodide'
 import { useGame } from '@/lib/gamification/engine'
+import { useLearning } from '@/lib/learning/store'
 import { SUNJOB_PALETTE } from '@/lib/os/brand'
 import { ReadProgress, lastView, rememberView } from '@/components/os/academy/reader'
 
@@ -426,6 +427,7 @@ export default function PythonAcademyApp() {
     (id: string) => {
       update((p) => (p.done.includes(id) ? p : { ...p, done: [...p.done, id] }))
       game.completeLesson('python', id, 20)
+      useLearning.getState().noteLessonCompleted('python', id)
     },
     [update, game],
   )
@@ -434,6 +436,7 @@ export default function PythonAcademyApp() {
     (id: string) => {
       update((p) => (p.ex.includes(id) ? p : { ...p, ex: [...p.ex, id] }))
       game.award(`py-ex:${id}`, 25, 'تمرین قبول شد')
+      useLearning.getState().noteExercisePassed('python', id)
     },
     [update, game],
   )
@@ -442,6 +445,7 @@ export default function PythonAcademyApp() {
     (id: string, score: number, total: number) => {
       update((p) => ({ ...p, quizBest: { ...p.quizBest, [id]: Math.max(p.quizBest[id] ?? 0, score) } }))
       game.registerQuiz('python', id, score === total, score >= Math.ceil(total * 0.7) ? 20 : 10)
+      useLearning.getState().noteQuizResult('python', id, score, total)
     },
     [update, game],
   )
@@ -456,6 +460,7 @@ export default function PythonAcademyApp() {
   const openLesson = (id: string) => {
     setActiveId(id)
     setHome(false)
+    useLearning.getState().noteLessonOpened('python', id)
     if (!isDone(id)) markDone(id)
   }
 

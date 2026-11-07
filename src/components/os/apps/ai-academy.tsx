@@ -54,6 +54,7 @@ import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
 import { useOS } from '@/lib/os/store'
 import { useGame } from '@/lib/gamification/engine'
+import { useLearning } from '@/lib/learning/store'
 import NNLab from './nn-lab'
 
 /* ================================================================
@@ -2471,6 +2472,7 @@ function QuizSection({ best, onSave }: { best: number; onSave: (score: number) =
     setSubmitted(true)
     onSave(score)
     useGame.getState().registerQuiz('ai', 'quiz', score === QUIZ.length, score >= 6 ? 25 : 10)
+    useLearning.getState().noteQuizResult('ai', 'quiz', score, QUIZ.length)
     if (score >= 6) {
       pushToast({
         title: 'قبول شدی!',
@@ -2635,6 +2637,7 @@ export default function AIAcademyApp() {
         const done = willBeDone ? [...p.done, id] : p.done.filter((d) => d !== id)
         if (willBeDone) {
           useGame.getState().completeLesson('ai', id, 20)
+          useLearning.getState().noteLessonCompleted('ai', id)
           const finishedAll = done.length >= SECTIONS.length
           pushToast({
             title: finishedAll ? 'همهٔ مفاهیم AI را یاد گرفتی!' : `بخش «${title}» تمام شد!`,

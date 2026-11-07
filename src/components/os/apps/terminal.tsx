@@ -364,7 +364,7 @@ const ALL_COMMANDS = [
   ...MAN_KEYS,
   'help', 'clear', 'exit', 'uptime', 'df', 'free', 'env', 'whoami', 'date',
   'uname', 'hostname', 'apps', 'cowsay', 'fortune', 'banner', 'matrix', 'sl',
-  'coffee', 'tux', 'ping', 'curl', 'lock', 'quit', 'dir', 'll', 'la', 'cls',
+  'coffee', 'tux', 'sanjabak', 'ping', 'curl', 'lock', 'quit', 'dir', 'll', 'la', 'cls',
 ]
 
 function didYouMean(input: string, extra: string[] = []): string | null {
@@ -478,16 +478,6 @@ function calGrid(month?: number, year?: number): string {
 }
 
 /* --------------------------- هنر --------------------------- */
-
-const TUX_ART = String.raw`
-   .--.
-  |o_o |
-  |:_/ |
- //   \ \
-(|     | )
-/'\_   _/'\
-\___)=(___/
-`
 
 const SQUIRREL_ART = String.raw`
    (\_/)
@@ -1394,7 +1384,7 @@ export default function TerminalApp() {
 
       /* ---------------- سرگرمی ---------------- */
       case 'neofetch': {
-        push('sys', TUX_ART)
+        push('sys', SQUIRREL_ART)
         const mins = os.bootAt ? Math.max(1, Math.round((Date.now() - os.bootAt) / 60000)) : 0
         const info: string[] = [
           `sanjab@sanjob-os`,
@@ -1469,9 +1459,10 @@ export default function TerminalApp() {
         )
         push('ok', 'قهوه آماده! ولی اینجا وب است، بو نمی‌دهد.')
         break
+      case 'sanjabak':
       case 'tux':
-        push('sys', TUX_ART)
-        push('ok', 'این ماسکات ماست: Tux. نماد رسمی لینوکس. خوشگل، نه؟')
+        push('sys', SQUIRREL_ART)
+        push('ok', 'این سنجابک است، ماسکات رسمی سان‌جاب‌اواس — Tux بازنشسته شد و حالا مشاور افتخاری است :)')
         break
       case 'ping': {
         const host = args[0] || 'penguin.os'

@@ -43,6 +43,7 @@ import { Progress } from '@/components/ui/progress'
 import { BRAND, SUNJOB_PALETTE } from '@/lib/os/brand'
 import { useOS } from '@/lib/os/store'
 import { useGame, type Track } from '@/lib/gamification/engine'
+import { useLearning } from '@/lib/learning/store'
 import { ReadProgress, lastView, rememberView } from '@/components/os/academy/reader'
 
 /* ------------------------------------------------------------------ */
@@ -2194,6 +2195,7 @@ export default function PowerShellAcademyApp() {
         const done = willBeDone ? [...p.done, lesson.id] : p.done.filter((d) => d !== lesson.id)
         if (willBeDone) {
           useGame.getState().completeLesson(PS_TRACK, lesson.id, 20)
+          useLearning.getState().noteLessonCompleted('powershell', lesson.id)
           pushToast({
             title: `درس «${lesson.title}» تمام شد!`,
             body: done.length >= LESSONS.length ? 'همهٔ ۱۲ درس پاورشل را تموم کردی؛ آزمون در انتظارت است. با اسپانسری سان‌جاب' : `${fa(LESSONS.length - done.length)} درس تا پایان دوره باقی مانده. با اسپانسری سان‌جاب`,
@@ -2222,6 +2224,7 @@ export default function PowerShellAcademyApp() {
     (s: number) => {
       update((p) => ({ ...p, quizBest: Math.max(p.quizBest, s) }))
       useGame.getState().registerQuiz(PS_TRACK, 'final', s === QUIZ.length, s >= PASS_SCORE ? 30 : 10)
+      useLearning.getState().noteQuizResult('powershell', 'quiz', s, QUIZ.length)
       if (s >= PASS_SCORE) pushToast({ title: 'قبول شدی! گواهی آکادمی پاورشل فعال شد', body: 'اسم داخل گواهی را می‌توانی همان‌جا وارد کنی.', icon: Award })
     },
     [pushToast, update]
