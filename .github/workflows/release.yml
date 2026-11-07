@@ -1,9 +1,12 @@
 name: Release
 
 # انتشار روی push تگ v*:
-#   1) job web: بیلد وب + بستهٔ CLI + SBOM + checksum → draft release
-#   2) job windows: بیلد نصب‌کنندهٔ دسکتاپ (Tauri v2 + Node sidecar) → NSIS/MSI به همان draft
-#   3) job publish: انتشار draft بعد از هر دو (اگر ویندوز شکست خورد، وب منتشر می‌شود و نکته صادقانه در یادداشت می‌رود)
+#   1) job web:      بیلد وب + بستهٔ CLI + SBOM + checksum → draft release
+#   2) job windows:  بیلد نصب‌کنندهٔ دسکتاپ (Tauri v2 + Node sidecar) → NSIS/MSI به همان draft
+#                    (دیگر continue-on-error نیست — شکستش شکست کل انتشار است)
+#   3) job publish:  فقط وقتی «همهٔ» آرتیفکت‌های اجباری سالم باشند draft را منتشر می‌کند.
+#                    اگر دسکتاپ شکست خورد، Release به‌صورت Draft می‌ماند و علت در خروجی گزارش می‌شود —
+#                    هیچ نسخهٔ ناقصی هرگز به‌عنوان Stable منتشر نمی‌شود.
 on:
   push:
     tags:
@@ -21,6 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
+      prerelease: ${{ steps.version.outputs.prerelease }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,15 +34,31 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Read version
+      - name: Read version + consistency gate
         id: version
-        run: echo "version=$(cat VERSION | tr -d '[:space:]')" >> "$GITHUB_OUTPUT"
+        run: |
+          V_FILE=$(tr -d '[:space:]' < VERSION)
+          V_PKG=$(node -p "require('./package.json').version")
+          V_TOML=$(grep -m1 '^version' src-tauri/Cargo.toml | sed 's/version = "\(.*\)"/\1/')
+          echo "VERSION=$V_FILE package.json=$V_PKG Cargo.toml=$V_TOML"
+          if [ "$V_FILE" != "$V_PKG" ] || [ "$V_FILE" != "$V_TOML" ]; then
+            echo "❌ نسخه‌ها هم‌خوان نیستند — انتشار متوقف شد"; exit 1
+          fi
+          if [ "v$V_FILE" != "${GITHUB_REF_NAME}" ]; then
+            echo "❌ تگ (${GITHUB_REF_NAME}) با VERSION ($V_FILE) یکی نیست — انتشار متوقف شد"; exit 1
+          fi
+          echo "version=$V_FILE" >> "$GITHUB_OUTPUT"
+          # نسخهٔ پیش‌انتشار: هر نسخهٔ دارای پسوند (-beta.1 و مانند آن) مطابق SemVer
+          if [[ "$V_FILE" == *-* ]]; then echo "prerelease=true" >> "$GITHUB_OUTPUT"; else echo "prerelease=false" >> "$GITHUB_OUTPUT"; fi
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
       - name: Generate Prisma client
         run: bunx prisma generate
+
+      - name: Unit tests (release gate)
+        run: bun test tests/
 
       - name: Typecheck + Lint (release gate)
         run: |
@@ -86,17 +106,17 @@ jobs:
         with:
           name: SanjabOS ${{ steps.version.outputs.version }}
           draft: true
-          prerelease: ${{ contains(steps.version.outputs.version, '-') }}
+          prerelease: ${{ steps.version.outputs.prerelease }}
           generate_release_notes: true
           files: |
             dist/*
             SBOM.spdx.json
 
   windows:
-    name: Windows desktop installer (Tauri v2)
+    name: Windows desktop installer (Tauri v2) — mandatory
     runs-on: windows-latest
     needs: web
-    continue-on-error: true
+    # شکست این job یعنی انتشار Stable انجام نمی‌شود (به publish نگاه کن)
     outputs:
       ok: ${{ steps.status.outputs.ok }}
     steps:
@@ -136,6 +156,15 @@ jobs:
           Copy-Item -Recurse -Force public src-tauri/server-dist/public
           Get-ChildItem src-tauri/server-dist | Select-Object Name
 
+      - name: Seed fresh desktop database (schema only — zero dev data)
+        shell: pwsh
+        env:
+          DATABASE_URL: "file:./sanjabos.db"
+        run: |
+          bunx prisma db push --skip-generate
+          Copy-Item prisma/sanjabos.db src-tauri/server-dist/sanjabos.db
+          Write-Output "fresh desktop DB (schema-only) bundled into server-dist"
+
       - name: Download portable Node.exe (sidecar)
         shell: pwsh
         run: |
@@ -161,7 +190,7 @@ jobs:
           releaseName: SanjabOS ${{ needs.web.outputs.version }}
           releaseId: ""
           releaseDraft: true
-          prerelease: false
+          prerelease: ${{ needs.web.outputs.prerelease == 'true' }}
           includeUpdaterJson: false
           args: "--target x86_64-pc-windows-msvc"
 
@@ -173,7 +202,7 @@ jobs:
           if ("${{ steps.tauri.outcome }}" -eq "success") { "ok=true" | Out-File -Append $env:GITHUB_OUTPUT } else { "ok=false" | Out-File -Append $env:GITHUB_OUTPUT }
 
   publish:
-    name: Publish release
+    name: Publish only when every mandatory artifact passed
     runs-on: ubuntu-latest
     needs: [web, windows]
     if: always()
@@ -181,28 +210,67 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Final checksums
-        if: needs.windows.outputs.ok == 'true'
+      # ------ مسیر شکست: Draft می‌ماند و علت دقیق گزارش می‌شود ------
+      - name: Keep draft + report reason (desktop build failed)
+        if: needs.web.outputs.version == '' || needs.windows.outputs.ok != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.web.outputs.version }}
+          WEB_RESULT: ${{ needs.web.result }}
+          WIN_RESULT: ${{ needs.windows.result }}
         run: |
-          TAG="v${{ needs.web.outputs.version }}"
+          TAG="v${VERSION}"
+          if [ -z "$VERSION" ]; then
+            echo "::error::web job failed before reading VERSION — no draft was created."
+            exit 1
+          fi
+          REASON="وب: ${WEB_RESULT} / ویندوز: ${WIN_RESULT}"
+          echo "Release $TAG در حالت Draft ماند. وضعیت: $REASON"
+          gh release edit "$TAG" --draft=true
+          gh release edit "$TAG" --notes "$(gh release view "$TAG" --json body --jq .body)
+
+          > ## ⚠️ این انتشار هنوز Draft است
+          > ساخت نصب‌کنندهٔ دسکتاپ ویندوز در این تگ موفق نشد ($REASON).
+          > طبق سیاست انتشار، هیچ نسخهٔ ناقصی به‌عنوان Stable منتشر نمی‌شود.
+          > پس از رفع علت، یک تگ جدید ساخته شود؛ بازنشر همین تگ با آرتیفکت متفاوت ممنوع است."
+          echo "::error::Stable publish blocked — desktop build failed ($REASON). Draft kept."
+          exit 1
+
+      # ------ مسیر موفق: راستی‌آزمایی آرتیفکت‌ها و سپس انتشار ------
+      - name: Verify mandatory assets exist on draft
+        if: needs.web.outputs.version != '' && needs.windows.outputs.ok == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.web.outputs.version }}
+        run: |
+          TAG="v${VERSION}"
           gh release view "$TAG" --json assets --jq '.assets[].name' > assets.txt
+          cat assets.txt
+          ok=1
+          grep -qi 'sanjabos-web-.*standalone.tar.gz' assets.txt || { echo "::error::بستهٔ وب یافت نشد"; ok=0; }
+          grep -qi '\.exe$' assets.txt || { echo "::error::نصاب exe ویندوز یافت نشد"; ok=0; }
+          grep -qi '\.msi$' assets.txt || { echo "::error::نصاب msi ویندوز یافت نشد"; ok=0; }
+          grep -qi 'SBOM' assets.txt || { echo "::error::SBOM یافت نشد"; ok=0; }
+          [ "$ok" = "1" ] || { echo "::error::آرتیفکت‌های اجباری ناقص‌اند — انتشار متوقف شد (Draft می‌ماند)"; exit 1; }
+
+      - name: Final checksums (installers included)
+        if: needs.web.outputs.version != '' && needs.windows.outputs.ok == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.web.outputs.version }}
+        run: |
+          TAG="v${VERSION}"
           gh release download "$TAG" --pattern "SHA256SUMS.txt" --clobber
-          # checksum نصب‌کننده‌ها را اضافه کن
           gh release download "$TAG" --pattern "SanjabOS_*" --clobber
           sha256sum SanjabOS_* >> SHA256SUMS.txt
           gh release upload "$TAG" SHA256SUMS.txt --clobber
 
       - name: Publish draft release
+        if: needs.web.outputs.version != '' && needs.windows.outputs.ok == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.web.outputs.version }}
         run: |
-          TAG="v${{ needs.web.outputs.version }}"
-          if [ "${{ needs.windows.outputs.ok }}" != "true" ]; then
-            gh release edit "$TAG" --notes "$(gh release view "$TAG" --json body --jq .body)
-
-            > **نکتهٔ صادقانه:** بیلد نصب‌کنندهٔ ویندوز در این تگ شکست خورد؛ نسخهٔ وب (standalone) سالم است و منتشر شد. نصب‌کننده در تگ بعدی دوباره تلاش می‌شود."
-          fi
+          TAG="v${VERSION}"
           gh release edit "$TAG" --draft=false
-          echo "Release $TAG published"
+          echo "✅ Release $TAG published"

@@ -43,6 +43,9 @@ jobs:
       - name: Typecheck (strict)
         run: bunx tsc --noEmit
 
+      - name: Unit tests (bun test)
+        run: bun test tests/
+
       - name: Lint
         run: bun run lint
 
