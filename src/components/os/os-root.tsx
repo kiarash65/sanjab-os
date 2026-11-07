@@ -219,12 +219,27 @@ export default function OSRoot() {
     }
   }, [settings.funMode])
 
-  // کلید Escape منوها را می‌بندد
+  // کلید Escape منوها را می‌بندد + میان‌برهای سراسری سان‌جاب‌اواس
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setMenu(null)
         useOS.getState().toggleStart(false)
+        return
+      }
+      /* میان‌برهای Ctrl+Alt مثل لینوکس واقعی */
+      if (e.ctrlKey && e.altKey && !e.shiftKey && !e.metaKey) {
+        const k = e.key.toLowerCase()
+        if (k === 't') {
+          e.preventDefault()
+          launch('terminal')
+        } else if (k === 'l') {
+          e.preventDefault()
+          useOS.getState().lockScreen()
+        } else if (k === 's') {
+          e.preventDefault()
+          launch('settings')
+        }
       }
     }
     window.addEventListener('keydown', h)

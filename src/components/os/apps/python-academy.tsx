@@ -41,6 +41,7 @@ import {
 import { PyodideRunner, type PyOutKind } from '@/lib/os/pyodide'
 import { useGame } from '@/lib/gamification/engine'
 import { SUNJOB_PALETTE } from '@/lib/os/brand'
+import { ReadProgress, lastView, rememberView } from '@/components/os/academy/reader'
 
 const fa = (n: number | string) => String(n).replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[Number(d)])
 
@@ -95,7 +96,7 @@ function CodeBlock({ code, caption }: { code: string; caption?: string }) {
           </Button>
         </div>
       </div>
-      <pre className="os-scroll overflow-x-auto p-3 font-mono text-[11.5px] leading-6 text-emerald-100/90" dir="ltr">
+      <pre className="os-scroll overflow-x-auto p-3 font-mono text-[11.5px] leading-6 text-emerald-100/90" dir="ltr" style={{ fontSize: 'var(--fa-code-size)', lineHeight: 'var(--fa-code-line-height)' }}>
         {code}
       </pre>
     </div>
@@ -385,9 +386,12 @@ export default function PythonAcademyApp() {
   const [home, setHome] = useState(true)
   const runnerRef = useRef<PyodideRunner | null>(null)
   const loadedRef = useRef(false)
+  const scrollRef = useRef<HTMLDivElement>(null)
 
   const lesson = useMemo(() => PYTHON_LESSONS.find((l) => l.id === activeId) ?? PYTHON_LESSONS[0], [activeId])
   const idx = PYTHON_LESSONS.findIndex((l) => l.id === lesson.id)
+  const resumeId = home ? lastView('python-academy') : null
+  const resumeLesson = resumeId ? (PYTHON_LESSONS.find((l) => l.id === resumeId) ?? null) : null
 
   const loadPy = useCallback(async () => {
     if (loadedRef.current) return
@@ -412,6 +416,11 @@ export default function PythonAcademyApp() {
       runnerRef.current = null
     }
   }, [])
+
+  /* آخرین درس دیده‌شده — برای «ادامهٔ یادگیری» در خانه */
+  useEffect(() => {
+    if (!home) rememberView('python-academy', activeId)
+  }, [activeId, home])
 
   const markDone = useCallback(
     (id: string) => {
@@ -454,7 +463,7 @@ export default function PythonAcademyApp() {
   if (home) {
     return (
       <div className="os-scroll h-full overflow-y-auto p-4" dir="rtl">
-        <div className="mx-auto max-w-3xl space-y-4">
+        <div className="reading-shell mx-auto space-y-4">
           <div className="flex items-center gap-2.5">
             <span
               className="flex h-11 w-11 items-center justify-center rounded-2xl"
@@ -478,6 +487,17 @@ export default function PythonAcademyApp() {
               </div>
             </div>
           </Card>
+
+          {resumeLesson && (
+            <button
+              onClick={() => openLesson(resumeLesson.id)}
+              className="flex w-full items-center gap-2.5 rounded-xl border border-amber-500/30 bg-amber-500/[0.06] p-3.5 text-start transition-colors hover:border-amber-500/50 hover:bg-amber-500/[0.09]"
+            >
+              <BookOpen size={16} className="shrink-0" style={{ color: SUNJOB_PALETTE.orange }} />
+              <span className="min-w-0 flex-1 truncate text-xs font-bold text-amber-200">ادامهٔ یادگیری: {resumeLesson.title}</span>
+              <ChevronLeft size={14} className="shrink-0 text-amber-400" />
+            </button>
+          )}
 
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {[
@@ -576,7 +596,8 @@ export default function PythonAcademyApp() {
         </span>
       </div>
 
-      <div className="os-scroll flex-1 overflow-y-auto p-4">
+      <div ref={scrollRef} className="os-scroll relative flex-1 overflow-y-auto p-4">
+        <ReadProgress targetRef={scrollRef} accent={SUNJOB_PALETTE.orange} />
         <AnimatePresence mode="wait">
           <motion.div
             key={lesson.id}
@@ -584,7 +605,7 @@ export default function PythonAcademyApp() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: reduced ? 0 : -12 }}
             transition={{ duration: reduced ? 0 : 0.2 }}
-            className="mx-auto max-w-3xl space-y-3.5"
+            className="reading-shell prose-fa mx-auto space-y-3.5"
           >
             {/* چه یاد می‌گیرید */}
             <Card className="border-white/10 bg-zinc-900/50 p-3.5">
@@ -611,11 +632,11 @@ export default function PythonAcademyApp() {
                 <div className="mb-1 flex items-center gap-1.5 text-[11px] font-black text-cyan-300">
                   <Sparkles size={12} /> تشبیه
                 </div>
-                <p className="text-[11.5px] leading-6 text-zinc-300">{lesson.analogy}</p>
+                <p className="text-zinc-300">{lesson.analogy}</p>
               </div>
               <div className="rounded-xl border border-white/10 bg-zinc-950/50 p-3">
                 <div className="mb-1 text-[11px] font-black text-zinc-200">تشریح فنی</div>
-                <p className="text-[11.5px] leading-6 text-zinc-400">{lesson.technical}</p>
+                <p className="text-zinc-400">{lesson.technical}</p>
               </div>
             </div>
 
@@ -679,13 +700,13 @@ export default function PythonAcademyApp() {
               <div className="mb-1 flex items-center gap-1.5 text-[11px] font-black text-purple-300">
                 <FlaskConical size={12} /> چالش بیشتر
               </div>
-              <p className="text-[11.5px] leading-6 text-zinc-300">{lesson.challenge}</p>
+              <p className="text-zinc-300">{lesson.challenge}</p>
             </div>
 
             {/* خلاصه */}
             <Card className="border-emerald-500/20 bg-emerald-500/[0.03] p-3.5">
               <div className="mb-1 text-xs font-black text-emerald-300">خلاصهٔ درس</div>
-              <p className="text-[11.5px] leading-6 text-zinc-300">{lesson.summary}</p>
+              <p className="text-zinc-300">{lesson.summary}</p>
             </Card>
 
             {/* کوئیز */}

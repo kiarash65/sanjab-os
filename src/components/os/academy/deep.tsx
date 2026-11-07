@@ -19,6 +19,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { SUNJOB_PALETTE } from '@/lib/os/brand'
+import { ReadingShell } from './reader'
 
 export interface DeepChapterDef {
   id: string
@@ -637,7 +638,7 @@ function LvmAnim() {
 
 function BootChapter() {
   return (
-    <div className="space-y-4 text-xs leading-6 text-zinc-300">
+    <div className="space-y-4 text-zinc-300">
       <p>
         وقتی دکمهٔ پاور را می‌زنی، تا لحظه‌ای که لاگین می‌کنی، لینوکس یک <b className="text-zinc-100">زنجیرهٔ دقیق</b> را اجرا می‌کند. هر حلقهٔ این
         زنجیره یک راز دارد — با انیمیشن زیر قدم‌به‌قدم ببین:
@@ -665,7 +666,7 @@ function BootChapter() {
 
 function KernelChapter() {
   return (
-    <div className="space-y-4 text-xs leading-6 text-zinc-300">
+    <div className="space-y-4 text-zinc-300">
       <p>
         هسته سه نقش دارد: <b className="text-zinc-100">داور زمان CPU</b> (زمان‌بندی)، <b className="text-zinc-100">نگهبان حافظه</b> و
         <b className="text-zinc-100">فروشندهٔ خدمات</b> به برنامه‌ها (سیستم‌کال). بیا از نزدیک:
@@ -692,7 +693,7 @@ function KernelChapter() {
 
 function FsChapter() {
   return (
-    <div className="space-y-4 text-xs leading-6 text-zinc-300">
+    <div className="space-y-4 text-zinc-300">
       <p>
         در لینوکس همه‌چیز «فایل» است — از متن‌ها تا دیسک، کارت صدا و حتی اطلاعات پروسه‌ها (
         <code dir="ltr" className="font-mono text-emerald-300">/proc</code>). این ایدهٔ جسورانه، ابزارها را ساده و قدرتمند می‌کند.
@@ -745,7 +746,7 @@ function FsChapter() {
 
 function NetChapter() {
   return (
-    <div className="space-y-4 text-xs leading-6 text-zinc-300">
+    <div className="space-y-4 text-zinc-300">
       <p>
         شبکه لینوکس از <b className="text-zinc-100">لایه‌های مشخص</b> ساخته شده — ابزار هر لایه جدا است و همین، دیباگ را آسان می‌کند:
       </p>
@@ -810,7 +811,7 @@ function ShellChapter() {
     },
   ]
   return (
-    <div className="space-y-4 text-xs leading-6 text-zinc-300">
+    <div className="space-y-4 text-zinc-300">
       <p>
         بش فقط «محل تایپ» نیست؛ یک <b className="text-zinc-100">زبان کامل برنامه‌نویسی</b> است. هر کد تکراری را یک بار بنویس و بعداً با یک دستور صداش کن:
       </p>
@@ -839,7 +840,7 @@ function ShellChapter() {
 
 function SecChapter() {
   return (
-    <div className="space-y-4 text-xs leading-6 text-zinc-300">
+    <div className="space-y-4 text-zinc-300">
       <p>
         امنیت لینوکس روی سه ستون است: <b className="text-zinc-100">دسترسی‌ها</b> (فصل ۶)، <b className="text-zinc-100">جداسازی</b> (کاربر/گروه/کانتینر) و{' '}
         <b className="text-zinc-100">رمزنگاری</b> (SSH و به‌روزرسانی‌ها).
@@ -886,7 +887,7 @@ export function DeepChapterView({ id, done, onToggleDone }: { id: string; done: 
   const def = DEEP_CHAPTERS.find((c) => c.id === id)
   if (!def) return null
   return (
-    <div className="space-y-4">
+    <ReadingShell className="space-y-4">
       <DeepChapterHeader def={def} done={done} onToggleDone={onToggleDone} />
       {id === 'boot' && <BootChapter />}
       {id === 'kernel' && <KernelChapter />}
@@ -894,6 +895,6 @@ export function DeepChapterView({ id, done, onToggleDone }: { id: string; done: 
       {id === 'net' && <NetChapter />}
       {id === 'shell' && <ShellChapter />}
       {id === 'sec' && <SecChapter />}
-    </div>
+    </ReadingShell>
   )
 }

@@ -49,6 +49,7 @@ import type { LucideIcon } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
+import { ReadProgress, lastView, rememberView } from '@/components/os/academy/reader'
 import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
 import { useOS } from '@/lib/os/store'
@@ -658,6 +659,7 @@ function Code({ children }: { children: ReactNode }) {
     <code
       dir="ltr"
       className="inline-block rounded-lg border border-white/10 bg-black/40 px-2.5 py-1.5 font-mono text-[11.5px] leading-5 text-teal-300"
+      style={{ fontSize: 'var(--fa-code-size)', lineHeight: 'var(--fa-code-line-height)' }}
     >
       {children}
     </code>
@@ -783,6 +785,12 @@ function ChapterShell({
    ================================================================ */
 
 function HomeSection({ onNavigate }: { onNavigate: (v: ViewId) => void }) {
+  /* آخرین بخش مطالعه‌شده — خواندن مستقیم از localStorage در رندر (اپ‌ها فقط سمت کلاینت مانت می‌شوند) */
+  const saved = lastView('ai-academy')
+  const savedDef = SECTIONS.find((s) => s.id === saved)
+  const resumeDef =
+    savedDef && savedDef.id !== 'home' && savedDef.id !== 'quiz' ? savedDef : undefined
+
   return (
     <div className="space-y-4">
       {/* قهرمان */}
@@ -801,6 +809,25 @@ function HomeSection({ onNavigate }: { onNavigate: (v: ViewId) => void }) {
           هر بخش یک «خواندم!» دارد؛ نه بخش را بخوان، نه آزمون آخر را جا بینداز.
         </p>
       </div>
+
+      {/* ادامهٔ یادگیری — بازگشت به آخرین بخش مطالعه‌شده */}
+      {resumeDef && (
+        <button
+          type="button"
+          onClick={() => onNavigate(resumeDef.id)}
+          className="flex w-full items-center gap-2.5 rounded-2xl border border-[#f7931e]/30 bg-[#f7931e]/10 p-3 text-right transition hover:border-[#f7931e]/50 hover:bg-[#f7931e]/15"
+          aria-label={`ادامهٔ یادگیری از بخش ${resumeDef.title}`}
+        >
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-[#f7931e]/20 text-[#f7931e]">
+            <BookOpen size={15} aria-hidden />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-[10px] font-bold text-[#f7931e]">ادامهٔ یادگیری</span>
+            <span className="mt-0.5 block truncate text-[12px] font-black text-zinc-100">{resumeDef.title}</span>
+          </span>
+          <ChevronLeft size={15} className="shrink-0 text-[#f7931e]" aria-hidden />
+        </button>
+      )}
 
       {/* نمودار مجموعه‌های تودرتو */}
       <SectionCard>
@@ -1174,7 +1201,7 @@ function PerceptronSection() {
 
       <SectionCard>
         <CardTitle>پرسپترون چه می‌گوید؟</CardTitle>
-        <div className="space-y-2 text-[11.5px] leading-6 text-zinc-300">
+        <div className="space-y-2 text-zinc-300">
           <p>
             پرسپترون سال ۱۹۵۸ توسط فرانک روزنبلات ساخته شد؛ ساده‌ترین شبکهٔ عصبی ممکن: ورودی‌ها را در
             وزن‌ها ضرب می‌کند، جمع می‌زند و از یک تابع فعال‌ساز رد می‌کند تا تصمیم بگیرد ۰ یا ۱.
@@ -1420,7 +1447,7 @@ function GradientSection() {
 
       <SectionCard>
         <CardTitle>چرا «منهای» گرادیان؟</CardTitle>
-        <div className="space-y-2 text-[11.5px] leading-6 text-zinc-300">
+        <div className="space-y-2 text-zinc-300">
           <p>
             یادگیری ماشین در هستهٔ خود یعنی کم‌کردن یک عدد: «خطا» یا Loss. نزول گرادیان ساده‌ترین و
             مهم‌ترین راه کم‌کردن آن است: به جهت تندترین شیبِ «بالا رفتن» نگاه کن و دقیقاً برعکسش قدم بردار.
@@ -1595,7 +1622,7 @@ function ActivationsSection() {
 
       <SectionCard>
         <CardTitle>اصلاً فعال‌ساز به چه دردی می‌خورد؟</CardTitle>
-        <div className="space-y-2 text-[11.5px] leading-6 text-zinc-300">
+        <div className="space-y-2 text-zinc-300">
           <p>
             اگر نورون فقط «ضرب و جمع» باشد، هر تعداد لایه که بگذاری حاصل می‌شود یک ضرب و جمع بزرگ —
             شبکه تا ابد فقط می‌تواند خط بکشد! تابع فعال‌ساز این خط را خم می‌کند و به شبکه قدرت
@@ -1815,7 +1842,7 @@ function NetworkSection() {
 
       <SectionCard>
         <CardTitle>پشت صحنه چه گذشت؟</CardTitle>
-        <div className="space-y-2 text-[11.5px] leading-6 text-zinc-300">
+        <div className="space-y-2 text-zinc-300">
           <p>
             هر گره در لایهٔ پنهان مجموع وزن‌دار ورودی‌ها را می‌گیرد و از tanh رد می‌کند؛ هر خروجی همین
             کار را با خروجی‌های پنهان می‌کند و از سیگموید رد می‌شود تا «امتیاز» بگیرد. آموزش یعنی
@@ -2030,7 +2057,7 @@ function LLMSection() {
 
       <SectionCard>
         <CardTitle>بایگرام تا ترنسفورمر</CardTitle>
-        <div className="space-y-2 text-[11.5px] leading-6 text-zinc-300">
+        <div className="space-y-2 text-zinc-300">
           <p>
             مدل ما «بایگرام» است: فقط به «یک» کلمهٔ قبل نگاه می‌کند. فرمولش ساده است:
           </p>
@@ -2298,7 +2325,7 @@ function OverfitSection() {
 
       <SectionCard>
         <CardTitle>بایاس در برابر واریانس</CardTitle>
-        <div className="space-y-2 text-[11.5px] leading-6 text-zinc-300">
+        <div className="space-y-2 text-zinc-300">
           <p>
             درجهٔ ۱ (یک خط) از واقعیت ساده‌تر است: هم آموزش و هم آزمون بدند — این «کم‌برازش» است.
             درجهٔ ۲ و ۳ شکل واقعی داده را می‌گیرند: نقطهٔ طلایی. از درجهٔ حدود ۴ به بعد، منحنی دارد
@@ -2415,7 +2442,7 @@ function EthicsSection() {
 
       <SectionCard>
         <CardTitle>آینده چی؟</CardTitle>
-        <p className="text-[11.5px] leading-6 text-zinc-300">
+        <p className="text-zinc-300">
           هیچ‌کس نمی‌داند مدل‌های ده سال دیگر چه شکلی‌اند؛ فقط یک چیز قطعی است: کسانی که «چطور
           فکر کردنِ» این ابزارها را می‌فهمند، فرق دارند با کسانی که فقط از آن‌ها دستور می‌گیرند.
           این آکادمی اولین قدمِ آن مسیر بود — پرسپترون تا عامل‌های هوشمند، همه از همان چند ضرب و جمع
@@ -2581,11 +2608,17 @@ export default function AIAcademyApp() {
   const [progress, setProgress] = useState<AIProgress>(EMPTY_PROGRESS)
   const [view, setView] = useState<ViewId>('home')
   const pushToast = useOS((s) => s.pushToast)
+  const mainRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
     const t = window.setTimeout(() => setProgress(loadProgress()), 0)
     return () => window.clearTimeout(t)
   }, [])
+
+  /* ---------- یادآوری آخرین بخش مطالعه ---------- */
+  useEffect(() => {
+    if (view !== 'home' && view !== 'quiz') rememberView('ai-academy', view)
+  }, [view])
 
   const update = useCallback((fn: (p: AIProgress) => AIProgress) => {
     setProgress((prev) => {
@@ -2735,7 +2768,8 @@ export default function AIAcademyApp() {
           </nav>
 
           {/* محتوا */}
-          <main className="os-scroll min-w-0 flex-1 overflow-y-auto p-4">
+          <main ref={mainRef} className="os-scroll relative min-w-0 flex-1 overflow-y-auto p-4">
+            <ReadProgress targetRef={mainRef} />
             <AnimatePresence mode="wait">
               <motion.div
                 key={view}
@@ -2743,7 +2777,7 @@ export default function AIAcademyApp() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.16 }}
-                className="mx-auto max-w-3xl"
+                className="reading-shell prose-fa mx-auto"
               >
                 {view === 'home' && renderSection('home', <HomeSection onNavigate={setView} />)}
                 {view === 'perceptron' && renderSection('perceptron', <PerceptronSection />)}

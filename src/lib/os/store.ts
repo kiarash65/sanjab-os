@@ -16,12 +16,70 @@ export interface OSWindow {
   z: number
 }
 
+export type FontFamilyKey = 'estedad' | 'vazirmatn' | 'vazirmatn-ui' | 'system'
+export type CodeFontKey = 'jetbrains' | 'system'
+export type LineHeightKey = 'compact' | 'comfortable' | 'relaxed'
+export type ReadingWidthKey = 'narrow' | 'standard' | 'wide'
+export type DensityKey = 'comfortable' | 'compact'
+
 export interface OSSettings {
   wallpaper: string
   accent: string
   funMode: boolean
   sound: boolean
   wallpaperRotate: boolean
+  /* ---- تایپوگرافی و مطالعه ---- */
+  fontFamily: FontFamilyKey
+  /** اندازه متن مطالعه (px) */
+  fontSize: number
+  lineHeight: LineHeightKey
+  readingWidth: ReadingWidthKey
+  /** وزن متن مطالعه — داخل بازه مجاز فونت انتخابی clamp می‌شود */
+  bodyWeight: number
+  codeFont: CodeFontKey
+  /** اندازه فونت کد (px) */
+  codeSize: number
+  /* ---- دسترس‌پذیری ---- */
+  reducedMotion: boolean
+  highContrast: boolean
+  largerControls: boolean
+  keyboardNav: boolean
+  /* ---- میزکار و رابط ---- */
+  /** مقیاس کلی رابط — ۰٫۹ تا ۱٫۱۵ */
+  uiScale: number
+  density: DensityKey
+  animations: boolean
+  /* ---- ترجیحات یادگیری ---- */
+  showGuides: boolean
+  /** هدف روزانه مطالعه (دقیقه) */
+  dailyGoalMin: number
+  /* ---- توسعه‌دهنده ---- */
+  devMode: boolean
+}
+
+export const DEFAULT_SETTINGS: OSSettings = {
+  wallpaper: 'img:sunjob-sunrise',
+  accent: DEFAULT_ACCENT,
+  funMode: true,
+  sound: true,
+  wallpaperRotate: false,
+  fontFamily: 'estedad',
+  fontSize: 16,
+  lineHeight: 'comfortable',
+  readingWidth: 'standard',
+  bodyWeight: 400,
+  codeFont: 'jetbrains',
+  codeSize: 13,
+  reducedMotion: false,
+  highContrast: false,
+  largerControls: false,
+  keyboardNav: true,
+  uiScale: 1,
+  density: 'comfortable',
+  animations: true,
+  showGuides: true,
+  dailyGoalMin: 20,
+  devMode: false,
 }
 
 export interface OSToast {
@@ -92,13 +150,7 @@ export const useOS = create<OSStore>()(
       cascade: 0,
       iconNonce: 0,
       startOpen: false,
-      settings: {
-        wallpaper: 'img:sunjob-sunrise',
-        accent: DEFAULT_ACCENT,
-        funMode: true,
-        sound: true,
-        wallpaperRotate: false,
-      },
+      settings: { ...DEFAULT_SETTINGS },
       toasts: [],
       setBooted: (v) => set({ booted: v, bootAt: v ? Date.now() : 0 }),
       lockScreen: () => set({ locked: true }),
@@ -252,7 +304,16 @@ export const useOS = create<OSStore>()(
     }),
     {
       name: 'sunjob-os-v1',
+      version: 2,
       partialize: (s) => ({ settings: s.settings }),
+      /* نسخه ۲: تنظیمات تایپوگرافی/دسترس‌پذیری/یادگیری اضافه شد —
+         مقادیر گمشده با پیش‌فرض‌ها پر می‌شوند تا هرگز undefined نماند */
+      migrate: (persisted) => {
+        const p = (persisted ?? {}) as { settings?: Partial<OSSettings> }
+        return {
+          settings: { ...DEFAULT_SETTINGS, ...(p.settings ?? {}) },
+        }
+      },
     }
   )
 )

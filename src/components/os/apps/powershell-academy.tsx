@@ -43,6 +43,7 @@ import { Progress } from '@/components/ui/progress'
 import { BRAND, SUNJOB_PALETTE } from '@/lib/os/brand'
 import { useOS } from '@/lib/os/store'
 import { useGame, type Track } from '@/lib/gamification/engine'
+import { ReadProgress, lastView, rememberView } from '@/components/os/academy/reader'
 
 /* ------------------------------------------------------------------ */
 /* موتور گیمیفیکیشن مرکزی فقط چهار ترک شناخته‌شده دارد؛ ترک «powershell» */
@@ -1421,7 +1422,7 @@ function CodeBlock({ title, code }: { title: string; code: string }) {
           {copied ? 'کپی شد' : 'کپی'}
         </button>
       </div>
-      <pre dir="ltr" className="overflow-x-auto p-3 font-mono text-[11px] leading-5">
+      <pre dir="ltr" className="overflow-x-auto p-3 font-mono text-[11px] leading-5" style={{ fontSize: 'var(--fa-code-size)', lineHeight: 'var(--fa-code-line-height)' }}>
         {code.split('\n').map((ln, i) => (
           <span key={i} className={ln.trimStart().startsWith('#') ? 'block text-zinc-500' : 'block text-emerald-300'}>
             {ln || ' '}
@@ -1652,12 +1653,12 @@ function LessonView({
   const [showSolution, setShowSolution] = useState(false)
   return (
     <ChapterShell lesson={lesson} stage={stage} done={done} onToggle={onToggle}>
-      <div className="space-y-4 text-xs leading-6 text-zinc-300">
+      <div className="space-y-4 text-zinc-300">
         <div className="flex items-start gap-2 rounded-xl border p-3" style={{ borderColor: `${SUNJOB_PALETTE.orange}30`, background: `${SUNJOB_PALETTE.orange}0d` }}>
           <Lightbulb size={15} className="mt-0.5 shrink-0" style={{ color: SUNJOB_PALETTE.orange }} aria-hidden />
           <div>
             <p className="mb-1 text-[11px] font-black text-amber-200">چرا مهم است؟</p>
-            <p className="text-[11.5px] leading-6 text-zinc-300">{lesson.intro}</p>
+            <p className="text-zinc-300">{lesson.intro}</p>
           </div>
         </div>
 
@@ -1704,7 +1705,7 @@ function LessonView({
             تمرین درس
           </SectionTitle>
           <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/[0.06] p-3">
-            <p className="text-[11.5px] leading-6 text-zinc-200">{lesson.exercise.prompt}</p>
+            <p className="text-zinc-200">{lesson.exercise.prompt}</p>
             <Button size="sm" variant="outline" className="mt-2 border-emerald-500/40 text-[10.5px] text-emerald-300" onClick={() => setShowSolution((s) => !s)}>
               {showSolution ? 'پنهان کردن پاسخ' : 'نمایش پاسخ نمونه'}
             </Button>
@@ -2166,11 +2167,17 @@ export default function PowerShellAcademyApp() {
   const [progress, setProgress] = useState<PsProgress>(EMPTY_PROGRESS)
   const [view, setView] = useState<ViewId>('home')
   const pushToast = useOS((s) => s.pushToast)
+  const scrollRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
     const t = window.setTimeout(() => setProgress(loadProgress()), 0)
     return () => window.clearTimeout(t)
   }, [])
+
+  /* آخرین درس دیده‌شده — برای «ادامهٔ یادگیری» در خانه */
+  useEffect(() => {
+    if (view !== 'home' && view !== 'play' && view !== 'quiz' && view !== 'cert') rememberView('powershell-academy', view)
+  }, [view])
 
   const update = useCallback((fn: (p: PsProgress) => PsProgress) => {
     setProgress((prev) => {
@@ -2224,6 +2231,8 @@ export default function PowerShellAcademyApp() {
   const pct = Math.round((lessonsDone / LESSONS.length) * 100)
   const missionCount = Math.min(progress.missionsDone.length, MISSIONS.length)
   const activeLesson = LESSONS.find((l) => l.id === view)
+  const resumeId = view === 'home' ? lastView('powershell-academy') : null
+  const resumeLesson = resumeId ? (LESSONS.find((l) => l.id === resumeId) ?? null) : null
 
   const sidebarItem = (v: ViewId, Icon: typeof BookOpen, label: string, tint: string, doneFlag?: boolean) => (
     <button
@@ -2312,9 +2321,10 @@ export default function PowerShellAcademyApp() {
         </div>
 
         {/* محتوا */}
-        <main className="os-scroll min-w-0 flex-1 overflow-y-auto p-4 pb-16 pt-10 md:pb-4 md:pt-4">
+        <main ref={scrollRef} className="os-scroll relative min-w-0 flex-1 overflow-y-auto p-4 pb-16 pt-10 md:pb-4 md:pt-4">
+          <ReadProgress targetRef={scrollRef} accent={SUNJOB_PALETTE.orange} />
           <AnimatePresence mode="wait">
-            <motion.div key={view} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.16 }} className="mx-auto max-w-3xl">
+            <motion.div key={view} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.16 }} className="reading-shell prose-fa mx-auto">
               {/* ---------------- خانه ---------------- */}
               {view === 'home' && (
                 <div className="space-y-4">
@@ -2326,6 +2336,19 @@ export default function PowerShellAcademyApp() {
                       <p className="mt-0.5 text-[11px] leading-4 text-zinc-300">۱۲ درس در ۴ مرحله، زمین بازی با شبیه‌ساز آموزشی صادق، ۵ مأموریت عملی، آزمون و گواهی — همه‌چیز آفلاین و بدون خطر.</p>
                     </div>
                   </div>
+
+                  {resumeLesson && (
+                    <button onClick={() => setView(resumeLesson.id)} className="flex w-full items-center gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/[0.06] p-3 text-right transition hover:border-amber-400/50 hover:bg-amber-500/[0.09]">
+                      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-amber-500/15" style={{ color: SUNJOB_PALETTE.orange }}>
+                        <BookOpen size={17} />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-xs font-black text-zinc-100">ادامهٔ یادگیری: {resumeLesson.title}</span>
+                        <span className="block text-[10px] text-zinc-500">مرحلهٔ {fa(resumeLesson.stage + 1)} — از همان‌جایی که رها کردی ادامه بده</span>
+                      </span>
+                      <ChevronLeft size={14} className="shrink-0 text-amber-400" aria-hidden />
+                    </button>
+                  )}
 
                   <div className="grid grid-cols-3 gap-2">
                     {[

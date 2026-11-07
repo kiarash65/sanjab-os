@@ -3,7 +3,7 @@
 /* آکادمی Rust — دورهٔ تعاملی فارسی با شبیه‌ساز کوچک Rust و زمین بازی */
 
 import dynamic from 'next/dynamic'
-import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
@@ -35,6 +35,7 @@ import type { LucideIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
+import { ReadProgress, rememberView } from '@/components/os/academy/reader'
 import { useOS } from '@/lib/os/store'
 import { useGame } from '@/lib/gamification/engine'
 
@@ -1772,6 +1773,7 @@ function CodeBlock({ code, tone = 'rust' }: { code: string; tone?: 'rust' | 'ter
       className={`os-scroll max-h-72 overflow-auto rounded-xl border p-3 text-left font-mono text-[11.5px] leading-6 ${
         tone === 'term' ? 'border-white/10 bg-black text-zinc-300' : 'border-emerald-500/15 bg-zinc-950 text-emerald-300'
       }`}
+      style={{ fontSize: 'var(--fa-code-size)', lineHeight: 'var(--fa-code-line-height)' }}
     >
       <code>{code}</code>
     </pre>
@@ -1819,6 +1821,7 @@ function SideItem({ icon: Icon, label, active, onClick }: { icon: LucideIcon; la
 
 export default function RustAcademyApp() {
   const pushToast = useOS((s) => s.pushToast)
+  const mainRef = useRef<HTMLElement>(null)
   const [view, setView] = useState<View>('home')
   const [trackId, setTrackId] = useState(TRACKS[0].id)
   const [lessonId, setLessonId] = useState(TRACKS[0].lessons[0].id)
@@ -1866,6 +1869,11 @@ export default function RustAcademyApp() {
       /* ignore */
     }
   }, [done, quizBest, missionsDone, loaded])
+
+  /* ---------- یادآوری آخرین درس در حال مطالعه ---------- */
+  useEffect(() => {
+    if (view === 'track') rememberView('rust-academy', view)
+  }, [view])
 
   /* ---------- محاسبات ---------- */
   const flat = useMemo(() => TRACKS.flatMap((t) => t.lessons.map((l) => ({ track: t, lesson: l }))), [])
@@ -2094,7 +2102,8 @@ export default function RustAcademyApp() {
         </nav>
 
         {/* محتوا */}
-        <main className="os-scroll min-w-0 flex-1 overflow-y-auto p-4">
+        <main ref={mainRef} className="os-scroll relative min-w-0 flex-1 overflow-y-auto p-4">
+          <ReadProgress targetRef={mainRef} />
           <AnimatePresence mode="wait">
             <motion.div
               key={`${view}:${view === 'track' ? lessonId : ''}`}
@@ -2102,7 +2111,7 @@ export default function RustAcademyApp() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.16 }}
-              className="mx-auto max-w-3xl space-y-3"
+              className="reading-shell prose-fa mx-auto space-y-3"
             >
               {/* --------- آزمایشگاه حافظه (مالکیت بصری) --------- */}
               {view === 'memory' && (
@@ -2237,7 +2246,7 @@ export default function RustAcademyApp() {
                   </div>
                   <div className="space-y-2.5 rounded-2xl border border-white/10 bg-zinc-900/60 p-4">
                     {lesson.paragraphs.map((p, i) => (
-                      <p key={i} className="text-[13px] leading-7 text-zinc-300">
+                      <p key={i} className="text-zinc-300">
                         {rich(p)}
                       </p>
                     ))}

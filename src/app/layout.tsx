@@ -1,17 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Geist_Mono, Vazirmatn } from "next/font/google";
 import "./globals.css";
 
-const vazir = Vazirmatn({
-  variable: "--font-vazir",
-  subsets: ["arabic", "latin"],
-  weight: ["400", "500", "700", "900"],
-});
-
-const mono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+/* فونت‌ها به‌صورت محلی در public/fonts باندل شده‌اند (woff2، مجوز SIL OFL)
+   و در globals.css با @font-face + font-display: swap تعریف شده‌اند.
+   دو فونت اصلی (وزیرمتن و استعداد) preload می‌شوند تا CLS نزدیک صفر بماند. */
 
 export const metadata: Metadata = {
   title: "سان‌جاب‌او‌اس | سیستم‌عامل بامزه تحت وب — با اسپانسری سان‌جاب",
@@ -34,9 +26,30 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fa" dir="rtl" suppressHydrationWarning>
-      <body
-        className={`${vazir.variable} ${mono.variable} antialiased overflow-hidden bg-zinc-950 text-zinc-100`}
-      >
+      <head>
+        <link
+          rel="preload"
+          href="/fonts/Vazirmatn-var.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/fonts/Estedad-var.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/fonts/JetBrainsMono-var.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+      </head>
+      <body className="antialiased overflow-hidden bg-zinc-950 text-zinc-100">
         {children}
       </body>
     </html>

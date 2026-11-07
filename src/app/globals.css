@@ -6,8 +6,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--fa-font-body);
+  --font-mono: var(--fa-font-code);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -120,11 +120,377 @@
     @apply bg-background text-foreground;
   }
   html {
-    font-family: var(--font-vazir), ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--fa-font-body);
+    font-size: 16px;
   }
 }
 
+/* ================================================================
+   فونت‌های فارسی محلی — بدون وابستگی به CDN
+   Vazirmatn / Vazirmatn UI / Estedad: مجوز SIL OFL 1.1
+   JetBrains Mono: مجوز SIL OFL 1.1 (فقط لاتین — برای کد)
+   ================================================================ */
+
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('/fonts/Vazirmatn-var.woff2') format('woff2-variations'), url('/fonts/Vazirmatn-var.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  font-stretch: normal;
+}
+
+@font-face {
+  font-family: 'Estedad';
+  src: url('/fonts/Estedad-var.woff2') format('woff2-variations'), url('/fonts/Estedad-var.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Vazirmatn UI';
+  src: url('/fonts/Vazirmatn-UI-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Vazirmatn UI';
+  src: url('/fonts/Vazirmatn-UI-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Vazirmatn UI';
+  src: url('/fonts/Vazirmatn-UI-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Vazirmatn UI';
+  src: url('/fonts/Vazirmatn-UI-Black.woff2') format('woff2');
+  font-weight: 800 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/JetBrainsMono-var.woff2') format('woff2-variations'), url('/fonts/JetBrainsMono-var.woff2') format('woff2');
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ================================================================
+   توکن‌های تایپوگرافی — تک منبع حقیقت کل سیستم
+   مقادیر runtime توسط TypographyProvider از تنظیمات کاربر ست می‌شوند
+   ================================================================ */
+
+:root {
+  --fa-font-body: 'Estedad', 'Vazirmatn', ui-sans-serif, system-ui, sans-serif;
+  --fa-font-code: 'JetBrains Mono', 'Vazirmatn', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --fa-body-size: 16px;
+  --fa-body-weight: 400;
+  --fa-line-height: 1.9;
+  --fa-paragraph-gap: 0.85em;
+  --fa-reading-width: 720px;
+  --fa-code-size: 13px;
+  --fa-code-line-height: 1.75;
+  --fa-heading-scale: 1;
+}
+
+/* جزیره‌های LTR داخل متن RTL — برای اصطلاحات فنی انگلیسی */
+.ltr-inline {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* پوسته عرض مطالعه */
+.reading-shell {
+  max-width: var(--fa-reading-width);
+  margin-inline: auto;
+}
+
+/* ================================================================
+   prose-fa — تایپوگرافی استاندارد مطالعه (Learning Reader)
+   فقط فرزندان مستقیم استایل می‌گیرند تا کارت‌ها و اجزای داخلی نشکنند
+   ================================================================ */
+
+.prose-fa {
+  font-family: var(--fa-font-body);
+  font-size: var(--fa-body-size);
+  font-weight: var(--fa-body-weight);
+  line-height: var(--fa-line-height);
+  color: #e4e4e7;
+  overflow-wrap: break-word;
+}
+.prose-fa > *:first-child {
+  margin-top: 0 !important;
+}
+.prose-fa > p {
+  margin-block: var(--fa-paragraph-gap) 0;
+  color: #e4e4e7;
+}
+.prose-fa > strong,
+.prose-fa > p strong,
+.prose-fa > p b {
+  font-weight: 700;
+  color: #fafafa;
+}
+.prose-fa > h2 {
+  font-size: calc(1.3em * var(--fa-heading-scale));
+  font-weight: 800;
+  line-height: 1.45;
+  color: #fafafa;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  scroll-margin-top: 3.5rem;
+}
+.prose-fa > h3 {
+  font-size: calc(1.1em * var(--fa-heading-scale));
+  font-weight: 800;
+  line-height: 1.5;
+  color: #f4f4f5;
+  margin-top: 1.35em;
+  margin-bottom: 0.4em;
+  scroll-margin-top: 3.5rem;
+}
+.prose-fa > h4 {
+  font-weight: 700;
+  color: #f4f4f5;
+  margin-top: 1.2em;
+  margin-bottom: 0.35em;
+}
+.prose-fa > ul,
+.prose-fa > ol {
+  margin-block: var(--fa-paragraph-gap) 0;
+  padding-inline-start: 1.35em;
+}
+.prose-fa > ul {
+  list-style: disc;
+}
+.prose-fa > ol {
+  list-style: decimal;
+}
+.prose-fa > ul > li,
+.prose-fa > ol > li {
+  margin-top: 0.4em;
+  padding-inline-start: 0.2em;
+}
+.prose-fa > ul > li::marker,
+.prose-fa > ol > li::marker {
+  color: var(--pengo-accent, #f7931e);
+}
+.prose-fa > a {
+  color: #67e8f9;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: rgba(103, 232, 249, 0.4);
+}
+.prose-fa > a:hover {
+  text-decoration-color: #67e8f9;
+}
+.prose-fa > blockquote {
+  border-inline-start: 3px solid var(--pengo-accent, #f7931e);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.65em 1em;
+  border-radius: 0.6rem;
+  margin-block: var(--fa-paragraph-gap) 0;
+  color: #d4d4d8;
+}
+.prose-fa > blockquote > p {
+  margin-block: 0.35em 0;
+}
+.prose-fa > hr {
+  border: 0;
+  border-top: 1px dashed rgba(255, 255, 255, 0.14);
+  margin-block: 1.6em;
+}
+.prose-fa > table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92em;
+  line-height: 1.7;
+  margin-block: var(--fa-paragraph-gap) 0;
+  overflow: hidden;
+  border-radius: 0.6rem;
+}
+.prose-fa > table th,
+.prose-fa > table td {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.45em 0.7em;
+  text-align: start;
+  vertical-align: top;
+}
+.prose-fa > table thead th {
+  background: rgba(255, 255, 255, 0.06);
+  font-weight: 700;
+  color: #fafafa;
+}
+.prose-fa > table tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* کد — همیشه LTR و با فونت مونو قابل تنظیم */
+.prose-fa code {
+  font-family: var(--fa-font-code);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.prose-fa > p code,
+.prose-fa > li code,
+.prose-fa > h2 code,
+.prose-fa > h3 code,
+.prose-fa > td code,
+.prose-fa > th code {
+  font-size: 0.85em;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 0.375rem;
+  padding: 0.08em 0.4em;
+  color: #fcd34d;
+  white-space: nowrap;
+}
+.prose-fa > pre,
+.prose-fa pre.prose-pre {
+  direction: ltr;
+  text-align: left;
+  font-family: var(--fa-font-code);
+  font-size: var(--fa-code-size);
+  line-height: var(--fa-code-line-height);
+  background: #0a0a0c;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  padding: 0.85rem 1rem;
+  overflow-x: auto;
+  margin-block: var(--fa-paragraph-gap) 0;
+  color: #e4e4e7;
+  tab-size: 4;
+}
+.prose-fa > pre code,
+.prose-fa pre.prose-pre code {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+  white-space: pre;
+}
+
+/* بلوک‌های ویژه آموزشی */
+.callout {
+  border-radius: 0.75rem;
+  border: 1px solid;
+  padding: 0.7rem 0.9rem;
+  font-size: calc(var(--fa-body-size) * 0.92);
+  line-height: var(--fa-line-height);
+  margin-block: var(--fa-paragraph-gap) 0;
+}
+.callout-note {
+  border-color: rgba(34, 211, 238, 0.35);
+  background: rgba(34, 211, 238, 0.08);
+  color: #a5f3fc;
+}
+.callout-warn {
+  border-color: rgba(244, 63, 94, 0.4);
+  background: rgba(244, 63, 94, 0.08);
+  color: #fda4af;
+}
+.callout-tip {
+  border-color: rgba(250, 204, 21, 0.35);
+  background: rgba(250, 204, 21, 0.08);
+  color: #fde68a;
+}
+.callout-example {
+  border-color: rgba(167, 139, 250, 0.35);
+  background: rgba(167, 139, 250, 0.08);
+  color: #ddd6fe;
+}
+.callout .callout-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 800;
+  margin-bottom: 0.3rem;
+  font-size: 0.95em;
+}
+.callout p {
+  margin: 0.2em 0 0;
+  color: inherit;
+}
+
+/* ================================================================
+   دسترس‌پذیری — کلاس‌های runtime روی html
+   ================================================================ */
+
+/* کاهش حرکت / خاموش بودن انیمیشن‌ها */
+html.fa-reduced-motion *,
+html.fa-reduced-motion *::before,
+html.fa-reduced-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* کنتراست بالا — متن‌های کم‌رنگ روشن‌تر و حاشیه‌ها واضح‌تر */
+html.fa-high-contrast [class*='text-zinc-4'],
+html.fa-high-contrast [class*='text-zinc-5'],
+html.fa-high-contrast [class*='text-zinc-6'] {
+  color: #e4e4e7 !important;
+}
+html.fa-high-contrast .prose-fa,
+html.fa-high-contrast .prose-fa > p {
+  color: #ffffff;
+}
+html.fa-high-contrast .prose-fa > strong {
+  color: #ffffff;
+}
+html.fa-high-contrast [class*='border-white/10'],
+html.fa-high-contrast [class*='border-white/15'] {
+  border-color: rgba(255, 255, 255, 0.32) !important;
+}
+html.fa-high-contrast .os-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.45);
+}
+
+/* ناوبری کیبورد — فوکوس همیشه با رنگ اکسنت پیدا باشد */
+html.fa-focus-indicators a:focus,
+html.fa-focus-indicators button:focus,
+html.fa-focus-indicators input:focus,
+html.fa-focus-indicators textarea:focus,
+html.fa-focus-indicators select:focus,
+html.fa-focus-indicators [tabindex]:focus {
+  outline: 2px solid var(--pengo-accent, #f7931e) !important;
+  outline-offset: 2px;
+  border-radius: 0.35rem;
+}
+
+/* چگالی فشرده — نوار عنوان و تسک‌بار باریک‌تر */
+html.fa-compact .os-taskbar {
+  height: 40px;
+}
+html.fa-compact .os-titlebar {
+  height: 32px;
+}
+
+/* اسکرول‌بار حالت مطالعه — ظریف‌تر */
+.reader-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.reader-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+}
+.reader-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
 /* ---------- پنگوئن‌اواس ---------- */
+/* (نام تاریخی از نسخه‌های اول — امروز سان‌جاب‌اواس هستیم) */
 html,
 body {
   height: 100%;

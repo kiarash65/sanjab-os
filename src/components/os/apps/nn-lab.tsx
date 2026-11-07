@@ -53,23 +53,6 @@ export default function NNLab() {
   const rafRef = useRef<number | null>(null)
   const epochRef = useRef(0)
 
-  const rebuild = useCallback(
-    (dsId: DatasetId, arch: number[]) => {
-      dataRef.current = makeDataset(dsId, 140)
-      netRef.current = new MLP(arch)
-      lossHistoryRef.current = []
-      epochRef.current = 0
-      setEpoch(0)
-      setLoss(0)
-      setAcc(0)
-      setParamsCount(netRef.current.parameters().length)
-      drawBoundary()
-      drawLoss()
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  )
-
   const drawBoundary = useCallback(() => {
     const cv = canvasRef.current
     const net = netRef.current
@@ -144,45 +127,58 @@ export default function NNLab() {
     ctx.stroke()
   }, [])
 
-  const stepLoop = useCallback(() => {
-    const net = netRef.current
-    if (!net || !running) return
-    // هر فریم چند گام آموزش — مدل کوچک است
-    const stepsPerFrame = 6
-    let last: { loss: number; accuracy: number } | null = null
-    for (let s = 0; s < stepsPerFrame; s++) {
-      epochRef.current++
-      last = trainStep(net, dataRef.current, { lr, epochs: 1, loss: lossFn }, epochRef.current)
+  const rebuild = useCallback(
+    (dsId: DatasetId, arch: number[]) => {
+      dataRef.current = makeDataset(dsId, 140)
+      netRef.current = new MLP(arch)
+      lossHistoryRef.current = []
+      epochRef.current = 0
+      setEpoch(0)
+      setLoss(0)
+      setAcc(0)
+      setParamsCount(netRef.current.parameters().length)
+      drawBoundary()
+      drawLoss()
+    },
+    [drawBoundary, drawLoss]
+  )
+
+  useEffect(() => {
+    if (!running) return
+    let raf = 0
+    /* حلقهٔ آموزش — هر فریم چند گام؛ مدل کوچک است */
+    const loop = () => {
+      const net = netRef.current
+      if (!net) return
+      const stepsPerFrame = 6
+      let last: { loss: number; accuracy: number } | null = null
+      for (let s = 0; s < stepsPerFrame; s++) {
+        epochRef.current++
+        last = trainStep(net, dataRef.current, { lr, epochs: 1, loss: lossFn }, epochRef.current)
+      }
+      if (last) {
+        setEpoch(epochRef.current)
+        setLoss(last.loss)
+        setAcc(last.accuracy)
+      }
+      // پاداش اولین آموزش واقعی مدل (idempotent)
+      if (epochRef.current === 60) {
+        useGame.getState().award('ai:lab:first-train', 15, 'اولین مدل را در آزمایشگاه آموزش دادی', { track: 'ai' })
+      }
+      lossHistoryRef.current.push(last?.loss ?? 0)
+      if (lossHistoryRef.current.length > 240) lossHistoryRef.current.shift()
+      drawBoundary()
+      drawLoss()
+      raf = requestAnimationFrame(loop)
     }
-    if (last) {
-      setEpoch(epochRef.current)
-      setLoss(last.loss)
-      setAcc(last.accuracy)
-    }
-    // پاداش اولین آموزش واقعی مدل (idempotent)
-    if (epochRef.current === 60) {
-      useGame.getState().award('ai:lab:first-train', 15, 'اولین مدل را در آزمایشگاه آموزش دادی', { track: 'ai' })
-    }
-    lossHistoryRef.current.push(last?.loss ?? 0)
-    if (lossHistoryRef.current.length > 240) lossHistoryRef.current.shift()
-    drawBoundary()
-    drawLoss()
-    rafRef.current = requestAnimationFrame(stepLoop)
+    raf = requestAnimationFrame(loop)
+    return () => cancelAnimationFrame(raf)
   }, [running, lr, lossFn, drawBoundary, drawLoss])
 
   useEffect(() => {
-    if (running) {
-      rafRef.current = requestAnimationFrame(stepLoop)
-      return () => {
-        if (rafRef.current) cancelAnimationFrame(rafRef.current)
-      }
-    }
-  }, [running, stepLoop])
-
-  useEffect(() => {
-    rebuild(dataset, [2, ...hidden, 1])
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dataset])
+    const t = window.setTimeout(() => rebuild(dataset, [2, ...hidden, 1]), 0)
+    return () => window.clearTimeout(t)
+  }, [dataset, rebuild, hidden])
 
   const changeHidden = (idx: number, delta: number) => {
     const next = [...hidden]

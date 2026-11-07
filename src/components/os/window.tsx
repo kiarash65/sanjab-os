@@ -116,7 +116,7 @@ export default function WindowFrame({
       aria-label={win.title}
     >
       <div
-        className={`pengo-noselect flex h-10 shrink-0 cursor-grab items-center gap-2 px-3 backdrop-blur active:cursor-grabbing ${
+        className={`os-titlebar pengo-noselect flex h-10 shrink-0 cursor-grab items-center gap-2 px-3 backdrop-blur active:cursor-grabbing ${
           focused && tint
             ? `bg-gradient-to-l ${tint}`
             : 'bg-zinc-900/95'

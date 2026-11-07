@@ -21,6 +21,7 @@ import {
   ScrollText,
   ShieldCheck,
   Sparkles,
+  Play,
   SquareTerminal,
   Target,
   Trophy,
@@ -32,6 +33,7 @@ import { BRAND, SUNJOB_PALETTE } from '@/lib/os/brand'
 import { useOS } from '@/lib/os/store'
 import { useGame } from '@/lib/gamification/engine'
 import { DEEP_CHAPTERS, DEEP_IDS, DeepChapterView } from '@/components/os/academy/deep'
+import LearningReader, { ReadingShell, ReadProgress, rememberView, lastView, type ReaderSection } from '@/components/os/academy/reader'
 import {
   CHEATSHEET,
   DISTROS,
@@ -1100,7 +1102,7 @@ function Chapter({
           {done ? 'خوانده شد' : 'خواندم!'}
         </Button>
       </div>
-      {children}
+      <ReadingShell className="pt-1">{children}</ReadingShell>
     </div>
   )
 }
@@ -1109,16 +1111,73 @@ function Chapter({
    اپ اصلی
    ================================================================ */
 
+/* برگه تقلب به‌صورت Learning Reader کامل — فهرست، فوکوس، پیشرفت و ادامه */
+const CHEAT_SECTIONS: ReaderSection[] = [
+  ...CHEATSHEET.map((g) => ({
+    id: g.group,
+    title: g.group,
+    content: (
+      <div key={g.group} className="divide-y divide-white/5 overflow-hidden rounded-xl border border-white/10 bg-zinc-900/50">
+        {g.rows.map(([cmd, desc]) => (
+          <div key={cmd} className="px-3 py-2">
+            <code
+              dir="ltr"
+              className="block text-left font-mono font-bold text-emerald-300"
+              style={{ fontSize: 'var(--fa-code-size)' }}
+            >
+              {cmd}
+            </code>
+            <p className="mt-0.5 text-[11px] leading-5 text-zinc-400">{desc}</p>
+          </div>
+        ))}
+      </div>
+    ),
+  })),
+  {
+    id: 'resources',
+    title: 'منابع واقعی برای ادامهٔ مسیر',
+    content: (
+      <div className="grid gap-1.5 sm:grid-cols-2">
+        {FURTHER_RESOURCES.map((r) => (
+          <a
+            key={r.name}
+            href={r.url}
+            target="_blank"
+            rel="noreferrer"
+            className="group flex items-start gap-2 rounded-xl border border-white/10 bg-black/25 p-2.5 transition hover:border-[#f7931e]/50"
+          >
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-black text-zinc-100" dir="ltr">{r.name}</p>
+              <p className="mt-0.5 text-[10px] leading-4 text-zinc-400">{r.desc}</p>
+            </div>
+            <ExternalLink size={13} className="mt-1 shrink-0 text-zinc-500 transition group-hover:text-amber-300" aria-hidden />
+          </a>
+        ))}
+      </div>
+    ),
+  },
+]
+
 export default function LinuxAcademyApp() {
   const [progress, setProgress] = useState<AcademyProgress>(EMPTY_PROGRESS)
   const [view, setView] = useState<ViewId>('home')
   const [installOpen, setInstallOpen] = useState<string>(INSTALL_METHODS[0].id)
   const pushToast = useOS((s) => s.pushToast)
+  const mainRef = useRef<HTMLElement>(null)
+  const [resumeTo, setResumeTo] = useState<string | null>(null)
 
   useEffect(() => {
-    const t = window.setTimeout(() => setProgress(loadProgress()), 0)
+    const t = window.setTimeout(() => {
+      setProgress(loadProgress())
+      setResumeTo(lastView('linux-academy'))
+    }, 0)
     return () => window.clearTimeout(t)
   }, [])
+
+  /* ذخیره آخرین فصل برای «ادامه بده» */
+  useEffect(() => {
+    if (view !== 'home' && view !== 'cheats') rememberView('linux-academy', view)
+  }, [view])
 
   const update = useCallback((fn: (p: AcademyProgress) => AcademyProgress) => {
     setProgress((prev) => {
@@ -1257,8 +1316,18 @@ export default function LinuxAcademyApp() {
           ))}
         </div>
 
-        {/* محتوا */}
-        <main className="os-scroll min-w-0 flex-1 overflow-y-auto p-4 pb-16 pt-10 md:pb-4 md:pt-4">
+        {/* محتوا — برگه تقلب با خوانندهٔ کامل رندر می‌شود */}
+        {view === 'cheats' ? (
+          <div className="relative min-w-0 flex-1">
+            <LearningReader
+              readerId="linux-cheats"
+              title="برگه تقلب لینوکس — دستورهای واقعی ترمینال"
+              sections={CHEAT_SECTIONS}
+            />
+          </div>
+        ) : (
+        <main ref={mainRef} className="os-scroll relative min-w-0 flex-1 overflow-y-auto p-4 pb-16 pt-10 md:pb-4 md:pt-4">
+          <ReadProgress targetRef={mainRef} />
           <AnimatePresence mode="wait">
             <motion.div
               key={view}
@@ -1266,7 +1335,7 @@ export default function LinuxAcademyApp() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.16 }}
-              className="mx-auto max-w-3xl"
+              className="reading-shell mx-auto"
             >
               {/* ---------------- خانه ---------------- */}
               {view === 'home' && (
@@ -1328,13 +1397,29 @@ export default function LinuxAcademyApp() {
                       رفتن به برگه تقلب
                     </Button>
                   </div>
+
+                  {resumeTo && resumeTo !== 'home' && (
+                    <button
+                      type="button"
+                      onClick={() => setView(resumeTo as ViewId)}
+                      className="flex w-full items-center justify-between gap-2 rounded-2xl border border-[#f7931e]/40 bg-[#f7931e]/10 p-3 text-right transition hover:bg-[#f7931e]/20"
+                    >
+                      <span className="min-w-0">
+                        <span className="block text-xs font-black text-amber-200">ادامه بده از جایی که بودی</span>
+                        <span className="mt-0.5 block text-[10.5px] text-amber-200/70">
+                          {CHAPTERS.find((c) => c.id === resumeTo)?.title ?? 'فصل آخر'} منتظرت است
+                        </span>
+                      </span>
+                      <Play size={16} className="shrink-0 text-amber-300" aria-hidden />
+                    </button>
+                  )}
                 </div>
               )}
 
               {/* ---------------- فصل ۱ ---------------- */}
               {view === 'what' && (
                 <Chapter def={CHAPTERS[0]} done={progress.done.includes('what')} onToggleDone={() => toggleDone('what', 'لینوکس چیست؟')}>
-                  <div className="space-y-3 text-xs leading-6 text-zinc-300">
+                  <div className="space-y-3 text-zinc-300">
                     <p>
                       <b className="text-zinc-100">لینوکس</b> اسم «هستهٔ» (kernel) یک سیستم‌عامل است — بخشی که بین سخت‌افزار و برنامه‌ها دادوستد می‌کند.
                       چیزی که مردم «لینوکس» صدا می‌زنند در واقع یک <b className="text-zinc-100">توزیع</b> است: هسته + ابزارها + محیط گرافیکی + نصب‌کننده، بسته‌بندی‌شده مثل یک گوشی با رام اختصاصی.
@@ -1381,7 +1466,7 @@ export default function LinuxAcademyApp() {
               {/* ---------------- فصل ۲ ---------------- */}
               {view === 'where' && (
                 <Chapter def={CHAPTERS[1]} done={progress.done.includes('where')} onToggleDone={() => toggleDone('where', 'لینوکس کجاست؟')}>
-                  <div className="space-y-4 text-xs leading-6 text-zinc-300">
+                  <div className="space-y-4 text-zinc-300">
                     <p>شاید فکر کنی لینوکس «سیستم‌عامل هکرها» است؛ ولی واقعیت این است که بدون اینکه بفهمی، هر روز ازش استفاده می‌کنی:</p>
 
                     <div className="space-y-2.5">
@@ -1425,7 +1510,7 @@ export default function LinuxAcademyApp() {
               {/* ---------------- فصل ۳ ---------------- */}
               {view === 'distros' && (
                 <Chapter def={CHAPTERS[2]} done={progress.done.includes('distros')} onToggleDone={() => toggleDone('distros', 'توزیع‌ها')}>
-                  <div className="space-y-4 text-xs leading-6 text-zinc-300">
+                  <div className="space-y-4 text-zinc-300">
                     <p>
                       «توزیع» یعنی همان بستهٔ کامل آمادهٔ نصب. همه از یک هستهٔ لینوکس استفاده می‌کنند ولی شخصیت‌شان فرق دارد — مثل پیتزافروشی‌هایی که خمیر یکسانی دارند!
                     </p>
@@ -1466,7 +1551,7 @@ export default function LinuxAcademyApp() {
               {view === 'install' && (
                 <Chapter def={CHAPTERS[3]} done={progress.done.includes('install')} onToggleDone={() => toggleDone('install', 'نصب لینوکس')}>
                   <div className="space-y-3">
-                    <p className="text-xs leading-6 text-zinc-300">
+                    <p className="text-zinc-300">
                       چهار راه استاندارد برای امتحان‌کردن لینوکس هست؛ از «هیچ ریسکی نمی‌خوام» تا «من کولاک می‌کنم». روی هر روش بزن تا قدم‌به‌قدم باز شود:
                     </p>
                     <div className="space-y-2">
@@ -1536,7 +1621,7 @@ export default function LinuxAcademyApp() {
               {/* ---------------- فصل ۵ ---------------- */}
               {view === 'terminal' && (
                 <Chapter def={CHAPTERS[4]} done={progress.done.includes('terminal')} onToggleDone={() => toggleDone('terminal', 'ترمینال')}>
-                  <div className="space-y-4 text-xs leading-6 text-zinc-300">
+                  <div className="space-y-4 text-zinc-300">
                     <p>
                       در لینوکس «دروازهٔ واقعی قدرت» ترمینال است؛ همان جایی که همه‌چیز با تایپ انجام می‌شود. عبارتی مثل <code dir="ltr" className="rounded bg-zinc-950 px-1.5 py-0.5 font-mono text-[10.5px] text-emerald-300">pengo@sunjob:~$</code> یعنی: کاربر pengo روی ماشین sunjob، در پوشهٔ خانه (~)، آمادهٔ دستور گرفتن ($).
                     </p>
@@ -1551,7 +1636,7 @@ export default function LinuxAcademyApp() {
               {/* ---------------- فصل ۶ ---------------- */}
               {view === 'permissions' && (
                 <Chapter def={CHAPTERS[5]} done={progress.done.includes('permissions')} onToggleDone={() => toggleDone('permissions', 'دسترسی‌ها')}>
-                  <div className="space-y-4 text-xs leading-6 text-zinc-300">
+                  <div className="space-y-4 text-zinc-300">
                     <p>
                       در لینوکس هر فایل سه نوع بیننده دارد: <b className="text-zinc-100">مالک</b>، <b className="text-zinc-100">گروه</b> و <b className="text-zinc-100">دیگران</b> — و هر کدام می‌توانند بخوانند (r)، بنویسند (w) یا اجرا کنند (x). با ماشین‌حساب زیر بازی کن:
                     </p>
@@ -1563,7 +1648,7 @@ export default function LinuxAcademyApp() {
               {/* ---------------- فصل ۷ ---------------- */}
               {view === 'procs' && (
                 <Chapter def={CHAPTERS[6]} done={progress.done.includes('procs')} onToggleDone={() => toggleDone('procs', 'فرآیندها و بسته‌ها')}>
-                  <div className="space-y-4 text-xs leading-6 text-zinc-300">
+                  <div className="space-y-4 text-zinc-300">
                     <div>
                       <SectionTitle icon={Cpu} color={SUNJOB_PALETTE.teal}>فرآیندها: هر برنامه یک شماره دارد</SectionTitle>
                       <p className="mb-2">
@@ -1591,7 +1676,7 @@ export default function LinuxAcademyApp() {
               {/* ---------------- فصل ۸ ---------------- */}
               {view === 'quiz' && (
                 <Chapter def={CHAPTERS[7]} done={progress.done.includes('quiz')} onToggleDone={() => toggleDone('quiz', 'آزمون و گواهی')}>
-                  <div className="text-xs leading-6 text-zinc-300">
+                  <div className="text-zinc-300">
                     <p className="mb-3">
                       {fa(QUIZ.length)} سؤال از تمام فصل‌ها (حتی فصل‌های عمیق). {fa(PASS_SCORE)} و بالاتر یعنی قبول و صاحب گواهی «آکادمی لینوکس سان‌جاب‌او‌اس». بهترین نمرهٔ فعلی تو: <b className="text-amber-300">{fa(progress.quizBest)}</b>
                     </p>
@@ -1609,59 +1694,11 @@ export default function LinuxAcademyApp() {
                 />
               )}
 
-              {/* ---------------- برگه تقلب ---------------- */}
-              {view === 'cheats' && (
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <span className="grid h-10 w-10 place-items-center rounded-xl" style={{ background: '#14b8a622', color: '#14b8a6' }}>
-                      <ScrollText size={19} />
-                    </span>
-                    <div>
-                      <h2 className="text-base font-black text-zinc-50">برگه تقلب لینوکس</h2>
-                      <p className="text-[11px] text-zinc-400">دستورهای که در ترمینال واقعی هم همان‌طور کار می‌کنند</p>
-                    </div>
-                  </div>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    {CHEATSHEET.map((g) => (
-                      <div key={g.group} className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/60">
-                        <p className="border-b border-white/10 px-3 py-2 text-xs font-black" style={{ color: g.color }}>{g.group}</p>
-                        <div className="divide-y divide-white/5">
-                          {g.rows.map(([cmd, desc]) => (
-                            <div key={cmd} className="px-3 py-2">
-                              <code dir="ltr" className="block text-left font-mono text-[10.5px] font-bold text-emerald-300">{cmd}</code>
-                              <p className="mt-0.5 text-[10px] leading-4 text-zinc-400">{desc}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-3">
-                    <SectionTitle icon={ExternalLink} color={SUNJOB_PALETTE.orange}>ادامهٔ مسیر — منابع واقعی</SectionTitle>
-                    <div className="grid gap-1.5 sm:grid-cols-2">
-                      {FURTHER_RESOURCES.map((r) => (
-                        <a
-                          key={r.name}
-                          href={r.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="group flex items-start gap-2 rounded-xl border border-white/10 bg-black/25 p-2.5 transition hover:border-[#f7931e]/50"
-                        >
-                          <div className="min-w-0 flex-1">
-                            <p className="text-[11px] font-black text-zinc-100" dir="ltr">{r.name}</p>
-                            <p className="mt-0.5 text-[10px] leading-4 text-zinc-400">{r.desc}</p>
-                          </div>
-                          <ExternalLink size={13} className="mt-1 shrink-0 text-zinc-500 transition group-hover:text-amber-300" aria-hidden />
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                  <p className="pb-1 text-center text-[10px] text-zinc-600">با اسپانسری سان‌جاب — یاد بگیر، ور برو، خراب کن (توی ماشین مجازی)!</p>
-                </div>
-              )}
+              {/* برگه تقلب به‌صورت خوانندهٔ کامل بالاتر (بیرون از main) رندر می‌شود */}
             </motion.div>
           </AnimatePresence>
         </main>
+        )}
       </div>
     </div>
   )
