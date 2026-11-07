@@ -25,6 +25,7 @@ export default function DesktopIcons() {
 
   return (
     <div
+      data-tour="icons"
       className="absolute bottom-16 right-3 top-3 z-0 flex flex-col flex-wrap-reverse content-start items-start gap-1"
       aria-label="آیکن‌های میزکار"
     >

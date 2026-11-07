@@ -645,6 +645,20 @@ body {
   animation: pengo-fadein 0.22s ease-out both;
 }
 
+/* تنفس حلقهٔ اسپات‌لایت تور خوش‌آمدگویی */
+@keyframes pengo-spotlight {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.35);
+  }
+}
+.pengo-spotlight {
+  animation: pengo-spotlight 2.2s ease-in-out infinite;
+}
+
 /* موج خوردن اعلان پیشنهاد اصلاح غلط تایپی */
 @keyframes pengo-wiggle {
   0%,
