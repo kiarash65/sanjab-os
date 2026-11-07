@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <title>SanjabOS — خطای راه‌اندازی</title>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        background: #0b0b12; color: #e4e4e7; margin: 0; height: 100vh;
+        display: grid; place-items: center;
+        font-family: "Segoe UI", Tahoma, sans-serif; padding: 24px;
+      }
+      .card {
+        max-width: 480px; width: 100%;
+        background: #14141c; border: 1px solid #2a2a35; border-radius: 16px;
+        padding: 28px; text-align: center;
+      }
+      .icon { font-size: 40px; margin-bottom: 8px; }
+      h2 { color: #f7931e; margin: 0 0 12px; font-size: 18px; }
+      p { font-size: 13px; line-height: 1.9; color: #a1a1aa; margin: 0 0 12px; }
+      .reason {
+        background: #0b0b12; border: 1px solid #2a2a35; border-radius: 10px;
+        padding: 12px; font-size: 12px; line-height: 1.9; color: #fca5a5;
+        word-break: break-word; min-height: 40px;
+      }
+      .hint { font-size: 11px; color: #71717a; line-height: 1.9; }
+      code { direction: ltr; unicode-bidi: embed; color: #fbbf24; font-size: 11px; }
+    </style>
+  </head>
+  <body>
+    <div class="card" role="alert">
+      <div class="icon">🐝</div>
+      <h2>راه‌اندازی سان‌جاب‌اواس ناموفق بود</h2>
+      <p>سرور محلی برنامه درست بالا نیامد. علت دقیق:</p>
+      <div class="reason" id="reason">در حال خواندن…</div>
+      <p class="hint">
+        پیشنهادها: برنامه را یک‌بار دیگر اجرا کن؛ اگر تکرار شد، آنتی‌ویروس/فایروال را موقتاً بررسی کن و
+        مطمئن شو پورت‌های محلی (127.0.0.1) بسته نیستند. پوشهٔ نصب را دستکاری نکن؛ در صورت تکرار مشکل،
+        نسخهٔ جدید را از صفحهٔ Releases دریافت کن. گزارش این خطا هیچ دادهٔ شخصی‌ای ارسال نمی‌کند.
+      </p>
+      <p class="hint"><code>SanjabOS 4.1 — SunJob Edition</code></p>
+    </div>
+    <script>
+      // علت خطا از بخش hash آدرس می‌آید (درصدهندک‌شدهٔ UTF-8)
+      try {
+        var h = decodeURIComponent(location.hash.replace(/^#/, ""));
+        document.getElementById("reason").textContent = h || "علت نامشخص — گزارش کامل در رویدادهای ویندوز.";
+      } catch (e) {
+        document.getElementById("reason").textContent = "علت نامشخص — گزارش کامل در رویدادهای ویندوز.";
+      }
+    </script>
+  </body>
+</html>
