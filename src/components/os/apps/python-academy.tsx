@@ -180,7 +180,7 @@ function QuizBlock({ lesson, best, onPass }: { lesson: PyLesson; best: number; o
         ) : (
           <>
             <Badge className={passed ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300' : 'border-rose-500/30 bg-rose-500/10 text-rose-300'}>
-              نمره: {fa(score)}/{fa(lesson.quiz.length)} {passed ? '— قبول' : '— نیاز به مرور'}
+              نمره: {fa(score)}/{fa(lesson.quiz.length)} {passed ? '· قبول' : '· نیاز به مرور'}
             </Badge>
             <Button
               size="sm"
@@ -222,7 +222,8 @@ function ExerciseBlock({
   const [output, setOutput] = useState<string[]>([])
   const [running, setRunning] = useState(false)
   const [verdict, setVerdict] = useState<'idle' | 'pass' | 'fail' | 'error'>('idle')
-  const [showHint, setShowHint] = useState(false)
+  const [hintLevel, setHintLevel] = useState(0)
+  const [showSolution, setShowSolution] = useState(false)
   const outBuf = useRef<string[]>([])
 
   const collect = useCallback((_kind: PyOutKind, text: string) => {
@@ -266,34 +267,70 @@ function ExerciseBlock({
       <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-1.5 text-xs font-black text-zinc-200">
           <Target size={14} style={{ color: SUNJOB_PALETTE.orange }} />
-          تمرین — با پایتون واقعی تصحیح می‌شود
+          تمرین؛ با پایتون واقعی تصحیح می‌شود
           {passed && (
             <Badge className="border-emerald-500/30 bg-emerald-500/10 text-emerald-300">
               <CircleCheck size={11} /> قبول شد
             </Badge>
           )}
         </div>
-        <Button
-          size="sm"
-          variant="ghost"
-          className="h-6 gap-1 px-2 text-[10px] text-zinc-500"
-          onClick={() => setShowHint((s) => !s)}
-        >
-          <Lightbulb size={11} /> {showHint ? 'پنهان' : 'راهنما'}
-        </Button>
+        <div className="flex items-center gap-1">
+          {(lesson.exercise.hints?.length ?? 0) > hintLevel && (
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-6 gap-1 px-2 text-[10px] text-zinc-500"
+              onClick={() => setHintLevel((n) => n + 1)}
+            >
+              <Lightbulb size={11} /> سرنخ {fa(hintLevel + 1)}
+            </Button>
+          )}
+          {lesson.exercise.solution && !showSolution && (
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-6 gap-1 px-2 text-[10px] text-zinc-500"
+              onClick={() => setShowSolution(true)}
+            >
+              <BookOpen size={11} /> نمایش راه‌حل
+            </Button>
+          )}
+        </div>
       </div>
 
       <p className="mb-2 text-[12px] leading-6 text-zinc-300">{lesson.exercise.prompt}</p>
 
-      {showHint && (
-        <motion.p
-          initial={{ opacity: 0, y: reduced ? 0 : -4 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-2 rounded-lg border border-cyan-500/20 bg-cyan-500/5 px-3 py-2 font-mono text-[11px] text-cyan-200"
-          dir="ltr"
-        >
-          {lesson.exercise.hint}
-        </motion.p>
+      {hintLevel > 0 && (
+        <div className="mb-2 space-y-1.5">
+          {lesson.exercise.hints.slice(0, hintLevel).map((h, i) => (
+            <motion.p
+              key={i}
+              initial={{ opacity: 0, y: reduced ? 0 : -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-lg border border-cyan-500/20 bg-cyan-500/5 px-3 py-2 text-[11px] leading-5 text-cyan-100"
+            >
+              <b className="text-cyan-300">سرنخ {fa(i + 1)}: </b>
+              {h}
+            </motion.p>
+          ))}
+        </div>
+      )}
+      {showSolution && lesson.exercise.solution && (
+        <>
+          <div
+            className="os-scroll mb-2 overflow-x-auto rounded-lg border border-white/10 bg-zinc-950/80 p-2.5 font-mono text-[11px] leading-5 text-emerald-100/90"
+            dir="ltr"
+            style={{ fontSize: 'var(--fa-code-size)', lineHeight: 'var(--fa-code-line-height)' }}
+          >
+            {lesson.exercise.solution}
+          </div>
+          {lesson.exercise.solutionExplain && (
+            <p className="mb-2 rounded-lg bg-white/[0.03] px-3 py-2 text-[10.5px] leading-5 text-zinc-400">
+              <b className="text-zinc-300">تحلیل راه‌حل: </b>
+              {lesson.exercise.solutionExplain}
+            </p>
+          )}
+        </>
       )}
 
       <textarea
@@ -358,7 +395,7 @@ function ExerciseBlock({
             exit={{ opacity: 0 }}
             className="mt-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-300"
           >
-            تمرین قبول شد — خب شد! پیشرفت ذخیره شد.
+            تمرین قبول شد؛ پیشرفت ذخیره شد.
           </motion.div>
         )}
         {verdict === 'fail' && (
@@ -478,7 +515,7 @@ export default function PythonAcademyApp() {
             </span>
             <div>
               <h1 className="text-base font-black text-zinc-100">آکادمی پایتون</h1>
-              <p className="text-[11px] text-zinc-500">از صفر تا پروژهٔ واقعی — تمرین‌ها با CPython واقعی در مرورگر شما اجرا و تصحیح می‌شوند</p>
+              <p className="text-[11px] text-zinc-500">از صفر تا پروژهٔ واقعی؛ تمرین‌ها با CPython واقعی در مرورگر شما اجرا و تصحیح می‌شوند</p>
             </div>
           </div>
 
@@ -552,6 +589,7 @@ export default function PythonAcademyApp() {
                           {isEx(l.id) && <CircleCheck size={10} className="text-emerald-400" />}
                           {l.title}
                           <span className="text-zinc-600">· {fa(l.minutes)}′</span>
+                          {l.optional && <span className="rounded border border-purple-500/30 px-1 text-[9px] text-purple-300">اختیاری</span>}
                         </span>
                       </button>
                     ))}
@@ -562,7 +600,7 @@ export default function PythonAcademyApp() {
           </div>
 
           <p className="pb-2 text-center text-[10px] text-zinc-600">
-            موتور اجرا: Pyodide v0.26.4 (CPython کامپایل‌شده به WebAssembly) — MPL-2.0 · تمرین‌ها سمت مرورگر شما تصحیح می‌شوند
+            موتور اجرا: Pyodide v0.26.4 (CPython کامپایل‌شده به WebAssembly)؛ مجوز MPL-2.0 · تمرین‌ها سمت مرورگر شما تصحیح می‌شوند
           </p>
         </div>
       </div>
@@ -578,6 +616,11 @@ export default function PythonAcademyApp() {
           <ChevronRight size={13} /> فهرست
         </Button>
         <Badge className="border-amber-500/30 bg-amber-500/10 text-amber-300">سطح {fa(lesson.level)}</Badge>
+        {lesson.optional && (
+          <Badge variant="outline" className="shrink-0 border-purple-500/40 text-[10px] text-purple-300">
+            درس اختیاری
+          </Badge>
+        )}
         <span className="truncate text-xs font-black text-zinc-200">{lesson.title}</span>
         <span className="ms-auto flex items-center gap-1">
           <Button
@@ -625,19 +668,47 @@ export default function PythonAcademyApp() {
                   </li>
                 ))}
               </ul>
+              {lesson.goal && lesson.goal.length > 0 && (
+                <div className="mt-2 rounded-lg border border-emerald-500/20 bg-emerald-500/[0.04] p-2.5">
+                  <div className="mb-1 text-[10.5px] font-black text-emerald-300">در پایان این درس می‌توانی</div>
+                  <ul className="space-y-0.5">
+                    {lesson.goal.map((g, i) => (
+                      <li key={i} className="flex items-start gap-1.5 text-[11px] leading-5 text-zinc-300">
+                        <CircleCheck size={11} className="mt-0.5 shrink-0 text-emerald-400" />
+                        {g}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               <p className="mt-2 rounded-lg bg-white/[0.03] px-2.5 py-1.5 text-[10.5px] text-zinc-500">
                 پیش‌نیاز: {lesson.prereq} · زمان تقریبی: {fa(lesson.minutes)} دقیقه
+                {lesson.optionalNote ? ` · ${lesson.optionalNote}` : ''}
               </p>
             </Card>
 
             {/* مقدمه */}
             <div className="space-y-2">
               <p className="text-[12.5px] leading-7 text-zinc-300">{lesson.intro}</p>
+              {lesson.whyMatters && (
+                <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/[0.03] p-3">
+                  <div className="mb-1 flex items-center gap-1.5 text-[11px] font-black text-emerald-300">
+                    <Target size={12} /> چرا این مفهوم لازم است؟
+                  </div>
+                  <p className="text-[11.5px] leading-6 text-zinc-300">{lesson.whyMatters}</p>
+                </div>
+              )}
               <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/[0.04] p-3">
                 <div className="mb-1 flex items-center gap-1.5 text-[11px] font-black text-cyan-300">
                   <Sparkles size={12} /> تشبیه
                 </div>
                 <p className="text-zinc-300">{lesson.analogy}</p>
+                {lesson.analogyLimit && (
+                  <p className="mt-2 border-t border-white/5 pt-2 text-[10.5px] leading-5 text-zinc-400">
+                    <b className="text-cyan-300">مرز تشبیه: </b>
+                    {lesson.analogyLimit}
+                  </p>
+                )}
               </div>
               <div className="rounded-xl border border-white/10 bg-zinc-950/50 p-3">
                 <div className="mb-1 text-[11px] font-black text-zinc-200">تشریح فنی</div>
@@ -650,7 +721,7 @@ export default function PythonAcademyApp() {
               <div key={i} className="space-y-1.5">
                 <div className="flex items-center gap-1.5 text-xs font-black text-zinc-200">
                   <Terminal size={13} style={{ color: SUNJOB_PALETTE.orange }} />
-                  مثال {fa(i + 1)} — {ex.title}
+                  مثال {fa(i + 1)}؛ {ex.title}
                 </div>
                 <CodeBlock code={ex.code} />
                 <p className="text-[11px] leading-5 text-zinc-400">{ex.explain}</p>

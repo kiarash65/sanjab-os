@@ -6,12 +6,14 @@
 
 use std::net::TcpListener;
 use std::path::PathBuf;
+use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Mutex;
 use std::time::Duration;
 
 use tauri::{AppHandle, Manager, RunEvent, WebviewUrl, WebviewWindowBuilder};
 use tauri_plugin_shell::process::CommandChild;
 use tauri_plugin_shell::ShellExt;
+use url::Url;
 
 struct ServerGuard(Mutex<Option<CommandChild>>);
 
@@ -36,14 +38,30 @@ fn wait_for_server(port: u16, timeout_ms: u64) -> bool {
 }
 
 fn resolve_server_dir(app: &AppHandle) -> PathBuf {
-    let res = app
-        .path()
-        .resource_dir()
-        .expect("مسیر منابع پیدا نشد");
+    let res = app.path().resource_dir().expect("مسیر منابع پیدا نشد");
     res.join("server-dist")
 }
 
 fn spawn_server(app: &AppHandle) -> Result<(u16, CommandChild), String> {
+    /* رقابت پورت: بین آزادسازی سوکت آزمایشی و بایندِ Node ممکن است پروسهٔ دیگری
+    همان پورت را بگیرد — تا ۳ بار تلاش می‌کنیم؛ اگر سرور بالا نیامد فرزند
+    کشته می‌شود و پورت تازه‌ای گرفته می‌شود. */
+    let mut last_err = String::from("خطای نامشخص");
+    for attempt in 0..3 {
+        match try_spawn_once(app) {
+            Ok(pair) => return Ok(pair),
+            Err(e) => {
+                last_err = e;
+                if attempt + 1 < 3 {
+                    std::thread::sleep(Duration::from_millis(250));
+                }
+            }
+        }
+    }
+    Err(last_err)
+}
+
+fn try_spawn_once(app: &AppHandle) -> Result<(u16, CommandChild), String> {
     let port = pick_free_port().map_err(|e| format!("پورت آزاد پیدا نشد: {e}"))?;
     let server_dir = resolve_server_dir(app);
     let server_js = server_dir.join("server.js");
@@ -68,6 +86,15 @@ fn spawn_server(app: &AppHandle) -> Result<(u16, CommandChild), String> {
         .spawn()
         .map_err(|e| format!("اجرای Node ناموفق بود: {e}"))?;
 
+    /* اگر Node به‌خاطر EADDRINUSE مرد، تا ۸ ثانیه صبر و بعد رد می‌کنیم تا
+    لایهٔ بالاتر با پورت تازه دوباره تلاش کند */
+    if !wait_for_server(port, 8_000) {
+        let _ = child.kill();
+        return Err(format!(
+            "سرور روی پورت {port} بالا نیامد (احتمالاً EADDRINUSE)"
+        ));
+    }
+
     // لاگ سرور را در استدآوت اپ می‌ریزیم (لاگِ محلی؛ به شبکه نمی‌رود)
     tauri::async_runtime::spawn(async move {
         use tauri_plugin_shell::process::CommandEvent;
@@ -82,10 +109,37 @@ fn spawn_server(app: &AppHandle) -> Result<(u16, CommandChild), String> {
     Ok((port, child))
 }
 
+/* شمارندهٔ برچسب یکتا برای پنجره‌های بومی مرورگر */
+static NATIVE_WIN_COUNTER: AtomicU32 = AtomicU32::new(1);
+
+/// باز کردن یک پنجرهٔ بومی واقعی مرورگر (WebView2 روی ویندوز، WebKit روی لینوکس/مک).
+/// برخلاف iframe، سیاست X-Frame-Options اینجا اعمال نمی‌شود چون زمینهٔ مرور
+/// سطح‌بالا (top-level) است — دقیقاً همان کاری که یک مرورگر واقعی می‌کند.
+#[tauri::command]
+fn open_native_browser_window(app: AppHandle, url: String) -> Result<String, String> {
+    let parsed = Url::parse(&url).map_err(|_| format!("URL نامعتبر: {url}"))?;
+    if parsed.scheme() != "http" && parsed.scheme() != "https" {
+        return Err("فقط http و https مجاز است".into());
+    }
+    let host = parsed.host_str().unwrap_or("site").to_string();
+    let label = format!(
+        "native-browser-{}",
+        NATIVE_WIN_COUNTER.fetch_add(1, Ordering::Relaxed)
+    );
+    WebviewWindowBuilder::new(&app, label.as_str(), WebviewUrl::External(parsed))
+        .title(format!("سفربُر — {host}"))
+        .inner_size(1100.0, 750.0)
+        .min_inner_size(360.0, 480.0)
+        .build()
+        .map_err(|e| e.to_string())?;
+    Ok(label)
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
+        .invoke_handler(tauri::generate_handler![open_native_browser_window])
         .manage(ServerGuard(Mutex::new(None)))
         .setup(|app| {
             let handle = app.handle().clone();
@@ -106,7 +160,7 @@ pub fn run() {
                             "main",
                             WebviewUrl::External(url.parse().expect("URL نامعتبر")),
                         )
-                        .title("SanjabOS 4.0 — SunJob Edition")
+                        .title("SanjabOS — SunJob Edition")
                         .inner_size(1280.0, 800.0)
                         .min_inner_size(360.0, 480.0)
                         .build();
