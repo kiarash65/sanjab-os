@@ -47,7 +47,6 @@
     "cli",
     "linux-edition",
     "download",
-    "webos-src",
-    "tests"
+    "webos-src"
   ]
 }

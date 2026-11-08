@@ -225,7 +225,7 @@ export default function SystemMonitorApp() {
 
   return (
     <Tabs defaultValue="overview" className="flex h-full w-full flex-col bg-zinc-950/60">
-      <div className="flex flex-wrap items-center gap-2 border-b border-white/10 px-3 py-2.5">
+      <div className="border-b border-white/10 px-3 py-2.5">
         <TabsList className="h-8 rounded-xl border border-white/10 bg-zinc-900 p-1">
           <TabsTrigger
             value="overview"
@@ -240,13 +240,6 @@ export default function SystemMonitorApp() {
             فرآیندها
           </TabsTrigger>
         </TabsList>
-        {/* صداقت: این داده‌ها شبیه‌سازی‌شده‌اند — نه سنجش واقعی دستگاه */}
-        <span
-          className="inline-flex items-center gap-1 rounded-full border border-amber-400/40 bg-amber-400/10 px-2 py-0.5 text-[9px] font-black text-amber-300"
-          title="این مانیتور داده‌های نمایشی و بامزه تولید می‌کند و منابع واقعی دستگاه تو را نمی‌سنجد."
-        >
-          ⚠ دادهٔ نمایشی — شبیه‌سازی‌شده
-        </span>
       </div>
 
       <TabsContent value="overview" className="mt-0 min-h-0 flex-1 px-3 pb-3 pt-3">

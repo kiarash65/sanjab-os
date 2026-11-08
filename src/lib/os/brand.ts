@@ -5,8 +5,8 @@
 export const BRAND = {
   name: 'سان‌جاب‌او‌اس',
   nameEn: 'SunJob OS',
-  version: '۴.۱ «سنجابک»',
-  versionEn: '4.1 "Sanjabak"',
+  version: '۴.۰ «سنجابک»',
+  versionEn: '4.0 "Sanjabak"',
   kernel: '6.12.4-sanjob-cute',
   sponsor: 'با اسپانسری سان‌جاب',
   sponsorShort: 'اسپانسر: سان‌جاب',

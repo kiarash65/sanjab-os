@@ -1,6 +1,6 @@
 [package]
 name = "sanjabos"
-version = "4.1.0"
+version = "4.0.0"
 description = "SanjabOS — Persian educational WebOS desktop (SunJob edition)"
 authors = ["kiarash65"]
 edition = "2021"

@@ -1,18 +1,14 @@
 'use client'
 
-/* ====================================================================
-   «مرکز انتشار» — نسخهٔ نصب‌شده، آخرین Stable، فایل پیشنهادی هوشمند،
-   تأییدکنندهٔ SHA-256 و تاریخچهٔ انتشارها. داده مستقیم از GitHub Releases.
-   قواعد صادقانگی: پیش‌انتشار جدا از Stable، نوع هر فایل از نام کامل،
-   هیچ فایلی بدون برچسب نوع رها نمی‌شود و نصاب لینوکسِ ناموجود ادعا نمی‌شود.
-   ==================================================================== */
+/* ------------------------------------------------------------------ */
+/* «دانلود و به‌روزرسانی» — انتشارهای گیت‌هاب، مقایسهٔ نسخه، فایل‌ها     */
+/* همهٔ درخواست‌ها سمت کلاینت؛ با تایم‌اوت ۱۰ ثانیه و حافظهٔ نهان ۱۰ دقیقه‌ای */
+/* ------------------------------------------------------------------ */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import {
-  BadgeCheck,
+  Check,
   CircleCheck,
   CloudOff,
   Copy,
@@ -20,31 +16,24 @@ import {
   ExternalLink,
   FileArchive,
   FileDown,
-  FileUp,
-  FlaskConical,
   Globe,
   HardDrive,
   History,
   Info,
   LoaderCircle,
-  Package,
   RefreshCw,
   ShieldCheck,
-  Sparkles,
   Tag,
-  Terminal,
   TriangleAlert,
 } from 'lucide-react'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
-import { Progress } from '@/components/ui/progress'
 import { useOS } from '@/lib/os/store'
 import { BRAND } from '@/lib/os/brand'
-import { classifyAsset, updateState, type AssetInfo, type UpdateState } from '@/lib/os/releases'
-import { Sha256, parseSums } from '@/lib/os/sha256'
 
 /* ------------------------------- انواع ------------------------------- */
 
+/** دارایی یک انتشار — نگاشت دقیق به پاسخ GitHub Releases API */
 interface GhAsset {
   name: string
   size: number
@@ -53,6 +42,7 @@ interface GhAsset {
   download_count?: number
 }
 
+/** یک انتشار (release) — نگاشت دقیق به پاسخ GitHub Releases API */
 interface GhRelease {
   id: number
   tag_name: string
@@ -65,6 +55,7 @@ interface GhRelease {
   assets: GhAsset[]
 }
 
+/** ساختار حافظهٔ نهان محلی */
 interface ReleasesCache {
   t: number
   data: GhRelease[]
@@ -72,14 +63,13 @@ interface ReleasesCache {
 
 type LoadStatus = 'loading' | 'ok' | 'from-cache' | 'error'
 
-type UserPlatform = 'windows' | 'linux' | 'mac' | 'other'
-
 /* ------------------------------ ثابت‌ها ------------------------------ */
 
-const RELEASES_URL = 'https://api.github.com/repos/kiarash65/sanjab-os/releases?per_page=20'
-const CACHE_KEY = 'sanjab-releases-cache-v2'
+const RELEASES_URL = 'https://api.github.com/repos/kiarash65/sanjab-os/releases?per_page=10'
+const CACHE_KEY = 'sanjab-releases-cache'
 const CACHE_TTL_MS = 10 * 60 * 1000
 const FETCH_TIMEOUT_MS = 10_000
+const MAX_CHECKSUM_BYTES = 64 * 1024
 
 /* ------------------------------ کمکی‌ها ------------------------------ */
 
@@ -88,12 +78,17 @@ const faNum = (n: number): string => n.toLocaleString('fa-IR')
 const faDate = (iso: string | null): string => {
   if (!iso) return '—'
   try {
-    return new Date(iso).toLocaleDateString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' })
+    return new Date(iso).toLocaleDateString('fa-IR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    })
   } catch {
     return iso
   }
 }
 
+/** حجم انسانی — مگابایت/کیلوبایت با ارقام فارسی */
 const humanSize = (bytes: number): string => {
   if (!Number.isFinite(bytes) || bytes <= 0) return '—'
   const mb = bytes / 1048576
@@ -101,6 +96,7 @@ const humanSize = (bytes: number): string => {
   return `${(bytes / 1024).toLocaleString('fa-IR', { maximumFractionDigits: 0 })} کیلوبایت`
 }
 
+/** نگاشت محافظه‌کارانهٔ پاسخ ناشناخته به GhRelease — بدون any */
 function isGhRelease(v: unknown): v is GhRelease {
   if (typeof v !== 'object' || v === null) return false
   const r = v as Record<string, unknown>
@@ -117,6 +113,7 @@ function parseReleases(v: unknown): GhRelease[] {
   return v.filter(isGhRelease)
 }
 
+/** خواندن حافظهٔ نهان با اعتبارسنجی سخت‌گیرانه */
 function loadCache(): ReleasesCache | null {
   try {
     const raw = localStorage.getItem(CACHE_KEY)
@@ -135,62 +132,117 @@ function loadCache(): ReleasesCache | null {
 
 function saveCache(data: GhRelease[]): void {
   try {
-    localStorage.setItem(CACHE_KEY, JSON.stringify({ t: Date.now(), data }))
+    const payload: ReleasesCache = { t: Date.now(), data }
+    localStorage.setItem(CACHE_KEY, JSON.stringify(payload))
   } catch {
     /* حافظه پر یا غیرفعال — مهم نیست */
   }
 }
 
-function detectPlatform(): UserPlatform {
-  if (typeof navigator === 'undefined') return 'other'
-  const ua = navigator.userAgent
-  if (/Windows/i.test(ua)) return 'windows'
-  if (/Mac/i.test(ua)) return 'mac'
-  if (/Linux/i.test(ua) && !/Android/i.test(ua)) return 'linux'
-  return 'other'
+/** مقایسهٔ نسخه: «v4.0.1» و «4.0 "Sanjabak"» → [4,0,1] و [4,0] */
+function parseVersion(s: string): number[] | null {
+  const m = /^v?(\d+(?:\.\d+)*)/.exec(s.trim())
+  if (!m) return null
+  return m[1].split('.').map((p) => parseInt(p, 10))
 }
 
-const PLATFORM_LABEL: Record<UserPlatform, string> = {
-  windows: 'ویندوز',
-  linux: 'لینوکس',
-  mac: 'مک',
-  other: 'مرورگر / موبایل',
+function compareVersions(a: number[], b: number[]): number {
+  const len = Math.max(a.length, b.length)
+  for (let i = 0; i < len; i++) {
+    const x = a[i] ?? 0
+    const y = b[i] ?? 0
+    if (x !== y) return x - y
+  }
+  return 0
 }
 
-/** رنگ برچسب نوع فایل — خوانا و یکدست */
-const KIND_STYLE: Record<AssetInfo['kind'], string> = {
-  'windows-nsis': 'border-rose-400/40 bg-rose-400/10 text-rose-300',
-  'windows-msi': 'border-rose-400/40 bg-rose-400/10 text-rose-300',
-  'windows-portable': 'border-amber-400/40 bg-amber-400/10 text-amber-300',
-  'web-standalone': 'border-emerald-400/40 bg-emerald-400/10 text-emerald-300',
-  cli: 'border-teal-400/40 bg-teal-400/10 text-teal-300',
-  sbom: 'border-cyan-400/40 bg-cyan-400/10 text-cyan-300',
-  checksums: 'border-cyan-400/40 bg-cyan-400/10 text-cyan-300',
-  notices: 'border-zinc-400/30 bg-zinc-400/10 text-zinc-300',
-  'version-file': 'border-zinc-400/30 bg-zinc-400/10 text-zinc-300',
-  unknown: 'border-zinc-500/30 bg-zinc-500/10 text-zinc-400',
+/** برچسب نوع فایل بر اساس نام واقعی دارایی — بدون حدس */
+function assetType(name: string): { label: string; cls: string } | null {
+  if (/sha256|checksum/i.test(name))
+    return { label: 'چک‌سام', cls: 'border-cyan-400/40 bg-cyan-400/10 text-cyan-300' }
+  if (/\.tar\.gz$/i.test(name))
+    return { label: 'لینوکس', cls: 'border-emerald-400/40 bg-emerald-400/10 text-emerald-300' }
+  if (/\.exe$/i.test(name))
+    return { label: 'ویندوز', cls: 'border-rose-400/40 bg-rose-400/10 text-rose-300' }
+  if (/\.msi$/i.test(name))
+    return { label: 'نصاب ویندوز', cls: 'border-rose-400/40 bg-rose-400/10 text-rose-300' }
+  if (/\.zip$/i.test(name))
+    return { label: 'آرشیو', cls: 'border-amber-400/40 bg-amber-400/10 text-amber-300' }
+  return null
 }
 
-const UPDATE_STATE_TEXT: Record<Exclude<UpdateState, 'unknown'>, { text: string; cls: string }> = {
-  'up-to-date': {
-    text: 'به‌روز هستی',
-    cls: 'border-emerald-400/40 bg-emerald-400/10 text-emerald-300',
-  },
-  'update-available': {
-    text: 'به‌روزرسانی Stable در دسترس',
-    cls: 'border-amber-400/40 bg-amber-400/10 text-amber-300',
-  },
-  'prerelease-available': {
-    text: 'فقط پیش‌انتشار جدید — پیشنهاد نمی‌شود',
-    cls: 'border-purple-400/40 bg-purple-400/10 text-purple-300',
-  },
-  'newer-than-stable': {
-    text: 'این نسخه از آخرین Stable جلوتر است (شاخهٔ آزمایشی)',
-    cls: 'border-sky-400/40 bg-sky-400/10 text-sky-300',
-  },
+/* --------------------- رندر امن متن انتشار (بدون innerHTML) --------------------- */
+
+/** تبدیل URL ها و `کد`ها به المان‌های امن — هیچ innerHTML ای در کار نیست */
+function linkify(text: string): ReactNode[] {
+  const parts = text.split(/(https?:\/\/[^\s)"'<>]+|`[^`]+`)/g)
+  return parts.map((part, i) => {
+    if (/^https?:\/\//.test(part)) {
+      return (
+        <a
+          key={i}
+          href={part}
+          target="_blank"
+          rel="noreferrer"
+          dir="ltr"
+          className="break-all text-cyan-300 underline decoration-cyan-400/40 underline-offset-2 hover:text-cyan-200"
+        >
+          {part}
+        </a>
+      )
+    }
+    if (/^`[^`]+`$/.test(part)) {
+      return (
+        <code
+          key={i}
+          dir="ltr"
+          className="mx-0.5 inline-block rounded bg-black/50 px-1.5 py-0.5 font-mono text-[10px] text-amber-200"
+        >
+          {part.slice(1, -1)}
+        </code>
+      )
+    }
+    return <span key={i}>{part}</span>
+  })
 }
 
-/* --------------------- SHA-256 و SHA256SUMS — از کتابخانهٔ خالص --------------------- */
+/** یادداشت انتشار: خط‌به‌خط، تیترها، بولت‌ها و پاراگراف‌ها */
+function ReleaseNotes({ body }: { body: string }) {
+  const lines = body.replace(/\r/g, '').split('\n')
+  return (
+    <div className="flex flex-col gap-1">
+      {lines.map((line, i) => {
+        const heading = /^(#{1,3})\s+(.*)$/.exec(line)
+        if (heading) {
+          const level = heading[1].length
+          return (
+            <p
+              key={i}
+              className={`mt-1.5 font-black text-amber-200 ${level === 1 ? 'text-[12px]' : 'text-[11px]'}`}
+            >
+              {linkify(heading[2])}
+            </p>
+          )
+        }
+        const bullet = /^\s*[-*]\s+(.*)$/.exec(line)
+        if (bullet) {
+          return (
+            <p key={i} className="flex items-start gap-1.5 text-[11px] leading-5 text-zinc-300">
+              <span className="mt-2 size-1 shrink-0 rounded-full bg-emerald-400/70" aria-hidden />
+              <span className="min-w-0">{linkify(bullet[1])}</span>
+            </p>
+          )
+        }
+        if (line.trim() === '') return <div key={i} className="h-1" aria-hidden />
+        return (
+          <p key={i} className="text-[11px] leading-5 text-zinc-300">
+            {linkify(line)}
+          </p>
+        )
+      })}
+    </div>
+  )
+}
 
 /* ============================ اپ اصلی ============================ */
 
@@ -203,9 +255,8 @@ export default function DownloadsApp() {
   const [err, setErr] = useState('')
   const [staleWarn, setStaleWarn] = useState('')
   const [cacheAt, setCacheAt] = useState(0)
-  const [platform, setPlatform] = useState<UserPlatform>('other')
 
-  /* بارگیری اولیه */
+  /* بارگیری اولیه: اگر حافظهٔ نهان تازه است، همین را نشان بده */
   const load = useCallback(async (force: boolean) => {
     if (!force) {
       const c = loadCache()
@@ -240,6 +291,7 @@ export default function DownloadsApp() {
             ? 'درخواست بیش از ۱۰ ثانیه طول کشید و لغو شد.'
             : e.message
           : 'خطای ناشناخته'
+      /* آفلاین یا خطا → حافظهٔ نهان موجود را با هشدار صادقانه نشان بده */
       const c = loadCache()
       if (c) {
         setReleases(c.data)
@@ -257,137 +309,58 @@ export default function DownloadsApp() {
 
   useEffect(() => {
     void load(false)
-    setPlatform(detectPlatform())
   }, [load])
 
-  /* تفکیک Stable از پیش‌انتشار — نسخهٔ پیشنهادی فقط از بین Stableها */
-  const { latestStable, stableList, prereleases } = useMemo(() => {
-    const all = releases ?? []
-    const stables = all.filter((r) => !r.prerelease && !r.draft)
-    return {
-      latestStable: stables[0] ?? null,
-      stableList: stables.slice(1),
-      prereleases: all.filter((r) => r.prerelease && !r.draft),
+  const latest = releases && releases.length > 0 ? releases[0] : null
+  const older = releases ? releases.slice(1) : []
+
+  /* مقایسهٔ صادقانهٔ نسخهٔ نصب‌شده با آخرین انتشار */
+  const cmp = useMemo(() => {
+    const installed = parseVersion(BRAND.versionEn)
+    const remote = latest ? parseVersion(latest.tag_name) : null
+    if (latest && installed && remote) {
+      const c = compareVersions(remote, installed)
+      if (c === 0) return 'equal' as const
+      return c > 0 ? ('newer' as const) : ('older' as const)
     }
-  }, [releases])
+    return 'unknown' as const
+  }, [latest])
 
-  const cmp: UpdateState = useMemo(
-    () => updateState(BRAND.versionEn, latestStable?.tag_name ?? null, releases?.[0]?.tag_name ?? null),
-    [latestStable, releases]
-  )
+  /* دارایی‌های کلیدی نسخهٔ آخر — فقط نام‌های واقعی، بدون حدس */
+  const exeAsset = useMemo(() => latest?.assets.find((a) => /\.exe$/i.test(a.name)) ?? null, [latest])
+  const zipAsset = useMemo(() => latest?.assets.find((a) => /\.zip$/i.test(a.name)) ?? null, [latest])
+  const targzAsset = useMemo(() => latest?.assets.find((a) => /\.tar\.gz$/i.test(a.name)) ?? null, [latest])
+  const sumsAsset = useMemo(() => latest?.assets.find((a) => /sha256|checksum/i.test(a.name)) ?? null, [latest])
 
-  /* دارایی‌های نسخهٔ پیشنهادی (آخرین Stable) */
-  const assets = useMemo(
-    () => (latestStable ? latestStable.assets.map((a) => ({ ...a, info: classifyAsset(a.name) })) : []),
-    [latestStable]
-  )
+  /* کپی چک‌سام‌ها — با سقف ۶۴ کیلوبایت */
+  const [ckBusy, setCkBusy] = useState(false)
+  const [ckDone, setCkDone] = useState(false)
+  const [ckErr, setCkErr] = useState('')
 
-  /* فایل پیشنهادی برای پلتفرم کاربر — صادقانه: مک نصاب دسکتاپ ندارد */
-  const recommended = useMemo(() => {
-    switch (platform) {
-      case 'windows':
-        return assets.find((a) => a.info.kind === 'windows-nsis') ?? null
-      case 'linux':
-        return assets.find((a) => a.info.kind === 'web-standalone') ?? null
-      case 'mac':
-        return assets.find((a) => a.info.kind === 'cli') ?? null
-      default:
-        return null
-    }
-  }, [platform, assets])
-
-  /* ---------- تأییدکنندهٔ SHA-256 ---------- */
-  const sumsAsset = useMemo(() => assets.find((a) => a.info.kind === 'checksums') ?? null, [assets])
-  const [sumsText, setSumsText] = useState<string | null>(null)
-  const [sumsState, setSumsState] = useState<'idle' | 'loading' | 'ok' | 'err'>('idle')
-  const [file, setFile] = useState<File | null>(null)
-  const [hashBusy, setHashBusy] = useState(false)
-  const [hashProgress, setHashProgress] = useState(0)
-  const [hashResult, setHashResult] = useState<{ ok: boolean; hash: string; expected: string | null } | null>(null)
-  const [hashErr, setHashErr] = useState('')
-  const fileInput = useRef<HTMLInputElement>(null)
-
-  const verifyFile = useCallback(
-    async (f: File) => {
-      setHashErr('')
-      setHashResult(null)
-      setHashBusy(true)
-      setHashProgress(0)
-      try {
-        const sha = new Sha256()
-        const CHUNK = 4 * 1024 * 1024
-        let off = 0
-        while (off < f.size) {
-          const slice = f.slice(off, Math.min(off + CHUNK, f.size))
-          const buf = new Uint8Array(await slice.arrayBuffer())
-          sha.update(buf)
-          off += buf.length
-          setHashProgress(Math.round((off / Math.max(1, f.size)) * 100))
-        }
-        const digest = sha.hex()
-        let expected: string | null = null
-        if (sumsText) {
-          const sums = parseSums(sumsText)
-          expected = sums.get(f.name.toLowerCase()) ?? null
-        }
-        const ok = expected ? expected === digest : false
-        setHashResult({ ok, hash: digest, expected })
-        if (expected === null) {
-          pushToast({
-            icon: 'ℹ️',
-            title: 'هش مرجع پیدا نشد',
-            body: 'این نام فایل در SHA256SUMS نبود — هش محاسبه شد ولی مقایسه‌ای انجام نشد.',
-          })
-        } else if (ok) {
-          pushToast({ icon: ShieldCheck, title: 'فایل سالم است ✓', body: 'امضای SHA-256 دقیقاً مطابق نسخهٔ رسمی است.' })
-        } else {
-          pushToast({
-            icon: TriangleAlert,
-            title: 'فایل سالم نیست!',
-            body: 'هش فایل با نسخهٔ رسمی یکی نیست — از دانلود مجدد و گزارش مشکل مطمئن شو.',
-          })
-        }
-      } catch (e) {
-        setHashErr(e instanceof Error ? e.message : 'محاسبهٔ هش ناموفق بود.')
-      } finally {
-        setHashBusy(false)
-        setHashProgress(0)
-      }
-    },
-    [pushToast, sumsText]
-  )
-
-  /* دانلود متن SHA256SUMS برای مقایسه */
-  const loadSums = useCallback(async () => {
-    if (!sumsAsset) return
-    setSumsState('loading')
+  const copyChecksums = useCallback(async () => {
+    if (!sumsAsset || ckBusy) return
+    setCkBusy(true)
+    setCkErr('')
     try {
       const res = await fetch(sumsAsset.browser_download_url)
-      if (!res.ok) throw new Error(`کد ${res.status}`)
+      if (!res.ok) throw new Error(`دانلود فایل چک‌سام ناموفق بود (کد ${res.status}).`)
       const text = await res.text()
-      if (text.length > 256 * 1024) throw new Error('فایل چک‌سام غیرعادی بزرگ است.')
-      setSumsText(text)
-      setSumsState('ok')
-    } catch {
-      setSumsState('err')
+      if (text.length > MAX_CHECKSUM_BYTES)
+        throw new Error('فایل چک‌سام بزرگ‌تر از حد انتظار است (سقف ۶۴ کیلوبایت).')
+      await navigator.clipboard.writeText(text)
+      setCkDone(true)
+      pushToast({
+        icon: ShieldCheck,
+        title: 'چک‌سام‌ها کپی شد',
+        body: 'محتوای کامل فایل تأیید صحت در کلیپ‌بورد است.',
+      })
+      setTimeout(() => setCkDone(false), 2500)
+    } catch (e) {
+      setCkErr(e instanceof Error ? e.message : 'کپی ناموفق بود.')
+    } finally {
+      setCkBusy(false)
     }
-  }, [sumsAsset])
-
-  useEffect(() => {
-    if (sumsAsset && sumsState === 'idle') void loadSums()
-  }, [sumsAsset, sumsState, loadSums])
-
-  const copySums = useCallback(async () => {
-    if (!sumsText) return
-    try {
-      await navigator.clipboard.writeText(sumsText)
-      pushToast({ icon: Copy, title: 'چک‌سام‌ها کپی شد', body: 'برای مقایسهٔ دستی در کلیپ‌بورد است.' })
-    } catch {
-      pushToast({ icon: '⚠️', title: 'کپی نشد', body: 'دسترسی کلیپ‌بورد داده نشد.' })
-    }
-  }, [sumsText, pushToast])
-
-  const updateBadge = cmp === 'unknown' ? null : UPDATE_STATE_TEXT[cmp]
+  }, [sumsAsset, ckBusy, pushToast])
 
   return (
     <div className="os-scroll h-full w-full overflow-y-auto bg-zinc-950">
@@ -402,16 +375,16 @@ export default function DownloadsApp() {
               >
                 <Download size={18} />
               </span>
-              <div className="min-w-0 flex-1">
-                <h2 className="text-base font-black text-zinc-100">مرکز انتشار</h2>
+              <div className="min-w-0">
+                <h2 className="text-base font-black text-zinc-100">دانلود و به‌روزرسانی</h2>
                 <p className="mt-0.5 text-[10.5px] leading-5 text-zinc-400">
-                  نسخهٔ نصب‌شده، آخرین Stable و فایل پیشنهادی سیستم تو — مستقیم از گیت‌هاب
+                  انتشارهای رسمی از مخزن گیت‌هاب — با حافظهٔ نهان محلی ۱۰ دقیقه‌ای
                 </p>
               </div>
               <Button
                 size="sm"
                 variant="ghost"
-                className="shrink-0"
+                className="mr-auto shrink-0"
                 onClick={() => void load(true)}
                 disabled={status === 'loading'}
                 aria-label="بارگیری دوباره فهرست انتشارها"
@@ -421,31 +394,64 @@ export default function DownloadsApp() {
               </Button>
             </div>
 
+            {/* نسخهٔ نصب‌شده و مقایسه */}
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-zinc-900/80 px-2.5 py-1 text-[10.5px] font-bold text-zinc-300">
                 <Tag size={12} className="text-amber-300" aria-hidden />
                 نسخهٔ نصب‌شده: <span dir="ltr" className="font-mono">{BRAND.versionEn}</span>
               </span>
-              {platform !== 'other' && (
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-zinc-900/80 px-2.5 py-1 text-[10.5px] font-bold text-zinc-300">
-                  <HardDrive size={12} className="text-teal-300" aria-hidden />
-                  سیستم تو: {PLATFORM_LABEL[platform]}
-                </span>
-              )}
-              {status !== 'loading' && updateBadge && (
-                <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10.5px] font-black ${updateBadge.cls}`}>
-                  {cmp === 'up-to-date' && <CircleCheck size={12} aria-hidden />}
-                  {cmp !== 'up-to-date' && <Info size={12} aria-hidden />}
-                  {updateBadge.text}
-                  {cmp === 'update-available' && latestStable ? ` — ${latestStable.tag_name}` : ''}
-                </span>
+
+              {status !== 'loading' && latest && (
+                <>
+                  {cmp === 'equal' && (
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-400/10 px-2.5 py-1 text-[10.5px] font-black text-emerald-300">
+                      <CircleCheck size={12} aria-hidden />
+                      به‌روز هستی — آخرین انتشار: {latest.tag_name}
+                    </span>
+                  )}
+                  {cmp === 'newer' && (
+                    <>
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-400/40 bg-amber-400/10 px-2.5 py-1 text-[10.5px] font-black text-amber-300">
+                        <TriangleAlert size={12} aria-hidden />
+                        به‌روزرسانی در دسترس — انتشار: {latest.tag_name}
+                      </span>
+                      <a
+                        href={latest.html_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex h-7 items-center gap-1 rounded-lg border border-amber-400/40 bg-amber-400/10 px-2.5 text-[10px] font-bold text-amber-200 transition hover:bg-amber-400/20"
+                      >
+                        <ExternalLink size={11} aria-hidden />
+                        مشاهده انتشار
+                      </a>
+                    </>
+                  )}
+                  {cmp === 'older' && (
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-purple-400/40 bg-purple-400/10 px-2.5 py-1 text-[10.5px] font-black text-purple-300">
+                      <Info size={12} aria-hidden />
+                      نسخهٔ نصب‌شده از آخرین انتشار جلوتر است
+                    </span>
+                  )}
+                  {cmp === 'unknown' && (
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-500/40 bg-zinc-500/10 px-2.5 py-1 text-[10.5px] font-black text-zinc-400">
+                      <Info size={12} aria-hidden />
+                      نسخه‌ها قابل مقایسهٔ خودکار نیستند
+                    </span>
+                  )}
+                </>
               )}
             </div>
 
+            {/* وضعیت داده */}
             {status === 'from-cache' && staleWarn && (
               <p className="mt-2 flex items-start gap-1.5 rounded-xl border border-amber-400/30 bg-amber-400/10 p-2.5 text-[10.5px] leading-5 text-amber-200">
                 <CloudOff className="mt-0.5 size-3.5 shrink-0" aria-hidden />
                 <span className="min-w-0">{staleWarn}</span>
+              </p>
+            )}
+            {status === 'ok' && cacheAt > 0 && (
+              <p className="mt-2 text-[10px] text-zinc-500">
+                داده از حافظهٔ نهان محلی (ذخیره: {faDate(new Date(cacheAt).toISOString())}) — تا ۱۰ دقیقه بدون درخواست تازه.
               </p>
             )}
           </header>
@@ -474,251 +480,290 @@ export default function DownloadsApp() {
           </div>
         )}
 
-        {latestStable && (
+        {latest && (
           <>
-            {/* ---------------- فایل پیشنهادی برای سیستم تو ---------------- */}
+            {/* ------------------------ کارت آخرین انتشار ------------------------ */}
             <FadeIn reduce={reduce}>
-              <section className="rounded-2xl border border-emerald-400/25 bg-emerald-400/[0.06] p-4">
-                <p className="flex items-center gap-1.5 text-[11px] font-black text-emerald-200">
-                  <Sparkles size={13} aria-hidden />
-                  پیشنهاد برای سیستم تو ({PLATFORM_LABEL[platform]})
-                </p>
-                {platform === 'other' ? (
-                  <p className="mt-2 text-[10.5px] leading-5 text-emerald-200/80">
-                    برای موبایل و تبلت، نسخهٔ مرورگر همین سایت بهترین گزینه است — چیزی برای نصب نیست.
-                  </p>
-                ) : recommended ? (
-                  <div className="mt-2.5">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-zinc-900/70 px-2.5 py-1 text-[10.5px] font-bold text-zinc-200">
-                        <Package size={12} className="text-emerald-300" aria-hidden />
-                        {recommended.info.label}
-                      </span>
-                      <span dir="ltr" className="min-w-0 truncate font-mono text-[10.5px] text-zinc-300">{recommended.name}</span>
-                      <span className="text-[10px] text-zinc-500">{humanSize(recommended.size)}</span>
-                    </div>
-                    <p className="mt-1.5 text-[10.5px] leading-5 text-zinc-400">{recommended.info.purpose}</p>
-                    <a
-                      href={recommended.browser_download_url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="mt-2.5 inline-flex h-9 items-center gap-1.5 rounded-xl bg-gradient-to-l from-emerald-500 to-teal-500 px-4 text-[11.5px] font-black text-white shadow-lg transition hover:brightness-110"
-                    >
-                      <Download size={14} aria-hidden />
-                      دانلود نسخهٔ پیشنهادی
-                    </a>
-                    {platform === 'mac' && (
-                      <p className="mt-2 flex items-start gap-1.5 rounded-xl border border-amber-400/30 bg-amber-400/10 p-2.5 text-[10.5px] leading-5 text-amber-200">
-                        <Info className="mt-0.5 size-3.5 shrink-0" aria-hidden />
-                        برای مک فعلاً نصاب دسکتاپ منتشر نمی‌شود — ابزار CLI و نسخهٔ وب در دسترس‌اند. این محدودیت صادقانه است، نه وعدهٔ ساختگی.
-                      </p>
-                    )}
-                  </div>
-                ) : (
-                  <p className="mt-2 text-[10.5px] leading-5 text-amber-200/90">
-                    برای این پلتفرم در آخرین Stable فایلی منتشر نشده — فهرست کامل فایل‌ها پایین‌تر است.
-                  </p>
-                )}
-              </section>
-            </FadeIn>
-
-            {/* ---------------- تأیید صحت فایل (SHA-256) ---------------- */}
-            <FadeIn reduce={reduce}>
-              <section className="rounded-2xl border border-cyan-400/25 bg-cyan-400/[0.05] p-4">
-                <p className="flex items-center gap-1.5 text-[11px] font-black text-cyan-200">
-                  <ShieldCheck size={13} aria-hidden />
-                  تأیید سلامت فایل دانلودشده (SHA-256)
-                </p>
-                <p className="mt-1.5 text-[10.5px] leading-5 text-zinc-400">
-                  فایل دانلودشده را انتخاب کن تا هش آن «روی همین دستگاه» محاسبه و با SHA256SUMS نسخهٔ رسمی مقایسه شود.
-                  هیچ فایلی به هیچ سروری فرستاده نمی‌شود.
-                </p>
-                <p className="mt-1 text-[10px] leading-4 text-zinc-500">
-                  تفاوت: «چک‌سام» سلامت فایل را در برابر خرابی/دستکاری بررسی می‌کند؛ «امضای دیجیتال ناشر» هنوز برای نصاب‌های
-                  سان‌جاب منتشر نشده و به‌محض فعال شدن همان‌جا اعلام می‌شود.
-                </p>
-
-                <input
-                  ref={fileInput}
-                  type="file"
-                  className="hidden"
-                  onChange={(e) => {
-                    const f = e.target.files?.[0] ?? null
-                    setFile(f)
-                    if (f) void verifyFile(f)
-                  }}
-                  aria-label="انتخاب فایل برای تأیید هش"
-                />
-                <div className="mt-2.5 flex flex-wrap items-center gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="border-cyan-400/40 text-cyan-200 hover:bg-cyan-400/15"
-                    onClick={() => fileInput.current?.click()}
-                    disabled={hashBusy}
+              <section className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/60">
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-white/10 bg-zinc-900/80 p-4">
+                  <span
+                    className="grid size-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-md"
+                    aria-hidden
                   >
-                    <FileUp size={14} aria-hidden />
-                    {file ? 'انتخاب فایل دیگر' : 'انتخاب فایل…'}
-                  </Button>
-                  {file && !hashBusy && !hashResult && <span dir="ltr" className="font-mono text-[10.5px] text-zinc-400">{file.name}</span>}
-                  {hashBusy && (
-                    <span className="flex min-w-40 flex-1 items-center gap-2">
-                      <LoaderCircle size={13} className="shrink-0 animate-spin text-cyan-300" aria-hidden />
-                      <Progress value={hashProgress} className="h-1.5 flex-1" aria-label="پیشرفت محاسبهٔ هش" />
-                      <span className="text-[10px] text-cyan-200">{faNum(hashProgress)}٪</span>
-                    </span>
-                  )}
-                </div>
-
-                {hashErr && (
-                  <p role="alert" className="mt-2 rounded-lg border border-rose-400/30 bg-rose-400/10 p-2 text-[10.5px] text-rose-300">
-                    {hashErr}
-                  </p>
-                )}
-
-                {hashResult && (
-                  <div className="mt-2.5 space-y-1.5">
-                    {hashResult.expected === null ? (
-                      <p className="flex items-start gap-1.5 rounded-lg border border-amber-400/30 bg-amber-400/10 p-2 text-[10.5px] leading-5 text-amber-200">
-                        <Info size={12} className="mt-0.5 shrink-0" aria-hidden />
-                        نام این فایل در SHA256SUMS نسخهٔ فعلی نیست (شاید از نسخهٔ قدیمی‌تری دانلود شده).
-                      </p>
-                    ) : hashResult.ok ? (
-                      <p className="flex items-center gap-1.5 rounded-lg border border-emerald-400/40 bg-emerald-400/10 p-2 text-[11px] font-black text-emerald-300">
-                        <BadgeCheck size={14} aria-hidden />
-                        سالم است — هش دقیقاً مطابق نسخهٔ رسمی
-                      </p>
-                    ) : (
-                      <p className="flex items-center gap-1.5 rounded-lg border border-rose-400/40 bg-rose-400/10 p-2 text-[11px] font-black text-rose-300">
-                        <TriangleAlert size={14} aria-hidden />
-                        هش مطابقت ندارد! این فایل یا خراب دانلود شده یا دستکاری شده — هرگز اجرایش نکن.
-                      </p>
-                    )}
-                    <div className="rounded-lg border border-white/10 bg-zinc-950/70 p-2" dir="ltr">
-                      <p className="font-mono text-[9.5px] leading-4 text-zinc-400 break-all">{hashResult.hash}</p>
-                      {hashResult.expected && (
-                        <p className="mt-1 font-mono text-[9.5px] leading-4 text-zinc-600 break-all">expected: {hashResult.expected}</p>
+                    <Tag size={15} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <h3 dir="ltr" className="font-mono text-[12px] font-black text-amber-200">
+                        {latest.tag_name}
+                      </h3>
+                      {latest.prerelease && (
+                        <span className="rounded-full border border-purple-400/40 bg-purple-400/10 px-2 py-0.5 text-[9px] font-black text-purple-300">
+                          پیش‌انتشار
+                        </span>
+                      )}
+                      {latest.draft && (
+                        <span className="rounded-full border border-zinc-500/40 bg-zinc-500/10 px-2 py-0.5 text-[9px] font-black text-zinc-400">
+                          پیش‌نویس
+                        </span>
                       )}
                     </div>
+                    <p className="mt-0.5 truncate text-[10.5px] text-zinc-500">
+                      {latest.name ?? 'بدون عنوان'} — انتشار: {faDate(latest.published_at)}
+                    </p>
                   </div>
-                )}
+                  <a
+                    href={latest.html_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg border border-white/10 bg-zinc-950/60 px-2.5 text-[10.5px] font-bold text-zinc-300 transition hover:bg-zinc-800"
+                  >
+                    <ExternalLink size={11} aria-hidden />
+                    در گیت‌هاب
+                  </a>
+                </div>
 
-                {sumsAsset && (
-                  <div className="mt-2.5 flex flex-wrap items-center gap-2 border-t border-white/10 pt-2.5">
-                    <span className="text-[10px] text-zinc-500">
-                      مرجع: <span dir="ltr" className="font-mono">{sumsAsset.name}</span>
-                      {sumsState === 'ok' && ' — بارگیری شد ✓'}
-                      {sumsState === 'err' && ' — بارگیری نشد'}
-                    </span>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="h-6 text-[10px] text-cyan-300"
-                      onClick={() => void loadSums()}
-                      disabled={sumsState === 'loading'}
+                <div className="flex flex-col gap-3 p-4">
+                  {/* یادداشت انتشار */}
+                  {latest.body && latest.body.trim() !== '' && (
+                    <div className="rounded-xl border border-white/10 bg-zinc-950/60 p-3">
+                      <p className="mb-1.5 flex items-center gap-1.5 text-[10px] font-black text-zinc-400">
+                        <FileDown size={11} className="text-emerald-300" aria-hidden />
+                        یادداشت انتشار
+                      </p>
+                      <ReleaseNotes body={latest.body} />
+                    </div>
+                  )}
+
+                  {/* صادقانه: اگر هنوز فایلی ساخته نشده */}
+                  {latest.assets.length === 0 && (
+                    <p className="flex items-start gap-1.5 rounded-xl border border-amber-400/30 bg-amber-400/10 p-2.5 text-[10.5px] leading-5 text-amber-200">
+                      <Info className="mt-0.5 size-3.5 shrink-0" aria-hidden />
+                      برای این نسخه هنوز فایل ساخته نشده — به‌محض انتشار اینجا دیده می‌شود.
+                    </p>
+                  )}
+
+                  {/* فهرست دارایی‌ها */}
+                  {latest.assets.length > 0 && (
+                    <div className="overflow-hidden rounded-xl border border-white/10">
+                      <p className="border-b border-white/10 bg-zinc-900/80 px-3 py-2 text-[10px] font-black text-zinc-400">
+                        فایل‌های این انتشار ({faNum(latest.assets.length)} فایل)
+                      </p>
+                      {latest.assets.map((a, i) => {
+                        const t = assetType(a.name)
+                        return (
+                          <div
+                            key={`${a.name}-${i}`}
+                            className={`flex flex-wrap items-center gap-2 px-3 py-2 ${
+                              i % 2 === 0 ? 'bg-zinc-900' : 'bg-zinc-900/50'
+                            }`}
+                          >
+                            <FileArchive size={13} className="shrink-0 text-zinc-500" aria-hidden />
+                            <span dir="ltr" className="min-w-0 flex-1 truncate font-mono text-[10.5px] text-zinc-200">
+                              {a.name}
+                            </span>
+                            {t && (
+                              <span className={`shrink-0 rounded-full border px-2 py-0.5 text-[9px] font-black ${t.cls}`}>
+                                {t.label}
+                              </span>
+                            )}
+                            <span className="shrink-0 text-[10px] text-zinc-500">{humanSize(a.size)}</span>
+                            <a
+                              href={a.browser_download_url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex h-7 shrink-0 items-center gap-1 rounded-lg border border-emerald-400/40 bg-emerald-400/10 px-2.5 text-[10px] font-bold text-emerald-300 transition hover:bg-emerald-400/20"
+                            >
+                              <Download size={11} aria-hidden />
+                              دانلود
+                            </a>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+
+                  {/* کپی چک‌سام‌ها */}
+                  {sumsAsset && (
+                    <div className="rounded-xl border border-cyan-400/30 bg-cyan-400/10 p-3">
+                      <p className="text-[10.5px] leading-5 text-cyan-200">
+                        فایل تأیید صحت پیدا شد: <span dir="ltr" className="font-mono">{sumsAsset.name}</span> —
+                        بعد از دانلود، امضای فایل را با آن مقایسه کن.
+                      </p>
+                      {ckErr && (
+                        <p role="alert" className="mt-1.5 text-[10px] leading-4 text-rose-300">
+                          {ckErr}
+                        </p>
+                      )}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="mt-2 border-cyan-400/40 text-cyan-200 hover:bg-cyan-400/15"
+                        onClick={() => void copyChecksums()}
+                        disabled={ckBusy}
+                      >
+                        {ckBusy ? (
+                          <LoaderCircle className="size-4 animate-spin" aria-hidden />
+                        ) : ckDone ? (
+                          <Check className="size-4" aria-hidden />
+                        ) : (
+                          <Copy className="size-4" aria-hidden />
+                        )}
+                        {ckDone ? 'کپی شد' : 'کپی چک‌سام‌ها'}
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* راهنمای نصب */}
+                  {latest.assets.length > 0 && (
+                    <div className="rounded-xl border border-white/10 bg-zinc-950/60 px-3">
+                      <p className="pt-3 text-[10px] font-black text-zinc-400">راهنمای نصب به تفکیک پلتفرم</p>
+                      <Accordion type="single" collapsible className="mt-1">
+                        {/* ویندوز — exe */}
+                        <AccordionItem value="win-exe">
+                          <AccordionTrigger className="py-3 text-[11px] font-black text-zinc-200 hover:no-underline">
+                            <span className="flex items-center gap-1.5">
+                              <FileDown size={12} className="text-rose-300" aria-hidden />
+                              ویندوز — نصاب exe
+                            </span>
+                          </AccordionTrigger>
+                          <AccordionContent className="pb-4">
+                            {exeAsset ? (
+                              <ol className="flex list-decimal flex-col gap-1.5 pr-4 text-[10.5px] leading-5 text-zinc-300">
+                                <li>
+                                  فایل <span dir="ltr" className="font-mono text-amber-200">{exeAsset.name}</span> را
+                                  از فهرست بالا دانلود کن ({humanSize(exeAsset.size)}).
+                                </li>
+                                <li>روی فایل دانلودشده دوبار کلیک کن تا نصاب اجرا شود.</li>
+                                <li>
+                                  اگر Windows Smart Screen هشدار داد: روی «More info» بزن و بعد
+                                  «Run anyway» را انتخاب کن — چون نصاب هنوز امضای دیجیتال ندارد.
+                                </li>
+                              </ol>
+                            ) : (
+                              <p className="rounded-lg border border-amber-400/30 bg-amber-400/10 p-2.5 text-[10.5px] leading-5 text-amber-200">
+                                در این نسخه فایل exe یافت نشد — راهنمای ویندوز فعلاً قابل ارائه نیست.
+                              </p>
+                            )}
+                          </AccordionContent>
+                        </AccordionItem>
+
+                        {/* ویندوز — zip پرتابل */}
+                        <AccordionItem value="win-zip">
+                          <AccordionTrigger className="py-3 text-[11px] font-black text-zinc-200 hover:no-underline">
+                            <span className="flex items-center gap-1.5">
+                              <FileArchive size={12} className="text-amber-300" aria-hidden />
+                              ویندوز — نسخهٔ پرتابل (بدون نصب)
+                            </span>
+                          </AccordionTrigger>
+                          <AccordionContent className="pb-4">
+                            {zipAsset ? (
+                              <ol className="flex list-decimal flex-col gap-1.5 pr-4 text-[10.5px] leading-5 text-zinc-300">
+                                <li>
+                                  فایل <span dir="ltr" className="font-mono text-amber-200">{zipAsset.name}</span> را
+                                  دانلود کن ({humanSize(zipAsset.size)}).
+                                </li>
+                                <li>محتوای آرشیو را در پوشه‌ای دلخواه استخراج کن — نیازی به نصب نیست.</li>
+                                <li>فایل اجرای اصلی داخل پوشه را اجرا کن؛ نسخهٔ پرتابل هیچ ردپایی در رجیستری نمی‌گذارد.</li>
+                              </ol>
+                            ) : (
+                              <p className="rounded-lg border border-amber-400/30 bg-amber-400/10 p-2.5 text-[10.5px] leading-5 text-amber-200">
+                                در این نسخه فایل zip یافت نشد — نسخهٔ پرتابل فعلاً منتشر نشده است.
+                              </p>
+                            )}
+                          </AccordionContent>
+                        </AccordionItem>
+
+                        {/* لینوکس — tar.gz */}
+                        <AccordionItem value="linux-targz">
+                          <AccordionTrigger className="py-3 text-[11px] font-black text-zinc-200 hover:no-underline">
+                            <span className="flex items-center gap-1.5">
+                              <HardDrive size={12} className="text-emerald-300" aria-hidden />
+                              لینوکس — بستهٔ tar.gz
+                            </span>
+                          </AccordionTrigger>
+                          <AccordionContent className="pb-4">
+                            {targzAsset ? (
+                              <>
+                                <ol className="mb-2 flex list-decimal flex-col gap-1.5 pr-4 text-[10.5px] leading-5 text-zinc-300">
+                                  <li>
+                                    فایل{' '}
+                                    <span dir="ltr" className="font-mono text-amber-200">{targzAsset.name}</span>{' '}
+                                    را دانلود کن ({humanSize(targzAsset.size)}).
+                                  </li>
+                                  <li>در همان پوشه، ترمینال را باز کن و فرمان زیر را اجرا کن:</li>
+                                </ol>
+                                <pre
+                                  dir="ltr"
+                                  className="os-scroll overflow-x-auto rounded-lg border border-white/10 bg-black/60 p-3 text-left font-mono text-[11px] leading-5 text-emerald-200"
+                                >
+                                  {`tar xzf ${targzAsset.name} && node server.js`}
+                                </pre>
+                              </>
+                            ) : (
+                              <p className="rounded-lg border border-amber-400/30 bg-amber-400/10 p-2.5 text-[10.5px] leading-5 text-amber-200">
+                                در این نسخه فایل tar.gz یافت نشد — بستهٔ لینوکس فعلاً منتشر نشده است.
+                                (روش نصب مستقیم از مخزن، در برنامهٔ «نسخه لینوکس واقعی» توضیح داده شده.)
+                              </p>
+                            )}
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Accordion>
+                    </div>
+                  )}
+
+                  {/* نسخهٔ مرورگر */}
+                  <div className="flex items-start gap-2.5 rounded-xl border border-emerald-400/30 bg-emerald-400/10 p-3">
+                    <span
+                      className="grid size-8 shrink-0 place-items-center rounded-lg bg-emerald-400/20 text-emerald-300"
+                      aria-hidden
                     >
-                      <RefreshCw size={10} aria-hidden />
-                      دوباره
-                    </Button>
-                    <Button size="sm" variant="ghost" className="h-6 text-[10px] text-cyan-300" onClick={() => void copySums()} disabled={!sumsText}>
-                      <Copy size={10} aria-hidden />
-                      کپی
-                    </Button>
+                      <Globe size={15} />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-[11px] font-black text-emerald-200">نسخهٔ مرورگر: همین سایت</p>
+                      <p className="mt-0.5 text-[10.5px] leading-5 text-emerald-200/75">
+                        اگر همین حالا سان‌جاب‌اواس را در مرورگر می‌بینی، نسخهٔ مرورگر را داری —
+                        چیزی برای دانلود نیست؛ به‌روزرسانی‌اش با خود سایت انجام می‌شود.
+                      </p>
+                    </div>
                   </div>
-                )}
+                </div>
               </section>
             </FadeIn>
 
-            {/* ---------------- کارت آخرین Stable ---------------- */}
-            <FadeIn reduce={reduce}>
-              <ReleaseCard release={latestStable} assets={assets} highlight />
-            </FadeIn>
-
-            {/* ---------------- پیش‌انتشارها — جدا و شفاف ---------------- */}
-            {prereleases.length > 0 && (
+            {/* ------------------------ نسخه‌های پیشین ------------------------ */}
+            {older.length > 0 && (
               <FadeIn reduce={reduce}>
-                <section className="overflow-hidden rounded-2xl border border-purple-400/25 bg-purple-400/[0.05]">
-                  <p className="flex items-center gap-1.5 border-b border-white/10 px-4 py-2.5 text-[10.5px] font-black text-purple-300">
-                    <FlaskConical size={12} aria-hidden />
-                    پیش‌انتشارها ({faNum(prereleases.length)}) — برای آزمایش؛ به کاربران عادی پیشنهاد نمی‌شود
+                <section className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/60">
+                  <p className="flex items-center gap-1.5 border-b border-white/10 bg-zinc-900/80 px-4 py-2.5 text-[10.5px] font-black text-zinc-400">
+                    <History size={12} className="text-purple-300" aria-hidden />
+                    نسخه‌های پیشین ({faNum(older.length)} انتشار)
                   </p>
-                  {prereleases.map((r) => (
+                  {older.map((r, i) => (
                     <a
                       key={r.id}
                       href={r.html_url}
                       target="_blank"
                       rel="noreferrer"
-                      className="flex flex-wrap items-center gap-2 px-4 py-2.5 text-[10.5px] transition hover:bg-purple-400/10"
+                      className={`flex flex-wrap items-center gap-2 px-4 py-2.5 text-[10.5px] transition hover:bg-zinc-800/60 ${
+                        i % 2 === 0 ? 'bg-zinc-900' : 'bg-zinc-900/50'
+                      }`}
                     >
-                      <span dir="ltr" className="shrink-0 font-mono font-bold text-purple-200">{r.tag_name}</span>
+                      <span dir="ltr" className="shrink-0 font-mono font-bold text-zinc-200">
+                        {r.tag_name}
+                      </span>
+                      {r.prerelease && (
+                        <span className="shrink-0 rounded-full border border-purple-400/40 bg-purple-400/10 px-1.5 py-0.5 text-[8.5px] font-black text-purple-300">
+                          پیش‌انتشار
+                        </span>
+                      )}
                       <span className="min-w-0 flex-1 truncate text-zinc-500">{r.name ?? ''}</span>
                       <span className="shrink-0 text-zinc-500">{faDate(r.published_at)}</span>
+                      <span className="shrink-0 text-zinc-600">{faNum(r.assets.length)} فایل</span>
                       <ExternalLink size={11} className="shrink-0 text-zinc-600" aria-hidden />
                     </a>
                   ))}
-                </section>
-              </FadeIn>
-            )}
-
-            {/* ---------------- نسخه‌های پیشین ---------------- */}
-            {stableList.length > 0 && (
-              <FadeIn reduce={reduce}>
-                <section className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/60">
-                  <p className="flex items-center gap-1.5 border-b border-white/10 bg-zinc-900/80 px-4 py-2.5 text-[10.5px] font-black text-zinc-400">
-                    <History size={12} className="text-sky-300" aria-hidden />
-                    نسخه‌های پیشین Stable ({faNum(stableList.length)} انتشار)
-                  </p>
-                  {stableList.map((r, i) => {
-                    const olderAssets = r.assets.map((a) => ({ ...a, info: classifyAsset(a.name) }))
-                    return (
-                      <Accordion key={r.id} type="single" collapsible>
-                        <AccordionItem value={`rel-${r.id}`} className={i % 2 === 0 ? 'bg-zinc-900' : 'bg-zinc-900/50'}>
-                          <AccordionTrigger className="flex flex-wrap items-center gap-2 px-4 py-2.5 text-[10.5px] hover:no-underline">
-                            <span dir="ltr" className="shrink-0 font-mono font-bold text-zinc-200">{r.tag_name}</span>
-                            <span className="min-w-0 flex-1 truncate text-left text-zinc-500">{r.name ?? ''}</span>
-                            <span className="shrink-0 text-zinc-500">{faDate(r.published_at)}</span>
-                            <span className="shrink-0 text-zinc-600">{faNum(r.assets.length)} فایل</span>
-                          </AccordionTrigger>
-                          <AccordionContent className="px-4 pb-4">
-                            {r.body?.trim() ? (
-                              <div className="mb-2 rounded-xl border border-white/10 bg-zinc-950/60 p-3">
-                                <MarkdownNotes body={r.body} />
-                              </div>
-                            ) : null}
-                            <div className="space-y-1">
-                              {olderAssets.map((a) => (
-                                <div key={a.name} className="flex flex-wrap items-center gap-2 text-[10.5px]">
-                                  <FileArchive size={12} className="shrink-0 text-zinc-600" aria-hidden />
-                                  <span dir="ltr" className="min-w-0 flex-1 truncate font-mono text-zinc-300">{a.name}</span>
-                                  <span className={`shrink-0 rounded-full border px-1.5 py-0.5 text-[9px] font-black ${KIND_STYLE[a.info.kind]}`}>
-                                    {a.info.label}
-                                  </span>
-                                  <span className="shrink-0 text-zinc-500">{humanSize(a.size)}</span>
-                                  <a
-                                    href={a.browser_download_url}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="shrink-0 rounded-md border border-emerald-400/40 bg-emerald-400/10 px-2 py-0.5 font-bold text-emerald-300 transition hover:bg-emerald-400/20"
-                                  >
-                                    دانلود
-                                  </a>
-                                </div>
-                              ))}
-                            </div>
-                            <a
-                              href={r.html_url}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="mt-2 inline-flex items-center gap-1 text-[10px] font-bold text-sky-300 hover:underline"
-                            >
-                              <ExternalLink size={10} aria-hidden />
-                              مشاهده در گیت‌هاب
-                            </a>
-                          </AccordionContent>
-                        </AccordionItem>
-                      </Accordion>
-                    )
-                  })}
                 </section>
               </FadeIn>
             )}
@@ -733,262 +778,9 @@ export default function DownloadsApp() {
   )
 }
 
-/* --------------------- کارت انتشار (Stable فعلی) --------------------- */
-
-function ReleaseCard({
-  release,
-  assets,
-  highlight,
-}: {
-  release: GhRelease
-  assets: (GhAsset & { info: AssetInfo })[]
-  highlight?: boolean
-}) {
-  const exe = assets.find((a) => a.info.kind === 'windows-nsis')
-  const msi = assets.find((a) => a.info.kind === 'windows-msi')
-  const web = assets.find((a) => a.info.kind === 'web-standalone')
-  const cli = assets.find((a) => a.info.kind === 'cli')
-
-  return (
-    <section className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/60">
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-white/10 bg-zinc-900/80 p-4">
-        <span
-          className="grid size-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-md"
-          aria-hidden
-        >
-          <Tag size={15} />
-        </span>
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-1.5">
-            <h3 dir="ltr" className="font-mono text-[12px] font-black text-amber-200">
-              {release.tag_name}
-            </h3>
-            {highlight ? (
-              <span className="rounded-full border border-emerald-400/40 bg-emerald-400/10 px-2 py-0.5 text-[9px] font-black text-emerald-300">
-                آخرین Stable
-              </span>
-            ) : null}
-          </div>
-          <p className="mt-0.5 truncate text-[10.5px] text-zinc-500">
-            {release.name ?? 'بدون عنوان'} — انتشار: {faDate(release.published_at)}
-          </p>
-        </div>
-        <a
-          href={release.html_url}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg border border-white/10 bg-zinc-950/60 px-2.5 text-[10.5px] font-bold text-zinc-300 transition hover:bg-zinc-800"
-        >
-          <ExternalLink size={11} aria-hidden />
-          در گیت‌هاب
-        </a>
-      </div>
-
-      <div className="flex flex-col gap-3 p-4">
-        {release.body && release.body.trim() !== '' && (
-          <div className="rounded-xl border border-white/10 bg-zinc-950/60 p-3">
-            <p className="mb-1.5 flex items-center gap-1.5 text-[10px] font-black text-zinc-400">
-              <FileDown size={11} className="text-emerald-300" aria-hidden />
-              یادداشت انتشار
-            </p>
-            <MarkdownNotes body={release.body} />
-          </div>
-        )}
-
-        {release.assets.length === 0 && (
-          <p className="flex items-start gap-1.5 rounded-xl border border-amber-400/30 bg-amber-400/10 p-2.5 text-[10.5px] leading-5 text-amber-200">
-            <Info className="mt-0.5 size-3.5 shrink-0" aria-hidden />
-            برای این نسخه هنوز فایلی ساخته نشده — به‌محض انتشار اینجا دیده می‌شود.
-          </p>
-        )}
-
-        {release.assets.length > 0 && (
-          <div className="overflow-hidden rounded-xl border border-white/10">
-            <p className="border-b border-white/10 bg-zinc-900/80 px-3 py-2 text-[10px] font-black text-zinc-400">
-              فایل‌های این انتشار ({faNum(release.assets.length)} فایل)
-            </p>
-            {assets.map((a, i) => (
-              <div
-                key={a.name}
-                className={`flex flex-wrap items-center gap-2 px-3 py-2 ${i % 2 === 0 ? 'bg-zinc-900' : 'bg-zinc-900/50'}`}
-                title={a.info.purpose}
-              >
-                <FileArchive size={13} className="shrink-0 text-zinc-500" aria-hidden />
-                <span dir="ltr" className="min-w-0 flex-1 truncate font-mono text-[10.5px] text-zinc-200">
-                  {a.name}
-                </span>
-                <span className={`shrink-0 rounded-full border px-2 py-0.5 text-[9px] font-black ${KIND_STYLE[a.info.kind]}`}>
-                  {a.info.label}
-                </span>
-                <span className="shrink-0 text-[10px] text-zinc-500">{humanSize(a.size)}</span>
-                <a
-                  href={a.browser_download_url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex h-7 shrink-0 items-center gap-1 rounded-lg border border-emerald-400/40 bg-emerald-400/10 px-2.5 text-[10px] font-bold text-emerald-300 transition hover:bg-emerald-400/20"
-                >
-                  <Download size={11} aria-hidden />
-                  دانلود
-                </a>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {release.assets.length > 0 && (
-          <div className="rounded-xl border border-white/10 bg-zinc-950/60 px-3">
-            <p className="pt-3 text-[10px] font-black text-zinc-400">راهنمای نصب به تفکیک پلتفرم</p>
-            <Accordion type="single" collapsible className="mt-1">
-              <AccordionItem value="win-exe">
-                <AccordionTrigger className="py-3 text-[11px] font-black text-zinc-200 hover:no-underline">
-                  <span className="flex items-center gap-1.5">
-                    <FileDown size={12} className="text-rose-300" aria-hidden />
-                    ویندوز — نصاب گرافیکی (exe)
-                  </span>
-                </AccordionTrigger>
-                <AccordionContent className="pb-4">
-                  {exe ? (
-                    <ol className="flex list-decimal flex-col gap-1.5 pr-4 text-[10.5px] leading-5 text-zinc-300">
-                      <li>
-                        فایل <span dir="ltr" className="font-mono text-amber-200">{exe.name}</span> را دانلود کن ({humanSize(exe.size)}).
-                      </li>
-                      <li>روی فایل دوبار کلیک کن تا نصاب اجرا شود؛ نصب per-user است و به دسترسی مدیر نیاز ندارد.</li>
-                      <li>
-                        اگر SmartScreen هشدار داد: «More info» و بعد «Run anyway» — چون نصاب هنوز امضای دیجیتال شرکت ندارد.
-                      </li>
-                      <li>
-                        پیش‌نیاز: WebView2 (روی ویندوز ۱۱ و بیشتر ویندوزهای ۱۰ از قبل نصب است). اگر نصب نباشد، نصاب آن را از اینترنت
-                        می‌گیرد — در اینترنتِ محدود، اول WebView2 Runtime را جداگانه نصب کن.
-                      </li>
-                      <li>داده‌های تو در AppData نگهداری می‌شوند و حذف/به‌روزرسانی برنامه آن‌ها را پاک نمی‌کند.</li>
-                    </ol>
-                  ) : (
-                    <p className="rounded-lg border border-amber-400/30 bg-amber-400/10 p-2.5 text-[10.5px] leading-5 text-amber-200">
-                      در این نسخه نصاب exe یافت نشد — راهنمای ویندوز فعلاً قابل ارائه نیست.
-                    </p>
-                  )}
-                </AccordionContent>
-              </AccordionItem>
-
-              {msi && (
-                <AccordionItem value="win-msi">
-                  <AccordionTrigger className="py-3 text-[11px] font-black text-zinc-200 hover:no-underline">
-                    <span className="flex items-center gap-1.5">
-                      <Package size={12} className="text-rose-300" aria-hidden />
-                      ویندوز — نصاب MSI (استقرار سازمانی)
-                    </span>
-                  </AccordionTrigger>
-                  <AccordionContent className="pb-4">
-                    <ol className="flex list-decimal flex-col gap-1.5 pr-4 text-[10.5px] leading-5 text-zinc-300">
-                      <li>
-                        فایل <span dir="ltr" className="font-mono text-amber-200">{msi.name}</span> مناسب استقرار با سیاست گروهی است.
-                      </li>
-                      <li dir="ltr" className="text-left">
-                        <code className="font-mono text-emerald-300">msiexec /i {msi.name} /qn</code>
-                      </li>
-                    </ol>
-                  </AccordionContent>
-                </AccordionItem>
-              )}
-
-              <AccordionItem value="web-standalone">
-                <AccordionTrigger className="py-3 text-[11px] font-black text-zinc-200 hover:no-underline">
-                  <span className="flex items-center gap-1.5">
-                    <Globe size={12} className="text-emerald-300" aria-hidden />
-                    وب self-host / لینوکس — اجرای سرور محلی
-                  </span>
-                </AccordionTrigger>
-                <AccordionContent className="pb-4">
-                  {web ? (
-                    <>
-                      <ol className="mb-2 flex list-decimal flex-col gap-1.5 pr-4 text-[10.5px] leading-5 text-zinc-300">
-                        <li>
-                          فایل <span dir="ltr" className="font-mono text-amber-200">{web.name}</span> را دانلود کن ({humanSize(web.size)}) —
-                          نیازمند Node.js 18+ روی سیستم.
-                        </li>
-                        <li>در همان پوشه ترمینال باز کن و:</li>
-                      </ol>
-                      <pre dir="ltr" className="os-scroll overflow-x-auto rounded-lg border border-white/10 bg-black/60 p-3 text-left font-mono text-[11px] leading-5 text-emerald-200">
-                        {`tar xzf ${web.name} && PORT=3000 node server.js`}
-                      </pre>
-                      <p className="mt-2 text-[10px] leading-4 text-zinc-500">
-                        نصب‌کنندهٔ بومی لینوکس (.deb/Arch) هنوز منتشر نشده؛ این محدودیت صادقانه اعلام می‌شود.
-                      </p>
-                    </>
-                  ) : (
-                    <p className="rounded-lg border border-amber-400/30 bg-amber-400/10 p-2.5 text-[10.5px] leading-5 text-amber-200">
-                      در این نسخه بستهٔ وب standalone یافت نشد.
-                    </p>
-                  )}
-                </AccordionContent>
-              </AccordionItem>
-
-              {cli && (
-                <AccordionItem value="cli">
-                  <AccordionTrigger className="py-3 text-[11px] font-black text-zinc-200 hover:no-underline">
-                    <span className="flex items-center gap-1.5">
-                      <Terminal size={12} className="text-teal-300" aria-hidden />
-                      ابزار CLI — آموزش در ترمینال واقعی
-                    </span>
-                  </AccordionTrigger>
-                  <AccordionContent className="pb-4">
-                    <ol className="mb-2 flex list-decimal flex-col gap-1.5 pr-4 text-[10.5px] leading-5 text-zinc-300">
-                      <li>
-                        <span dir="ltr" className="font-mono text-amber-200">{cli.name}</span> ابزار خط‌فرمان یادگیری است (Python 3.10+) —
-                        روی ویندوز، لینوکس و مک کار می‌کند.
-                      </li>
-                    </ol>
-                    <pre dir="ltr" className="os-scroll overflow-x-auto rounded-lg border border-white/10 bg-black/60 p-3 text-left font-mono text-[11px] leading-5 text-teal-200">
-                      {`tar xzf ${cli.name}\ncd $(basename ${cli.name} .tar.gz)\npip install .\nsanjab --help`}
-                    </pre>
-                  </AccordionContent>
-                </AccordionItem>
-              )}
-            </Accordion>
-          </div>
-        )}
-
-        {/* نسخهٔ مرورگر */}
-        <div className="flex items-start gap-2.5 rounded-xl border border-emerald-400/30 bg-emerald-400/10 p-3">
-          <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-emerald-400/20 text-emerald-300" aria-hidden>
-            <Globe size={15} />
-          </span>
-          <div className="min-w-0">
-            <p className="text-[11px] font-black text-emerald-200">نسخهٔ مرورگر: همین سایت</p>
-            <p className="mt-0.5 text-[10.5px] leading-5 text-emerald-200/75">
-              اگر همین حالا سان‌جاب‌اواس را در مرورگر می‌بینی، نسخهٔ مرورگر را داری — به‌روزرسانی‌اش با خود سایت انجام می‌شود.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-/* ---------------- یادداشت انتشار — Markdown امن (بدون innerHTML) ---------------- */
-
-function MarkdownNotes({ body }: { body: string }) {
-  return (
-    <div className="prose-invert max-w-none text-[11px] leading-6 text-zinc-300 [&_a]:break-all [&_a]:text-cyan-300 [&_a]:underline [&_blockquote]:border-r-2 [&_blockquote]:border-amber-400/40 [&_blockquote]:pr-3 [&_blockquote]:text-zinc-400 [&_code]:rounded [&_code]:bg-black/50 [&_code]:px-1 [&_code]:font-mono [&_code]:text-[10px] [&_code]:text-amber-200 [&_h1]:mt-2 [&_h1]:text-[12px] [&_h1]:font-black [&_h1]:text-amber-200 [&_h2]:mt-2 [&_h2]:text-[11.5px] [&_h2]:font-black [&_h2]:text-amber-200 [&_h3]:mt-2 [&_h3]:text-[11px] [&_h3]:font-black [&_h3]:text-zinc-200 [&_hr]:border-white/10 [&_img]:max-w-full [&_li]:my-0.5 [&_ol]:my-1 [&_ol]:list-decimal [&_ol]:pr-4 [&_p]:my-1 [&_pre]:overflow-x-auto [&_pre]:rounded-lg [&_pre]:bg-black/60 [&_pre]:p-2.5 [&_pre]:font-mono [&_pre]:text-[10px] [&_table]:w-full [&_table]:text-[10px] [&_td]:border [&_td]:border-white/10 [&_td]:px-1.5 [&_td]:py-1 [&_th]:border [&_th]:border-white/10 [&_th]:bg-white/5 [&_th]:px-1.5 [&_th]:py-1 [&_ul]:my-1 [&_ul]:list-disc [&_ul]:pr-4">
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
-        components={{
-          a: ({ href, children }) => (
-            <a href={href} target="_blank" rel="noreferrer noopener">
-              {children}
-            </a>
-          ),
-        }}
-      >
-        {body}
-      </ReactMarkdown>
-    </div>
-  )
-}
-
 /* ------------------------- قطعات کمکی رابط ------------------------- */
 
-function FadeIn({ children, reduce }: { children: React.ReactNode; reduce: boolean | null }) {
+function FadeIn({ children, reduce }: { children: ReactNode; reduce: boolean | null }) {
   return (
     <motion.div
       initial={reduce ? false : { opacity: 0, y: 12 }}
@@ -1014,5 +806,3 @@ function SkeletonList() {
     </div>
   )
 }
-
-

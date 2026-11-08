@@ -4,7 +4,7 @@
 
 import packageJson from '../../../package.json'
 
-export const OS_VERSION = '4.1.0'
+export const OS_VERSION = '4.0.0'
 export const OS_CODENAME = 'سنجابک'
 export const OS_SPONSOR = 'sunjob.ir'
 export const OS_REPO = 'https://github.com/kiarash65/sanjab-os'

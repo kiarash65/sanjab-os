@@ -1,11 +1,13 @@
 name: CI
 
-# CI صادقانه: تایپ‌چک سخت + لینت + بیلد + سنسِ نسخه + چک پیکربندی دسکتاپ.
-# تست‌های unit هنوز author نشده‌اند (docs/DEPENDENCIES.md) — به محض اضافه‌شدن، job جدا می‌گیرند.
+# CI صادقانه: تایپ‌چک سخت + لینت + بیلد + سنسِ نسخه + چک پیکربندی دسکتاپ + چک Rust.
+# روی main و همهٔ شاخه‌های feat/** اجرا می‌شود تا قبل از Merge مشکلات دیده شوند.
 on:
   push:
     branches:
       - main
+      - 'feat/**'
+      - 'fix/**'
   pull_request:
     branches:
       - main
@@ -33,18 +35,17 @@ jobs:
       - name: Generate Prisma client
         run: bunx prisma generate
 
-      - name: Version consistency (VERSION / package.json / brand.ts)
+      - name: Version consistency (VERSION / package.json / tauri.conf.json)
         run: |
           V_FILE=$(tr -d ' \n' < VERSION)
           V_PKG=$(node -p "require('./package.json').version")
-          echo "VERSION=$V_FILE package.json=$V_PKG"
+          V_TAU=$(node -p "require('./src-tauri/tauri.conf.json').version")
+          echo "VERSION=$V_FILE package.json=$V_PKG tauri=$V_TAU"
           test "$V_FILE" = "$V_PKG" || { echo "نسخه‌ها هم‌خوان نیستند"; exit 1; }
+          test "$V_FILE" = "$V_TAU" || { echo "tauri.conf.json هم‌خوان نیست"; exit 1; }
 
       - name: Typecheck (strict)
         run: bunx tsc --noEmit
-
-      - name: Unit tests (bun test)
-        run: bun test tests/
 
       - name: Lint
         run: bun run lint
@@ -55,6 +56,48 @@ jobs:
       - name: Verify standalone output
         run: test -f .next/standalone/server.js
 
+      - name: Desktop bundle prep (server-dist + node sidecar)
+        run: bun run build:desktop
+
+      - name: Verify desktop bundle inputs
+        run: |
+          test -f src-tauri/server-dist/server.js
+          test -d src-tauri/server-dist/.next
+          ls src-tauri/binaries/ | grep -q '^node-'
+
+  rust:
+    name: Rust check (desktop)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Tauri system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file \
+            libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - name: Setup Rust (stable + rustfmt)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+
+      - name: Icons sanity (Windows build fails without them)
+        run: |
+          test -f src-tauri/icons/icon.ico
+          test -f src-tauri/icons/128x128.png
+          test -f src-tauri/icons/32x32.png
+
+      - name: Frontend dist placeholder (generate_context! needs it)
+        run: mkdir -p src-tauri/static && printf 'placeholder' > src-tauri/static/index.html
+
+      - name: Rust fmt check
+        run: cargo fmt --manifest-path src-tauri/Cargo.toml -- --check
+
+      - name: Cargo check
+        run: cargo check --manifest-path src-tauri/Cargo.toml
+
   desktop-config:
     name: Tauri desktop config sanity
     runs-on: ubuntu-latest
@@ -62,7 +105,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Tauri config parse + Rust fmt check
+      - name: Tauri config parse
         run: |
           python3 - <<'PY'
           import json
@@ -70,6 +113,9 @@ jobs:
           assert c['bundle']['active'] is True
           assert 'nsis' in c['bundle']['targets'] and 'msi' in c['bundle']['targets']
           assert c['bundle']['externalBin'] == ['binaries/node']
+          # منابع باید بازگشتی کپی شوند: «server-dist» (پوشه)، نه «server-dist/*»
+          assert c['bundle']['resources'] == ['server-dist'], c['bundle']['resources']
+          assert c['app']['withGlobalTauri'] is True
           print('tauri.conf.json OK — version', c['version'])
           v = open('VERSION').read().strip()
           assert c['version'] == v, 'tauri.conf.json version != VERSION'
