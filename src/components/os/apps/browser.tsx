@@ -50,24 +50,10 @@ const TILES: { title: string; desc: string; url: string; color: string; letter: 
   },
   {
     title: 'ویکی‌پدیا فارسی',
-    desc: 'دانشنامهٔ آزاد',
-    url: 'https://fa.wikipedia.org/wiki/%D8%B5%D9%81%D8%AD%D9%87%D9%94_%D8%A7%D8%B5%D9%84%DB%8C',
+    desc: 'دانشنامهٔ آزاد — نسخهٔ موبایل',
+    url: 'https://fa.m.wikipedia.org/wiki/صفحهٔ_اصلی',
     color: '#8b5cf6',
     letter: 'و',
-  },
-  {
-    title: 'آرشیو اینترنت',
-    desc: 'Archive.org — موزهٔ وب',
-    url: 'https://archive.org',
-    color: '#f59e0b',
-    letter: 'آ',
-  },
-  {
-    title: 'MDN',
-    desc: 'مستندات فنی وب',
-    url: 'https://developer.mozilla.org',
-    color: '#34d399',
-    letter: 'M',
   },
   {
     title: 'هواشناسی wttr',
@@ -95,47 +81,6 @@ const BOOKMARKS: { label: string; url: string }[] = [
 
 const HIST_KEY = 'sunjob-browser-hist'
 const BM_KEY = 'sunjob-browser-bm'
-
-/* سایت‌هایی که با سیاست امنیتی خودشان (X-Frame-Options / CSP frame-ancestors)
-   اجازهٔ نمایش داخل iframe را نمی‌دهند — با تست زندهٔ هدرها تأیید شده.
-   این سیاست‌ها را دور نمی‌زنیم؛ فقط فوراً راهنما نشان می‌دهیم. */
-const FRAME_BLOCKED_HOSTS = [
-  'google.com',
-  'youtube.com',
-  'youtu.be',
-  'github.com',
-  'x.com',
-  'twitter.com',
-  'facebook.com',
-  'instagram.com',
-  'linkedin.com',
-  'bing.com',
-  'duckduckgo.com',
-  'bbc.com',
-  'bbc.co.uk',
-  'digikala.com',
-  'zoomit.ir',
-  'aparat.com',
-  'virgool.io',
-]
-
-/* استثناها: زیردامنه‌هایی که علیرغم دامنهٔ والد، فریم‌پذیرند */
-const FRAME_ALLOWED_HOSTS = ['embed.duckduckgo.com']
-
-function isFrameBlockedHost(url: string): boolean {
-  try {
-    const h = new URL(url).hostname.replace(/^www\./, '')
-    if (FRAME_ALLOWED_HOSTS.includes(h)) return false
-    return FRAME_BLOCKED_HOSTS.some((d) => h === d || h.endsWith('.' + d))
-  } catch {
-    return false
-  }
-}
-
-/* آیا داخل اپ دسکتاپ Tauri اجرا می‌شویم؟ */
-function inTauri(): boolean {
-  return typeof window !== 'undefined' && '__TAURI__' in window
-}
 
 function normalizeInput(raw: string): { url: string; search?: string } {
   const t = raw.trim()
@@ -225,7 +170,7 @@ export default function BrowserApp() {
           if (l) setFrameBlocked(true)
           return false
         })
-      }, 4500)
+      }, 6500)
       return () => clearTimeout(t)
     }
   }, [loading, active?.url])
@@ -365,32 +310,9 @@ export default function BrowserApp() {
     pushToast({ icon: '🌐', title: 'در تب جدید باز شد', body: hostOf(url) })
   }
 
-  /* در دسکتاپ Tauri: پنجرهٔ واقعی مرورگر (WebView2 بومی، بدون محدودیت iframe)
-   در وب: تب جدید مرورگر کاربر */
-  const openNative = async (url: string) => {
-    if (!url) return
-    if (inTauri()) {
-      try {
-        const tauri = (
-          window as unknown as {
-            __TAURI__: { core: { invoke: (cmd: string, args?: object) => Promise<string> } }
-          }
-        ).__TAURI__
-        await tauri.core.invoke('open_native_browser_window', { url })
-        pushToast({ icon: '🦊', title: 'پنجرهٔ واقعی مرورگر باز شد', body: hostOf(url) })
-        return
-      } catch {
-        pushToast({ icon: '⚠️', title: 'پنجرهٔ بومی باز نشد', body: 'با تب مرورگر بازش کردم.' })
-      }
-    }
-    openExternal(url)
-  }
-
   const isHome = !active?.url
   const canBack = !!active && active.hi > 0
   const canForward = !!active && active.hi < active.hist.length - 1
-  /* فوراً برای سایت‌های شناخته‌شدهٔ فریم‌نشو، بدون انتظار برای تایم‌اوت */
-  const showBlocked = frameBlocked || (active?.url ? isFrameBlockedHost(active.url) : false)
 
   return (
     <div className="flex h-full w-full flex-col bg-zinc-950/70">
@@ -587,9 +509,9 @@ export default function BrowserApp() {
                   </button>
                 ))}
               </div>
-              {/* جستجوی ویکی‌پدیا + جستجوی وب فریم‌پذیر */}
+              {/* جستجوی ویکی‌پدیا */}
               <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-3 text-right">
-                <p className="mb-2 text-[11px] font-black text-zinc-200">جستجو</p>
+                <p className="mb-2 text-[11px] font-black text-zinc-200">جستجوی سریع ویکی‌پدیا</p>
                 <div className="flex gap-1.5">
                   <input
                     value={wikiQ}
@@ -599,38 +521,23 @@ export default function BrowserApp() {
                     }}
                     placeholder="مثلاً: لینوکس توروالدز"
                     className="min-w-0 flex-1 rounded-lg border border-white/10 bg-zinc-950 px-3 py-2 text-[11.5px] text-zinc-100 placeholder:text-zinc-600 outline-none focus:border-[#f7931e]/60"
-                    aria-label="جستجو"
+                    aria-label="جستجوی ویکی‌پدیا"
                   />
                   <button
                     onClick={() => wikiQ.trim() && void runWikiSearch(wikiQ.trim())}
                     disabled={wikiBusy}
                     className="grid size-9 shrink-0 place-items-center rounded-lg bg-[#8b5cf6] text-white transition hover:brightness-110 active:scale-95 disabled:opacity-50"
-                    aria-label="جستجو در ویکی‌پدیا"
-                    title="جستجو در ویکی‌پدیا"
+                    aria-label="جستجو"
                   >
                     {wikiBusy ? <Loader2 size={14} className="animate-spin" /> : <Search size={14} />}
                   </button>
-                  <button
-                    onClick={() =>
-                      wikiQ.trim() &&
-                      navigate(`https://embed.duckduckgo.com/?q=${encodeURIComponent(wikiQ.trim())}&kae=d`)
-                    }
-                    className="grid size-9 shrink-0 place-items-center rounded-lg bg-[#f7931e] text-white transition hover:brightness-110 active:scale-95"
-                    aria-label="جستجوی وب با داک‌داک‌گو"
-                    title="جستجوی وب با داک‌داک‌گو — نسخهٔ فریم‌پذیر"
-                  >
-                    <Globe size={14} />
-                  </button>
                 </div>
-                <p className="mt-1.5 text-[9.5px] leading-4 text-zinc-600">
-                  بنفش: ویکی‌پدیا · نارنجی: جستجوی وب داک‌داک‌گو (نسخهٔ فریم‌پذیر)
-                </p>
                 {wikiResults && wikiResults.length > 0 && (
                   <div className="pengo-fadein mt-2 max-h-52 space-y-1 overflow-y-auto">
                     {wikiResults.map((r) => (
                       <button
                         key={r.title}
-                        onClick={() => navigate(`https://fa.wikipedia.org/wiki/${encodeURIComponent(r.title.replace(/ /g, '_'))}`)}
+                        onClick={() => navigate(`https://fa.m.wikipedia.org/wiki/${encodeURIComponent(r.title.replace(/ /g, '_'))}`)}
                         className="block w-full rounded-lg border border-white/5 bg-white/[0.03] p-2 text-right transition hover:border-[#8b5cf6]/50 hover:bg-[#8b5cf6]/10"
                       >
                         <span className="block text-[11px] font-black text-violet-300">{r.title}</span>
@@ -664,7 +571,7 @@ export default function BrowserApp() {
         )}
 
         {/* هشدار سایت رفریم‌نشدنی */}
-        {!isHome && showBlocked && (
+        {!isHome && frameBlocked && (
           <div className="pengo-fadein absolute inset-0 z-10 grid place-items-center bg-zinc-950/95 p-6 text-center">
             <div className="max-w-xs space-y-3">
               <ShieldAlert size={34} className="mx-auto text-amber-400" aria-hidden />
@@ -674,19 +581,13 @@ export default function BrowserApp() {
                 X-Frame-Options جلوی نمایش داخل مرورگرهای دیگر را می‌گیرند. این محدودیت
                 مرورگر است، نه خرابی سان‌جاب‌اواس.
               </p>
-              <div className="flex flex-wrap items-center justify-center gap-2">
+              <div className="flex items-center justify-center gap-2">
                 <button
-                  onClick={() => void openNative(active?.url ?? '')}
+                  onClick={() => openExternal(active?.url ?? '')}
                   className="flex items-center gap-1.5 rounded-lg bg-[#f7931e] px-3 py-2 text-[11px] font-black text-white transition hover:brightness-110"
                 >
                   <ExternalLink size={12} />
-                  {inTauri() ? 'پنجرهٔ واقعی مرورگر' : 'باز کردن در تب جدید'}
-                </button>
-                <button
-                  onClick={() => navigate(`https://embed.duckduckgo.com/?q=${encodeURIComponent(hostOf(active?.url ?? ''))}`)}
-                  className="rounded-lg border border-white/15 px-3 py-2 text-[11px] font-bold text-zinc-300 transition hover:bg-white/10"
-                >
-                  جستجوی همین سایت در داک‌داک‌گو
+                  باز کردن در تب جدید
                 </button>
                 <button
                   onClick={() => navigate('')}
@@ -741,11 +642,11 @@ export default function BrowserApp() {
             {active?.url}
           </span>
           <button
-            onClick={() => (inTauri() ? void openNative(active?.url ?? '') : openExternal(active?.url ?? ''))}
+            onClick={() => openExternal(active?.url ?? '')}
             className="flex shrink-0 items-center gap-1 rounded-md bg-white/5 px-2 py-1 text-[10px] font-bold text-zinc-300 transition hover:bg-white/10"
           >
             <ExternalLink size={10} />
-            {inTauri() ? 'باز کردن در پنجرهٔ واقعی' : 'صفحه سفید است؟ باز کردن بیرونی'}
+            صفحه سفید است؟ باز کردن بیرونی
           </button>
         </div>
       )}

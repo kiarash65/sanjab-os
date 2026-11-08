@@ -13,6 +13,7 @@ use std::time::Duration;
 use tauri::{AppHandle, Manager, RunEvent, WebviewUrl, WebviewWindowBuilder};
 use tauri_plugin_shell::process::CommandChild;
 use tauri_plugin_shell::ShellExt;
+use url::Url;
 
 struct ServerGuard(Mutex<Option<CommandChild>>);
 
@@ -37,17 +38,14 @@ fn wait_for_server(port: u16, timeout_ms: u64) -> bool {
 }
 
 fn resolve_server_dir(app: &AppHandle) -> PathBuf {
-    let res = app
-        .path()
-        .resource_dir()
-        .expect("مسیر منابع پیدا نشد");
+    let res = app.path().resource_dir().expect("مسیر منابع پیدا نشد");
     res.join("server-dist")
 }
 
 fn spawn_server(app: &AppHandle) -> Result<(u16, CommandChild), String> {
     /* رقابت پورت: بین آزادسازی سوکت آزمایشی و بایندِ Node ممکن است پروسهٔ دیگری
-       همان پورت را بگیرد — تا ۳ بار تلاش می‌کنیم؛ اگر سرور بالا نیامد فرزند
-       کشته می‌شود و پورت تازه‌ای گرفته می‌شود. */
+    همان پورت را بگیرد — تا ۳ بار تلاش می‌کنیم؛ اگر سرور بالا نیامد فرزند
+    کشته می‌شود و پورت تازه‌ای گرفته می‌شود. */
     let mut last_err = String::from("خطای نامشخص");
     for attempt in 0..3 {
         match try_spawn_once(app) {
@@ -89,10 +87,12 @@ fn try_spawn_once(app: &AppHandle) -> Result<(u16, CommandChild), String> {
         .map_err(|e| format!("اجرای Node ناموفق بود: {e}"))?;
 
     /* اگر Node به‌خاطر EADDRINUSE مرد، تا ۸ ثانیه صبر و بعد رد می‌کنیم تا
-       لایهٔ بالاتر با پورت تازه دوباره تلاش کند */
+    لایهٔ بالاتر با پورت تازه دوباره تلاش کند */
     if !wait_for_server(port, 8_000) {
         let _ = child.kill();
-        return Err(format!("سرور روی پورت {port} بالا نیامد (احتمالاً EADDRINUSE)"));
+        return Err(format!(
+            "سرور روی پورت {port} بالا نیامد (احتمالاً EADDRINUSE)"
+        ));
     }
 
     // لاگ سرور را در استدآوت اپ می‌ریزیم (لاگِ محلی؛ به شبکه نمی‌رود)
@@ -117,7 +117,7 @@ static NATIVE_WIN_COUNTER: AtomicU32 = AtomicU32::new(1);
 /// سطح‌بالا (top-level) است — دقیقاً همان کاری که یک مرورگر واقعی می‌کند.
 #[tauri::command]
 fn open_native_browser_window(app: AppHandle, url: String) -> Result<String, String> {
-    let parsed = tauri::Url::parse(&url).map_err(|_| format!("URL نامعتبر: {url}"))?;
+    let parsed = Url::parse(&url).map_err(|_| format!("URL نامعتبر: {url}"))?;
     if parsed.scheme() != "http" && parsed.scheme() != "https" {
         return Err("فقط http و https مجاز است".into());
     }

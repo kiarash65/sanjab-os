@@ -10,7 +10,6 @@
     "frontendDist": "./static"
   },
   "app": {
-    "withGlobalTauri": true,
     "windows": [],
     "security": {
       "csp": null
@@ -35,7 +34,7 @@
       "binaries/node"
     ],
     "resources": [
-      "server-dist"
+      "server-dist/*"
     ],
     "windows": {
       "webviewInstallMode": {
