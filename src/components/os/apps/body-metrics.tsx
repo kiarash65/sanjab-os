@@ -1,9 +1,9 @@
 'use client'
 
-/* «قدسنج و وزن‌یاب» — تخمین قد با کالیبراسیون چهره + وزن سالم پیشنهادی
+/* «قدسنج و وزن‌یاب»، تخمین قد با کالیبراسیون چهره + وزن سالم پیشنهادی
    روش: عرض/ارتفاع صورت به‌عنوان «خط‌کش» زنده استفاده می‌شود؛
    بعد از فریز کردن تصویر، کاربر بالای سر و پاشنه پا را علامت می‌زند.
-   صددرصد محلی — هیچ تصویری ارسال نمی‌شود. تخمین سرگرم‌کننده است، ترازو حرف آخر را می‌زند! */
+   صددرصد محلی، هیچ تصویری ارسال نمی‌شود. تخمین سرگرم‌کننده است، ترازو حرف آخر را می‌زند! */
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
@@ -99,7 +99,7 @@ export default function BodyMetricsApp() {
           s.src = FACEAPI_CDN
           s.async = true
           s.onload = () => resolve()
-          s.onerror = () => reject(new Error('بارگذاری کتابخانه ناموفق بود — اینترنت را چک کن'))
+          s.onerror = () => reject(new Error('بارگذاری کتابخانه ناموفق بود، اینترنت را چک کن'))
           document.head.appendChild(s)
         })
       }
@@ -201,7 +201,7 @@ export default function BodyMetricsApp() {
     } catch (err) {
       const msg =
         err instanceof DOMException && err.name === 'NotAllowedError'
-          ? 'دسترسی به دوربین داده نشد — اجازه بده!'
+          ? 'دسترسی به دوربین داده نشد، اجازه بده!'
           : 'دوربینی پیدا نشد یا خطایی پیش آمد'
       setLibErr(msg)
       pushToast({ icon: '⚠️', title: 'دوربین کار نکرد', body: msg })
@@ -295,13 +295,13 @@ export default function BodyMetricsApp() {
     ctx.fillStyle = '#f7931e'
     ctx.font = 'bold 20px Vazirmatn, sans-serif'
     ctx.fillText(
-      `قد تخمینی: ${fa(Math.round(heightCm))} سانتی‌متر — وزن سالم: ${fa(Math.round(wMin))} تا ${fa(Math.round(wMax))} کیلوگرم`,
+      `قد تخمینی: ${fa(Math.round(heightCm))} سانتی‌متر، وزن سالم: ${fa(Math.round(wMin))} تا ${fa(Math.round(wMax))} کیلوگرم`,
       w - 12,
       h + 34
     )
     ctx.fillStyle = '#71717a'
     ctx.font = '12px Vazirmatn, sans-serif'
-    ctx.fillText('قدسنج و وزن‌یاب سان‌جاب‌اواس — با اسپانسری سان‌جاب', w - 12, h + 50)
+    ctx.fillText('قدسنج و وزن‌یاب سان‌جاب‌اواس، با اسپانسری سان‌جاب', w - 12, h + 50)
     const a = document.createElement('a')
     a.href = out.toDataURL('image/png')
     a.download = 'sanjab-qad-sanj.png'
@@ -343,7 +343,7 @@ export default function BodyMetricsApp() {
         </span>
         <div className="min-w-0">
           <h2 className="text-xs font-black text-zinc-100">قدسنج و وزن‌یاب</h2>
-          <p className="text-[10px] text-zinc-500">تخمین قد با خط‌کش چهره — سرگرمی علمی</p>
+          <p className="text-[10px] text-zinc-500">تخمین قد با خط‌کش چهره، سرگرمی علمی</p>
         </div>
         <span className="mr-auto flex items-center gap-1">
           {(['idle', 'live', 'frozen'] as const).map((p, i) => (
@@ -392,7 +392,7 @@ export default function BodyMetricsApp() {
                 <button
                   type="button"
                   onPointerDown={markerDrag('head')}
-                  aria-label="نشانگر بالای سر — بکش"
+                  aria-label="نشانگر بالای سر، بکش"
                   className={`absolute z-10 grid size-8 -translate-x-1/2 -translate-y-1/2 touch-none place-items-center rounded-full border-2 border-white bg-[#f7931e] text-white shadow-lg transition ${
                     dragging === 'head' ? 'scale-125' : 'hover:scale-110'
                   }`}
@@ -403,7 +403,7 @@ export default function BodyMetricsApp() {
                 <button
                   type="button"
                   onPointerDown={markerDrag('foot')}
-                  aria-label="نشانگر پاشنه پا — بکش"
+                  aria-label="نشانگر پاشنه پا، بکش"
                   className={`absolute z-10 grid size-8 -translate-x-1/2 -translate-y-1/2 touch-none place-items-center rounded-full border-2 border-white bg-[#f7931e] text-white shadow-lg transition ${
                     dragging === 'foot' ? 'scale-125' : 'hover:scale-110'
                   }`}
@@ -430,7 +430,7 @@ export default function BodyMetricsApp() {
                     <>
                       <Ruler className="size-7 text-zinc-500" />
                       <p className="max-w-[240px] text-xs leading-5 text-zinc-400">
-                        دوربین را روشن کن، صورتت داخل قاب سبز شود و بعد «فریز» را بزن —
+                        دوربین را روشن کن، صورتت داخل قاب سبز شود و بعد «فریز» را بزن،
                         الان جلوی دوربین ایستادن لازم نیست، عکس تمام‌قد بعداً!
                       </p>
                     </>
@@ -481,7 +481,7 @@ export default function BodyMetricsApp() {
                   }`}
                 >
                   {detected
-                    ? `چهره کالیبره شد — ارتفاع قاب: ${fa(faceHpx)} پیکسل`
+                    ? `چهره کالیبره شد، ارتفاع قاب: ${fa(faceHpx)} پیکسل`
                     : 'منتظر چهره… صورتت را جلوی دوربین بگیر'}
                 </span>
               </>
@@ -521,7 +521,7 @@ export default function BodyMetricsApp() {
             <div className="pengo-fadein flex items-start gap-2 rounded-xl border border-[#f7931e]/25 bg-[#f7931e]/10 p-3 text-[11px] leading-5 text-amber-200/90">
               <Sparkles size={15} className="mt-0.5 shrink-0 text-[#f7931e]" aria-hidden />
               <span>
-                دو نشانگر نارنجی را بکش: یکی <b>فرق سر</b>، یکی <b>پاشنه پا</b> — در عکس تمام‌قد!
+                دو نشانگر نارنجی را بکش: یکی <b>فرق سر</b>، یکی <b>پاشنه پا</b>، در عکس تمام‌قد!
                 اگر فقط نیم‌تنه داری، اندازه تا جایی که هست؛ قد واقعی بعداً تناسبی حساب می‌شود.
               </span>
             </div>
@@ -561,7 +561,7 @@ export default function BodyMetricsApp() {
                 <span className="text-sm font-bold"> سانتی‌متر</span>
               </p>
               <p className="mt-1 text-[9.5px] text-zinc-400">
-                دقت این روش به کیفیت عکس و نشانگرها بستگی دارد — چند بار امتحان کن!
+                دقت این روش به کیفیت عکس و نشانگرها بستگی دارد، چند بار امتحان کن!
               </p>
             </div>
           )}
@@ -636,7 +636,7 @@ export default function BodyMetricsApp() {
             <AlertTriangle size={13} className="mt-0.5 shrink-0 text-amber-400" aria-hidden />
             <span>
               این اعداد «تخمین سرگرم‌کننده» هستند، نه تشخیص پزشکی! برای عدد دقیق، متر و ترازو حرف آخر را می‌زنند.
-              همه‌چیز همین‌جا در مرورگر پردازش می‌شود — هیچ تصویری جایی ارسال نمی‌شود. با اسپانسری سان‌جاب
+              همه‌چیز همین‌جا در مرورگر پردازش می‌شود، هیچ تصویری جایی ارسال نمی‌شود. با اسپانسری سان‌جاب
             </span>
           </div>
         </div>

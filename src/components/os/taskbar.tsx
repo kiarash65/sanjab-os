@@ -71,7 +71,7 @@ export default function Taskbar() {
         href="https://sunjob.ir"
         target="_blank"
         rel="noreferrer"
-        title="اسپانسیر ما: سان‌جاب — sunjob.ir"
+        title="اسپانسیر ما: سان‌جاب، sunjob.ir"
         className="mr-1 hidden h-7 shrink-0 items-center gap-1.5 rounded-full border border-[#f7931e]/40 bg-gradient-to-l from-[#f7931e]/20 to-[#8b5cf6]/20 px-2.5 text-[10px] font-black text-amber-200 transition hover:from-[#f7931e]/35 hover:to-[#8b5cf6]/35 lg:flex"
       >
         <img

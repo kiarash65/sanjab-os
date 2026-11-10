@@ -1,7 +1,7 @@
 'use client'
 
 /* ------------------------------------------------------------------ */
-/* آکادمی پایتون — با CPython واقعی (Pyodide) در تمرین‌ها               */
+/* آکادمی پایتون، با CPython واقعی (Pyodide) در تمرین‌ها               */
 /* صادقانه: بارگیری ~۱۰MB از CDN، سقف اجرای ۱۵ ثانیه، فایل مجازی       */
 /* ------------------------------------------------------------------ */
 
@@ -117,7 +117,7 @@ function QuizBlock({ lesson, best, onPass }: { lesson: PyLesson; best: number; o
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-1.5 text-xs font-black text-zinc-200">
           <ListChecks size={14} style={{ color: SUNJOB_PALETTE.violet }} />
-          آزمونک درس — {fa(lesson.quiz.length)} سؤال
+          آزمونک درس، {fa(lesson.quiz.length)} سؤال
         </div>
         {best > 0 && (
           <Badge variant="outline" className="border-emerald-500/30 text-[10px] text-emerald-300">
@@ -405,7 +405,7 @@ function ExerciseBlock({
             exit={{ opacity: 0 }}
             className="mt-2 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs leading-5 text-rose-300"
           >
-            تست‌ها قبول نشد. خروجی/خطای واقعی پایتون را در کنسول بالا بخوانید — traceback دقیقاً می‌گوید کجا و چرا.
+            تست‌ها قبول نشد. خروجی/خطای واقعی پایتون را در کنسول بالا بخوانید، traceback دقیقاً می‌گوید کجا و چرا.
           </motion.div>
         )}
       </AnimatePresence>
@@ -420,7 +420,7 @@ export default function PythonAcademyApp() {
   const { progress, update } = usePyProgress()
   const game = useGame()
   const [activeId, setActiveId] = useState<string>(PYTHON_LESSONS[0].id)
-  const [pyStatus, setPyStatus] = useState('پایتون واقعی هنوز بارگیری نشده — با اولین اجرا خودکار بارگیری می‌شود')
+  const [pyStatus, setPyStatus] = useState('پایتون واقعی هنوز بارگیری نشده، با اولین اجرا خودکار بارگیری می‌شود')
   const [home, setHome] = useState(true)
   const runnerRef = useRef<PyodideRunner | null>(null)
   const loadedRef = useRef(false)
@@ -444,7 +444,7 @@ export default function PythonAcademyApp() {
     setPyStatus('در حال بارگیری CPython از CDN… (~۱۰MB، فقط بار اول)')
     await runner.ensure()
     loadedRef.current = true
-    setPyStatus('CPython آماده است — اجرای واقعی با سقف ۱۵ ثانیه')
+    setPyStatus('CPython آماده است، اجرای واقعی با سقف ۱۵ ثانیه')
     game.award('python:runtime-first-load', 10, 'اولین بارگیری پایتون واقعی')
   }, [game])
 
@@ -455,7 +455,7 @@ export default function PythonAcademyApp() {
     }
   }, [])
 
-  /* آخرین درس دیده‌شده — برای «ادامهٔ یادگیری» در خانه */
+  /* آخرین درس دیده‌شده، برای «ادامهٔ یادگیری» در خانه */
   useEffect(() => {
     if (!home) rememberView('python-academy', activeId)
   }, [activeId, home])
@@ -523,7 +523,7 @@ export default function PythonAcademyApp() {
             <div className="flex items-start gap-2">
               <Zap size={15} className="mt-0.5 shrink-0 text-amber-400" />
               <div className="text-[11.5px] leading-5 text-zinc-300">
-                <b className="text-amber-300">پایتون واقعی، نه شبیه‌ساز:</b> تمرین‌ها با CPython 3.12 (Pyodide/WebAssembly) تصحیح می‌شوند — همان موتور python.org.
+                <b className="text-amber-300">پایتون واقعی، نه شبیه‌ساز:</b> تمرین‌ها با CPython 3.12 (Pyodide/WebAssembly) تصحیح می‌شوند، همان موتور python.org.
                 بارگیری اول ~۱۰MB از CDN می‌خواهد (اینترنت لازم)، اجرا سقف ۱۵ ثانیه دارد و فایل‌ها روی سیستم‌فایل مجازیِ مرورگر ساخته می‌شوند.
                 درس‌های نظری آفلاین هم کامل‌اند.
               </div>

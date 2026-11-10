@@ -24,7 +24,7 @@ const PROCESS_SEED: ReadonlyArray<{ pid: number; name: string; desc: string }> =
   { pid: 1, name: 'systemd-bamze', desc: 'مدیر بامزگی سیستم' },
   { pid: 2, name: 'meowd', desc: 'سرویس گربه‌ها 🐱' },
   { pid: 4, name: 'coffee_daemon', desc: 'سرویس قهوه ☕' },
-  { pid: 88, name: 'chrome_eating_ram', desc: 'خورنده رم — اولویت بالا' },
+  { pid: 88, name: 'chrome_eating_ram', desc: 'خورنده رم، اولویت بالا' },
   { pid: 42, name: 'vibe_engine', desc: 'موتور لایب' },
   { pid: 7, name: 'kernel_task', desc: 'هسته لینوکس ۶.۹.۴' },
   { pid: 13, name: 'procrastinatord', desc: 'بهانه‌گیری حرفه‌ای' },
@@ -247,7 +247,7 @@ export default function SystemMonitorApp() {
           <div className="flex items-center justify-between gap-2">
             <span className="flex items-center gap-1.5 text-[11px] text-zinc-500">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--pengo-accent)]" />
-              آمار زنده — هر ۱ ثانیه یه قدم جلو
+              آمار زنده، هر ۱ ثانیه یه قدم جلو
             </span>
             <Button
               variant="outline"

@@ -316,7 +316,7 @@ export default function PongGame() {
     <GameShell
       emoji="🏓"
       title="پینگ‌پنگ"
-      howTo="موس/انگشت روی زمین بازی بکش یا از کلیدهای بالا/پایین استفاده کن — اولین نفر به ۵ امتیاز"
+      howTo="موس/انگشت روی زمین بازی بکش یا از کلیدهای بالا/پایین استفاده کن، اولین نفر به ۵ امتیاز"
       stats={[
         { label: 'شما', value: fa(playerScore) },
         { label: 'پنگوئن', value: fa(aiScore) },
@@ -346,8 +346,8 @@ export default function PongGame() {
         }
         subtitle={
           playerWon
-            ? `${fa(playerScore)} به ${fa(aiScore)} — معلومه کی مربی حرفه‌ایه!`
-            : `${fa(aiScore)} به ${fa(playerScore)} — دفعه بعد بکشش کف زمین!`
+            ? `${fa(playerScore)} به ${fa(aiScore)}، معلومه کی مربی حرفه‌ایه!`
+            : `${fa(aiScore)} به ${fa(playerScore)}، دفعه بعد بکشش کف زمین!`
         }
         onAction={reset}
       />

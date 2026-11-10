@@ -1,7 +1,7 @@
 'use client'
 
 /* ------------------------------------------------------------------ */
-/* Sanjab Project Lab — یادگیری از طریق ساخت                            */
+/* Sanjab Project Lab، یادگیری از طریق ساخت                            */
 /* پروژه‌های هدایت‌شده با Task List، Hint، Checkpoint، اجرای واقعی      */
 /* پایتون با Pyodide و تست خودکار (الگوی PY_PASS)، Export و Portfolio.  */
 /* ------------------------------------------------------------------ */
@@ -52,7 +52,7 @@ export default function ProjectLabApp() {
       <header className="mb-4">
         <h1 className="flex items-center gap-2 text-lg font-black text-white">
           <Hammer size={18} className="text-amber-400" aria-hidden />
-          Project Lab — یادگیری از طریق ساخت
+          Project Lab، یادگیری از طریق ساخت
         </h1>
         <p className="mt-1 text-[12px] leading-6 text-zinc-400">
           بعد از درس‌ها، اینجا چیزی «واقعی» می‌سازی. صرفاً باز کردن پروژه به‌عنوان انجام‌شده ثبت نمی‌شود؛
@@ -167,7 +167,7 @@ function Workspace({ project, onBack }: { project: LearningProject; onBack: () =
       setOutput((cur) => [...cur, '▶ اجرای کد + تست‌ها…'])
       const full = `${code}\n# --- تست‌های سنجاب‌اواس ---\n${project.tests}`
       const res = await runner.run(full, 20000)
-      /* تشخیص پاس از خروجی واقعی — همان الگوی آکادمی پایتون */
+      /* تشخیص پاس از خروجی واقعی، همان الگوی آکادمی پایتون */
       const pass = lines.some((l) => l.includes(PASS_MARK))
       if (pass) {
         setTestsPassed(true)
@@ -184,7 +184,7 @@ function Workspace({ project, onBack }: { project: LearningProject; onBack: () =
           })
         }
       } else if (!res.ok) {
-        setOutput((cur) => [...cur, '✗ اجرا با خطا تمام شد — خروجی بالا را بررسی کن.'])
+        setOutput((cur) => [...cur, '✗ اجرا با خطا تمام شد، خروجی بالا را بررسی کن.'])
       }
     } catch {
       setOutput((cur) => [...cur, '⚠️ خطای اجرای ران‌تایم.'])
@@ -298,7 +298,7 @@ function Workspace({ project, onBack }: { project: LearningProject; onBack: () =
                 type="button"
                 onClick={() => {
                   saveCode(project.id, code)
-                  pushToast({ title: 'Checkpoint ذخیره شد', body: 'کدت محفوظ است — بعداً ادامه بده.' })
+                  pushToast({ title: 'Checkpoint ذخیره شد', body: 'کدت محفوظ است، بعداً ادامه بده.' })
                 }}
                 className="flex items-center gap-1.5 rounded-lg bg-white/5 px-3 py-1.5 text-[11px] font-bold text-zinc-300 transition hover:bg-white/10"
               >

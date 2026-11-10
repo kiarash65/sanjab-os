@@ -18,7 +18,7 @@ const FLIP_MS = 300
 type Feedback = 'correct' | 'present' | 'absent'
 type GameStatus = 'playing' | 'won' | 'lost'
 
-// کلمات ۵ حرفی فارسی — بدون نیم‌فاصله
+// کلمات ۵ حرفی فارسی، بدون نیم‌فاصله
 const RAW_WORDS = [
   'پنجره',
   'گلدان',
@@ -291,7 +291,7 @@ export default function WordleGame() {
       icon={SpellCheck}
       title="حدس‌لغت"
       board={<LiveBoard game="wordle" best={best} refreshKey={refreshKey} />}
-      howTo="یک کلمه ۵ حرفی فارسی حدس بزن — ۶ فرصت داری. سبز: جای درست، کهربایی: هست ولی جای دیگه، خاکستری: نیست."
+      howTo="یک کلمه ۵ حرفی فارسی حدس بزن، ۶ فرصت داری. سبز: جای درست، کهربایی: هست ولی جای دیگه، خاکستری: نیست."
       stats={[
         { label: 'تلاش', value: String(attempt) },
         { label: 'برد', value: wins.toLocaleString('fa-IR') },
@@ -399,7 +399,7 @@ export default function WordleGame() {
         show={status === 'won'}
         icon={PartyPopper}
         title="آفرین!"
-        subtitle={`کلمه «${answer}» بود — با ${guesses.length.toLocaleString(
+        subtitle={`کلمه «${answer}» بود، با ${guesses.length.toLocaleString(
           'fa-IR'
         )} تلاش پیدا شد`}
         actionLabel="کلمه بعدی"

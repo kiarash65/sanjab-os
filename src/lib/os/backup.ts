@@ -63,7 +63,7 @@ export function downloadBackup(includeSecrets = false): boolean {
   }
 }
 
-/** بازیابی — تعداد کلیدهای بازیابی‌شده را برمی‌گرداند */
+/** بازیابی، تعداد کلیدهای بازیابی‌شده را برمی‌گرداند */
 export function restoreFromString(json: string): { ok: boolean; count: number; error?: string } {
   try {
     const file = JSON.parse(json) as BackupFile

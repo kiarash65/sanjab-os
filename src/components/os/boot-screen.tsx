@@ -8,7 +8,7 @@ interface BootLine {
   tag?: 'ok' | 'warn' | 'info'
 }
 
-/** خطوط بوت به سبک dmesg — کمی آموزشی، خیلی بامزه */
+/** خطوط بوت به سبک dmesg، کمی آموزشی، خیلی بامزه */
 const LINES: BootLine[] = [
   { t: `Linux version ${BRAND.kernel} (gcc 13.2.0) #1 SMP PREEMPT`, tag: 'info' },
   { t: 'Command line: BOOT_IMAGE=/vmlinuz-sanjob root=/dev/sunjob/sd0 ro cute colorful', tag: 'info' },
@@ -17,7 +17,7 @@ const LINES: BootLine[] = [
   { t: 'Waking up kernel… 5 more minutes please', tag: 'warn' },
   { t: 'smpboot: CPU0: مغز شما (cores: unknown) online', tag: 'ok' },
   { t: 'sanjob-sponsor: پالت رنگی از sunjob.ir با موفقیت دانلود شد', tag: 'ok' },
-  { t: 'sanjob-sponsor: اسپانسری فعال شد — با اسپانسری سان‌جاب', tag: 'ok' },
+  { t: 'sanjob-sponsor: اسپانسری فعال شد، با اسپانسری سان‌جاب', tag: 'ok' },
   { t: 'meowd: cat service started successfully', tag: 'ok' },
   { t: 'smart-fridge: device not found on network', tag: 'warn' },
   { t: 'sanjob-fs: mounting /home/pengo … your files are safe-ish', tag: 'ok' },
@@ -25,12 +25,12 @@ const LINES: BootLine[] = [
   { t: 'tutor: terminal lesson engine ready — 28 missions queued', tag: 'ok' },
   { t: 'python-runtime: mini-python 3.11 «سنجابی» loaded (0 MB, جادویی)', tag: 'ok' },
   { t: 'word-processor: نویسا آمادهٔ خروجی Word و PDF', tag: 'ok' },
-  { t: 'linux-academy: آکادمی لینوکس بوت شد — ۱۴ فصل، ترمینال تعاملی، توزیع‌ها و نصب', tag: 'ok' },
-  { t: 'linux-edition: نسخهٔ هستهٔ واقعی آماده است — install.sh در ریپو (Debian/Arch/Docker/Kiosk)', tag: 'ok' },
+  { t: 'linux-academy: آکادمی لینوکس بوت شد، ۱۴ فصل، ترمینال تعاملی، توزیع‌ها و نصب', tag: 'ok' },
+  { t: 'linux-edition: نسخهٔ هستهٔ واقعی آماده است، install.sh در ریپو (Debian/Arch/Docker/Kiosk)', tag: 'ok' },
   { t: 'sanjob-logo: لوگوی رسمی سان‌جاب از sunjob.ir بارگذاری شد', tag: 'ok' },
   { t: 'Random crontab joke scheduled for later', tag: 'ok' },
   { t: 'systemd[1]: Reached target Colorful Cute Interface.', tag: 'ok' },
-  { t: `Welcome to ${BRAND.nameEn} ${BRAND.versionEn} — کلیک برای ورود`, tag: 'ok' },
+  { t: `Welcome to ${BRAND.nameEn} ${BRAND.versionEn}، کلیک برای ورود`, tag: 'ok' },
 ]
 
 const MASCOT = String.raw`
@@ -86,7 +86,7 @@ export default function BootScreen({ onDone }: { onDone: () => void }) {
       className="boot-scanlines fixed inset-0 z-[9999] block cursor-pointer bg-[#0b1120] text-left"
       aria-label="پرش از بوت"
     >
-      {/* نقشه نئونی ایران — گوشه پایین چپ، خیلی کوچک، فقط هنگام لود */}
+      {/* نقشه نئونی ایران، گوشه پایین چپ، خیلی کوچک، فقط هنگام لود */}
       <svg
         viewBox="0 0 120 100"
         className="boot-iran-neon pointer-events-none absolute bottom-3 left-3 z-10 h-10 w-12 opacity-90"
@@ -141,7 +141,7 @@ export default function BootScreen({ onDone }: { onDone: () => void }) {
               </span>
             </h1>
             <p className="text-[11px] text-zinc-500">
-              {BRAND.name} — وب‌سیستم‌عامل بامزهٔ رنگی
+              {BRAND.name}، وب‌سیستم‌عامل بامزهٔ رنگی
             </p>
             <p className="mt-0.5 inline-flex items-center gap-1 rounded-full border border-[#f7931e]/40 bg-[#f7931e]/10 px-2 py-0.5 text-[10px] font-bold text-amber-300">
               <img
@@ -180,7 +180,7 @@ export default function BootScreen({ onDone }: { onDone: () => void }) {
           ))}
           {n >= LINES.length && (
             <div className="pengo-fadein text-amber-300">
-              [ <b>OK</b> ] خوش اومدی! داری وارد می‌شی…
+              [ <b>OK</b> ] خوش آمدی! داری وارد می‌شوی…
             </div>
           )}
         </div>

@@ -1,10 +1,10 @@
 /**
- * بانک سؤال — همهٔ مسیرها
+ * بانک سؤال، همهٔ مسیرها
  *
  * هر سؤال validationStatus: 'reviewed' دارد و پاسخ صحیحش دستی اجرا و
  * بررسی شده است (Edge Caseها: آرایه خالی، عناصر تکراری، ایندکس مرزی).
  * سؤال‌ها عمداً «حفظیات» نیستند: پیش‌بینی خروجی، پیدا کردن باگ، trace
- * متغیرها، ترتیب عملیات و تحلیل — مطابق استاندارد کیفیت محتوا.
+ * متغیرها، ترتیب عملیات و تحلیل، مطابق استاندارد کیفیت محتوا.
  */
 import type { Question } from './assessment'
 
@@ -53,7 +53,7 @@ export const QUESTION_BANK: Question[] = [
     },
     hints: [
       'آیا b = a یک لیست جدید می‌سازد یا فقط نام جدیدی است؟',
-      'append روی b رخ داده — روی کدام آبجکت؟',
+      'append روی b رخ داده، روی کدام آبجکت؟',
     ],
     estimatedMin: 2,
     validationStatus: 'reviewed',
@@ -76,7 +76,7 @@ export const QUESTION_BANK: Question[] = [
     explanation:
       'با «=» در هر دور مقدار قبلی total پاک و فقط آخرین عنصر جای آن می‌نشیند؛ در نتیجه میانگین آخرین عنصر تقسیم بر تعداد می‌شود. عملگر تجمعی «+=» درست است.',
     distractorExplanations: {
-      'return باید داخل حلقه باشد': 'این باعث می‌شود تابع در اولین دور برگردد — بدتر!',
+      'return باید داخل حلقه باشد': 'این باعث می‌شود تابع در اولین دور برگردد، بدتر!',
       'len(nums) باید len(total) باشد': 'total یک عدد است؛ len روی عدد تعریف نشده.',
     },
     hints: [
@@ -122,7 +122,7 @@ export const QUESTION_BANK: Question[] = [
     explanation:
       'ایندکس‌ها از صفر شروع می‌شوند: S=0, a=1, n=2, j=3, a=4, b=5. برش [2:6] از ایندکس 2 تا 5 را می‌گیرد (6 خودش نیست): "njab".',
     distractorExplanations: {
-      'njabO': 'کاراکتر ایندکس 6 (O) در برش نمی‌آید — انتهای بازه حذف است.',
+      'njabO': 'کاراکتر ایندکس 6 (O) در برش نمی‌آید، انتهای بازه حذف است.',
       'anja': 'ایندکس‌ها را از 1 شروع دیده‌ای.',
     },
     hints: [
@@ -143,7 +143,7 @@ export const QUESTION_BANK: Question[] = [
     answer: [2, 3, 5],
     explanation: 'list، dict و set قابل تغییرند؛ int و str و tuple تغییرناپذیرند.',
     distractorExplanations: {
-      tuple: 'tuple تغییرناپذیر است — دقیقاً تفاوت اصلی‌اش با list همین است.',
+      tuple: 'tuple تغییرناپذیر است، دقیقاً تفاوت اصلی‌اش با list همین است.',
       str: 'متدهایی مثل replace مقدار جدید برمی‌گردانند، رشتهٔ اصلی را عوض نمی‌کنند.',
     },
     hints: [
@@ -179,7 +179,7 @@ export const QUESTION_BANK: Question[] = [
     prompt: 'متغیرهای تعریف‌شده داخل یک تابع، بعد از پایان تابع هم از بیرون قابل دسترسی هستند.',
     answer: false,
     explanation:
-      'نادرست — متغیرهای محلی با پایان اجرای تابع از بین می‌روند. اگر لازم است، مقدار را return کن.',
+      'نادرست، متغیرهای محلی با پایان اجرای تابع از بین می‌روند. اگر لازم است، مقدار را return کن.',
     hints: ['بحث Scope را به یاد بیاور.'],
     estimatedMin: 1,
     validationStatus: 'reviewed',
@@ -192,7 +192,7 @@ export const QUESTION_BANK: Question[] = [
     type: 'code-completion',
     prompt: 'حلقه‌ای که دقیقاً ۱۰ بار اجرا شود را کامل کن:\nfor i in ______:\n    print(i)',
     answer: 'range(10)|range(0, 10)|range(0,10)',
-    explanation: 'range(10) اعداد 0 تا 9 را می‌دهد — دقیقاً 10 تکرار.',
+    explanation: 'range(10) اعداد 0 تا 9 را می‌دهد، دقیقاً 10 تکرار.',
     hints: [
       'تابعی که دنبالهٔ عدد می‌سازد؟',
       'جواب: range(10)',
@@ -349,7 +349,7 @@ export const QUESTION_BANK: Question[] = [
     prompt: 'در لینوکس تقریباً همه‌چیز (حتی دستگاه‌ها) به شکل فایل نمایش داده می‌شود.',
     answer: true,
     explanation:
-      'درست — این اصل طراحی یونیکس است: دیسک‌ها، ترمینال‌ها و حتی اطلاعات پردازه‌ها در /proc به شکل فایل‌اند.',
+      'درست، این اصل طراحی یونیکس است: دیسک‌ها، ترمینال‌ها و حتی اطلاعات پردازه‌ها در /proc به شکل فایل‌اند.',
     hints: ['اصل معروف یونیکس...'],
     estimatedMin: 1,
     validationStatus: 'reviewed',
@@ -363,11 +363,11 @@ export const QUESTION_BANK: Question[] = [
     difficulty: 'beginner',
     type: 'predict-output',
     prompt:
-      'حubble Sort: در اولین مقایسهٔ اولین گذر، آرایهٔ [5, 1, 4, 2] چه شکلی می‌شود؟',
+      'مرتب‌سازی حبابی (Bubble Sort): در اولین مقایسهٔ اولین گذر، آرایهٔ [5, 1, 4, 2] چه شکلی می‌شود؟',
     options: ['[1, 5, 4, 2]', '[1, 4, 2, 5]', '[5, 1, 4, 2]', '[2, 1, 4, 5]'],
     answer: 0,
     explanation:
-      'حubble دو عنصر اول را مقایسه می‌کند: 5 > 1 پس جابه‌جا می‌شوند → [1, 5, 4, 2]. فقط یک مقایسه/جابه‌جایی انجام شده است.',
+      'حبابی دو عنصر اول را مقایسه می‌کند: 5 > 1 پس جابه‌جا می‌شوند → [1, 5, 4, 2]. فقط یک مقایسه/جابه‌جایی انجام شده است.',
     distractorExplanations: {
       '[1, 4, 2, 5]': 'این نتیجهٔ کل گذر اول است، نه فقط اولین مقایسه.',
     },
@@ -438,7 +438,7 @@ export const QUESTION_BANK: Question[] = [
     code: 'def f(n):\n    if n <= 1:\n        return 1\n    return n * f(n - 1)\nprint(f(4))',
     options: ['24', '10', '4', '∞ (خطای عمق)'],
     answer: 0,
-    explanation: 'f(4)=4×f(3)=4×3×f(2)=4×3×2×f(1)=4×3×2×1=24 — فاکتوریل 4.',
+    explanation: 'f(4)=4×f(3)=4×3×f(2)=4×3×2×f(1)=4×3×2×1=24، فاکتوریل 4.',
     distractorExplanations: {
       '10': 'این جمع 1+2+3+4 است؛ ضرب لازم است.',
     },
@@ -503,7 +503,7 @@ export const QUESTION_BANK: Question[] = [
     ],
     answer: 0,
     explanation:
-      'آخرین تغییر انجام‌شده، اولین چیزی است که واگرد می‌شود — دقیقاً رفتار Last-In-First-Out پشته.',
+      'آخرین تغییر انجام‌شده، اولین چیزی است که واگرد می‌شود، دقیقاً رفتار Last-In-First-Out پشته.',
     hints: ['اولین واگرد، آخرین عمل را برمی‌گرداند.'],
     estimatedMin: 1,
     validationStatus: 'reviewed',
@@ -600,7 +600,7 @@ export const QUESTION_BANK: Question[] = [
     ],
     answer: 0,
     explanation:
-      'String کپی نمی‌شود؛ مالکیت به s2 منتقل می‌شود و s1 دیگر معتبر نیست — خطای borrow of moved value در زمان کامپایل.',
+      'String کپی نمی‌شود؛ مالکیت به s2 منتقل می‌شود و s1 دیگر معتبر نیست، خطای borrow of moved value در زمان کامپایل.',
     hints: ['String روی heap است؛ assignment چه می‌کند؟'],
     estimatedMin: 2,
     validationStatus: 'reviewed',
@@ -636,7 +636,7 @@ export const QUESTION_BANK: Question[] = [
     prompt: 'RAG یعنی ابتدا اسناد مرتبط بازیابی و بعد پاسخ با کمک آن‌ها تولید می‌شود.',
     answer: true,
     explanation:
-      'درست — Retrieval-Augmented Generation: بازیابی + تولید. به مدل زبانی «حافظهٔ سند» می‌دهد.',
+      'درست؛ Retrieval-Augmented Generation: بازیابی + تولید. به مدل زبانی «حافظهٔ سند» می‌دهد.',
     hints: ['نام کامل RAG چیست؟'],
     estimatedMin: 1,
     validationStatus: 'reviewed',

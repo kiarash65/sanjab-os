@@ -1,6 +1,6 @@
 'use client'
 
-/* «هوش‌یار» — گفتگوی هوش مصنوعی با کلید API خود کاربر */
+/* «هوش‌یار»، گفتگوی هوش مصنوعی با کلید API خود کاربر */
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import {
@@ -294,7 +294,7 @@ function Onboarding({ onConnected }: { onConnected: (cfg: AICfg) => void }) {
         </div>
         <p className="mb-2 text-xs leading-6 text-zinc-400">
           می‌توانی «هوش‌یار» را به <strong className="text-zinc-200">هر سرویس هوش مصنوعی‌ای</strong> که خودت کلیدش را داری وصل کنی:
-          OpenAI، OpenRouter، Groq، DeepSeek، Claude یا GLM (چی‌پو) — فقط کلید و نام مدل را بده.
+          OpenAI، OpenRouter، Groq، DeepSeek، Claude یا GLM (چی‌پو)، فقط کلید و نام مدل را بده.
         </p>
         <p className="mb-3 flex items-start gap-1.5 rounded-lg border border-teal-500/25 bg-teal-500/10 p-2 text-[11px] leading-5 text-teal-300">
           <ShieldCheck className="mt-0.5 size-3.5 shrink-0" />
@@ -455,7 +455,7 @@ export default function AIChatApp() {
 
   return (
     <div className="flex h-full w-full">
-      {/* فهرست گفتگوها — سمت راست در چیدمان راست‌به‌چپ */}
+      {/* فهرست گفتگوها، سمت راست در چیدمان راست‌به‌چپ */}
       <aside className="flex w-40 shrink-0 flex-col border-l border-white/10 bg-zinc-900/50 sm:w-52">
         <div className="flex shrink-0 items-center justify-between border-b border-white/10 px-2 py-1.5">
           <span className="px-1 text-[11px] font-bold text-zinc-400">گفتگوها</span>

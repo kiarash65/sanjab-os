@@ -1,7 +1,7 @@
 'use client'
 
 /* ------------------------------------------------------------------ */
-/* فصل‌های عمیق «آکادمی لینوکس» — بوت، هسته، فایل‌سیستم، شبکه، بش، امنیت */
+/* فصل‌های عمیق «آکادمی لینوکس»: بوت، هسته، فایل‌سیستم، شبکه، بش، امنیت */
 /* هر فصل انیمیشن تعاملی اختصاصی دارد.                                 */
 /* ------------------------------------------------------------------ */
 
@@ -27,15 +27,67 @@ export interface DeepChapterDef {
   subtitle: string
   icon: typeof BookOpen
   tint: string
+  /** پیش‌نیاز در یک جمله */
+  prereq?: string
+  /** هدف‌های قابل‌آزمایش: «در پایان این فصل می‌توانید ...» */
+  goal?: string[]
 }
 
 export const DEEP_CHAPTERS: DeepChapterDef[] = [
-  { id: 'boot', title: 'فرآیند بوت', subtitle: 'از دکمهٔ پاور تا صفحهٔ لاگین، قدم‌به‌قدم', icon: Power, tint: '#f7931e' },
-  { id: 'kernel', title: 'هسته از نزدیک', subtitle: 'سیستم‌کال، زمان‌بند و حافظهٔ مجازی', icon: Cpu, tint: '#8b5cf6' },
-  { id: 'fsdisk', title: 'فایل‌سیستم و دیسک', subtitle: 'inode ،journal و راز mount', icon: HardDrive, tint: '#0ea5a0' },
-  { id: 'net', title: 'شبکه در لینوکس', subtitle: 'سفر یک بسته از اپ تا کابل و برعکس', icon: Network, tint: '#14b8a6' },
-  { id: 'shell', title: 'اسکریپت‌نویسی Bash', subtitle: 'اتوماسیون: حلقه، شرط، کرون', icon: SquareTerminal, tint: '#e11d48' },
-  { id: 'sec', title: 'امنیت و SSH', subtitle: 'دست‌دادن رمزنگاری‌شده و قانون کمترین دسترسی', icon: ShieldCheck, tint: '#22c55e' },
+  {
+    id: 'boot',
+    title: 'فرآیند بوت',
+    subtitle: 'از دکمهٔ پاور تا صفحهٔ لاگین، قدم‌به‌قدم',
+    icon: Power,
+    tint: '#f7931e',
+    prereq: 'فصل «ترمینال» را خوانده باشی تا مفهوم فرآیند برایت آشنا باشد.',
+    goal: ['ترتیب مراحل بوت از پاور تا لاگین را بگویی', 'نقش BIOS/UEFI، بوت‌لودر و systemd را در این زنجیره توضیح بدهی', 'وقتی سیستم بالا نمی‌آید، بدانی کدام حلقهٔ زنجیره را بررسی کنی'],
+  },
+  {
+    id: 'kernel',
+    title: 'هسته از نزدیک',
+    subtitle: 'سیستم‌کال، زمان‌بند و حافظهٔ مجازی',
+    icon: Cpu,
+    tint: '#8b5cf6',
+    prereq: 'فصل «فرآیند بوت» را خوانده باشی تا بدانی هسته کی وارد میدان می‌شود.',
+    goal: ['سیستم‌کال را تعریف کنی و تفاوت فضای کاربر و هسته را بگویی', 'کار زمان‌بند و حافظهٔ مجازی را با مثال توضیح بدهی'],
+  },
+  {
+    id: 'fsdisk',
+    title: 'فایل‌سیستم و دیسک',
+    subtitle: 'راز inode، journal و mount',
+    icon: HardDrive,
+    tint: '#0ea5a0',
+    prereq: 'فصل «ترمینال» را خوانده باشی و با پوشه و فایل در لینوکس کار کرده باشی.',
+    goal: ['مفهوم inode را تعریف کنی و تفاوتش با نام فایل را بگویی', 'نقش journal را در برابر قطع‌شدن برق توضیح بدهی', 'مفهوم mount را با مثال درخت پوشه‌ها توضیح بدهی'],
+  },
+  {
+    id: 'net',
+    title: 'شبکه در لینوکس',
+    subtitle: 'سفر یک بسته از اپ تا کابل و برعکس',
+    icon: Network,
+    tint: '#14b8a6',
+    prereq: 'فصل «ترمینال» را خوانده باشی؛ دستورهای شبکه در همان محیط اجرا می‌شوند.',
+    goal: ['مسیر یک بسته از اپ تا کابل را مرحله‌به‌مرحله بگویی', 'نقش IP و پورت را با آدرس و شمارهٔ واحد توضیح بدهی'],
+  },
+  {
+    id: 'shell',
+    title: 'اسکریپت‌نویسی Bash',
+    subtitle: 'اتوماسیون: حلقه، شرط، زمان‌بندی کارها',
+    icon: SquareTerminal,
+    tint: '#e11d48',
+    prereq: 'فصل «ترمینال» را خوانده باشی و با دستورهای پایه کار کرده باشی.',
+    goal: ['یک اسکریپت Bash کوچک با حلقه و شرط بنویسی و اجرا کنی', 'کرون (زمان‌بند وظایف لینوکس) را تعریف کنی و یک کار زمان‌بندی‌شده بخوانی', 'بگویی چرا اتوماسیون قدرت اصلی کاربر ترمینال است'],
+  },
+  {
+    id: 'sec',
+    title: 'امنیت و SSH',
+    subtitle: 'دست‌دادن رمزنگاری‌شده و قانون کمترین دسترسی',
+    icon: ShieldCheck,
+    tint: '#22c55e',
+    prereq: 'فصل «شبکه در لینوکس» را خوانده باشی.',
+    goal: ['توضیح بدهی دست‌دادن رمزنگاری‌شده چگونه هویتت را ثابت می‌کند', 'قانون کمترین دسترسی را با یک مثال به‌کار ببری', 'سه عادت امنیتی پایه را در کار روزمره رعایت کنی'],
+  },
 ]
 
 export const DEEP_IDS = new Set(DEEP_CHAPTERS.map((c) => c.id))
@@ -48,23 +100,45 @@ const fa = (n: number) => n.toLocaleString('fa-IR')
 
 function DeepChapterHeader({ def, done, onToggleDone }: { def: DeepChapterDef; done: boolean; onToggleDone: () => void }) {
   return (
-    <div className="flex items-start gap-3">
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl" style={{ background: `${def.tint}22`, color: def.tint }}>
-        <def.icon size={19} />
-      </span>
-      <div className="min-w-0 flex-1">
-        <h2 className="text-base font-black text-zinc-50">{def.title}</h2>
-        <p className="text-[11px] text-zinc-400">{def.subtitle}</p>
+    <div className="space-y-3">
+      <div className="flex items-start gap-3">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl" style={{ background: `${def.tint}22`, color: def.tint }}>
+          <def.icon size={19} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <h2 className="text-base font-black text-zinc-50">{def.title}</h2>
+          <p className="text-[11px] text-zinc-400">{def.subtitle}</p>
+        </div>
+        <Button
+          size="sm"
+          variant={done ? 'secondary' : 'outline'}
+          onClick={onToggleDone}
+          className={`shrink-0 text-[11px] ${done ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-300' : 'border-white/15 text-zinc-300'}`}
+        >
+          <Check size={13} />
+          {done ? 'خوانده شد' : 'خواندم!'}
+        </Button>
       </div>
-      <Button
-        size="sm"
-        variant={done ? 'secondary' : 'outline'}
-        onClick={onToggleDone}
-        className={`shrink-0 text-[11px] ${done ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-300' : 'border-white/15 text-zinc-300'}`}
-      >
-        <Check size={13} />
-        {done ? 'خوانده شد' : 'خواندم!'}
-      </Button>
+      {(def.prereq || def.goal) && (
+        <div className="space-y-1.5 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-[11px] leading-5 text-zinc-300">
+          {def.prereq && (
+            <p>
+              <span className="font-bold text-zinc-100">پیش‌نیاز: </span>
+              {def.prereq}
+            </p>
+          )}
+          {def.goal && (
+            <div>
+              <p className="font-bold text-zinc-100">در پایان این فصل می‌توانی:</p>
+              <ul className="mt-0.5 list-disc space-y-0.5 pr-4 text-zinc-400">
+                {def.goal.map((g) => (
+                  <li key={g}>{g}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
@@ -126,12 +200,12 @@ const StepBtn = ({ onClick, label }: { onClick: () => void; label: string }) => 
    ================================================================ */
 
 const BOOT_STAGES = [
-  { t: 'BIOS / UEFI', d: 'قطعهٔ روشن‌کنندهٔ سخت‌افزار — POST و انتخاب دیسک بوت', code: 'POST … OK  ·  Boot Device: NVMe0' },
+  { t: 'BIOS / UEFI', d: 'قطعهٔ روشن‌کنندهٔ سخت‌افزار؛ POST و انتخاب دیسک بوت', code: 'POST … OK  ·  Boot Device: NVMe0' },
   { t: 'Bootloader (GRUB)', d: 'منویی که کرنل را انتخاب و بارگذاری می‌کند', code: 'GRUB loading /boot/vmlinuz-6.x' },
   { t: 'هسته (Kernel)', d: 'باز شدن هسته: درایورها، حافظه و CPU بیدار می‌شوند', code: 'Linux version 6.x … Booting the kernel.' },
   { t: 'initramfs', d: 'فایل‌سیستم ریشهٔ موقت در RAM تا درایور دیسک واقعی آماده شود', code: 'unpacking initramfs → /sysroot' },
   { t: 'systemd (PID 1)', d: 'اولین پروسه؛ سرویس‌ها را موازی بالا می‌آورد', code: '[  OK  ] Started target: graphical' },
-  { t: 'صفحهٔ لاگین', d: 'display manager آماده است — خوش آمدی!', code: 'sanjabos login: _' },
+  { t: 'صفحهٔ لاگین', d: 'مدیر نمایش (display manager) آماده است؛ خوش آمدی!', code: 'sanjabos login: _' },
 ]
 
 function BootAnim() {
@@ -139,7 +213,7 @@ function BootAnim() {
   return (
     <div className="rounded-2xl border border-white/10 bg-zinc-950 p-3">
       <div className="mb-2 flex items-center justify-between">
-        <p className="text-[11px] font-black text-zinc-200">توالی بوت — انیمیشن زنده</p>
+        <p className="text-[11px] font-black text-zinc-200">توالی بوت: انیمیشن زنده</p>
         <StepBtn onClick={bump} label="قدم بعدی ⏭" />
       </div>
       <div className="space-y-1.5">
@@ -193,7 +267,7 @@ function SyscallAnim() {
   return (
     <div className="rounded-2xl border border-white/10 bg-zinc-950 p-3">
       <p className="mb-2 text-[11px] font-black text-zinc-200">
-        مثال: <code dir="ltr" className="font-mono text-emerald-300">open(&quot;notes.txt&quot;)</code> — سفر به اعماق
+        مثال: <code dir="ltr" className="font-mono text-emerald-300">open(&quot;notes.txt&quot;)</code>؛ سفر به اعماق
       </p>
       <div className="flex items-center gap-1">
         {SYSCALL_NODES.map((n, i) => (
@@ -217,7 +291,7 @@ function SyscallAnim() {
       </div>
       <div className="mt-2 flex items-center justify-between gap-2">
         <p className="text-[10px] leading-4 text-zinc-500">
-          برنامه مستقیماً با سخت‌افزار حرف نمی‌زند؛ همیشه از دروازهٔ رسمی هسته (سیستم‌کال) رد می‌شود — یعنی امنیت.
+          برنامه مستقیماً با سخت‌افزار حرف نمی‌زند؛ همیشه از دروازهٔ رسمی هسته (سیستم‌کال) رد می‌شود؛ یعنی امنیت.
         </p>
         <StepBtn onClick={bump} label="بفرست ⚡" />
       </div>
@@ -238,7 +312,7 @@ function SchedulerAnim() {
   ]
   return (
     <div className="rounded-2xl border border-white/10 bg-zinc-950 p-3">
-      <p className="mb-2 text-[11px] font-black text-zinc-200">زمان‌بند Round-Robin — هرکدام «کوانتوم» می‌گیرند، هیچ‌کس گرسنه نمی‌ماند</p>
+      <p className="mb-2 text-[11px] font-black text-zinc-200">زمان‌بند Round-Robin: هرکدام «کوانتوم» می‌گیرند، هیچ‌کس گرسنه نمی‌ماند</p>
       <div className="grid grid-cols-[1fr_auto] gap-2">
         <div className="space-y-1.5">
           {procs.map((p, i) => (
@@ -334,7 +408,7 @@ function PageTableAnim() {
       </div>
       <div className="mt-2 flex items-center justify-between gap-2">
         <p className="text-[10px] leading-4 text-zinc-500">
-          وقتی آدرسی به swap برود یعنی صفحه روی دیسک است — سرعت می‌افتد ولی سیستم زنده می‌ماند!
+          وقتی آدرسی به swap برود یعنی صفحه روی دیسک است؛ سرعت می‌افتد ولی سیستم زنده می‌ماند!
         </p>
         <StepBtn onClick={bump} label="آدرس بعدی 🎲" />
       </div>
@@ -377,7 +451,7 @@ function InodeAnim() {
       </div>
       <div className="mt-2 flex items-center justify-between gap-2">
         <p className="text-[10px] leading-4 text-zinc-500">
-          یعنی «hard link» دو اسم برای یک inode است — پاک کردن یکی، داده را نمی‌کشد تا آخری برود!
+          یعنی «hard link» دو اسم برای یک inode است؛ پاک کردن یکی داده را نمی‌کشد تا آخری برود!
         </p>
         <StepBtn onClick={bump} label="فایل بعدی 📄" />
       </div>
@@ -398,7 +472,7 @@ function PacketAnim() {
   return (
     <div className="rounded-2xl border border-white/10 bg-zinc-950 p-3">
       <p className="mb-2 text-[11px] font-black text-zinc-200">
-        <code dir="ltr" className="font-mono text-emerald-300">curl sunjob.ir</code> — بسته پایین می‌رود تا روی سیم، بعد برمی‌گردد
+        <code dir="ltr" className="font-mono text-emerald-300">curl sunjob.ir</code>؛ بسته پایین می‌رود تا روی سیم، بعد برمی‌گردد
       </p>
       <div className="space-y-1">
         {NET_LAYERS.map((l, i) => {
@@ -425,7 +499,7 @@ function PacketAnim() {
       </div>
       <div className="mt-2 flex items-center justify-between gap-2">
         <p className="text-[10px] leading-4 text-zinc-500">
-          هر لایه پاکت را با «پاکت‌نامهٔ» خودش می‌پوشاند (Encapsulation) — مثل نامهٔ پستی با آدرس و تمبر!
+          هر لایه پاکت را با «پاکت‌نامهٔ» خودش می‌پوشاند (Encapsulation)؛ مثل نامهٔ پستی با آدرس و تمبر!
         </p>
         <StepBtn onClick={bump} label="ارسال 📨" />
       </div>
@@ -484,7 +558,7 @@ function NetfilterAnim() {
         </motion.div>
       </div>
       <p className="mt-2 text-[10px] leading-4 text-zinc-500">
-        iptables/nftables همان زبان نوشتن قواعد این گیت‌هاست: ACCEPT ،DROP یا REJECT — دیوار بلند و صبر!
+        iptables/nftables همان زبان نوشتن قواعد این گیت‌هاست: ACCEPT، DROP یا REJECT؛ دیوار بلند و صبر!
       </p>
     </div>
   )
@@ -495,11 +569,11 @@ function NetfilterAnim() {
    ================================================================ */
 
 const SSH_STEPS = [
-  { t: 'اتصال TCP', d: 'پورت ۲۲ باز شد — سلام و علیک اولیه', l: 'tcp connect :22' },
+  { t: 'اتصال TCP', d: 'پورت ۲۲ باز شد؛ سلام و علیک اولیه', l: 'tcp connect :22' },
   { t: 'تبادل کلید (DH)', d: 'هر دو یک رمز مشترک می‌سازند بدون اینکه روی سیم فرستاده‌اش کنند!', l: 'kex: curve25519-sha256' },
-  { t: 'بررسی کلید میزبان', d: '«این سرور همانی است که می‌شناسم؟» — همان yes معروف اولین اتصال', l: 'host key fingerprint OK' },
+  { t: 'بررسی کلید میزبان', d: '«این سرور همانی است که می‌شناسم؟» همان yes معروف اولین اتصال', l: 'host key fingerprint OK' },
   { t: 'احراز هویت', d: 'کلید عمومی تو (یا رمز) چک می‌شود', l: 'auth: publickey "id_ed25519"' },
-  { t: 'کانال امن', d: 'همه‌چیز رمزنگاری‌شده — ترمینال تو روی سرور!', l: 'session opened' },
+  { t: 'کانال امن', d: 'همه‌چیز رمزنگاری‌شده؛ ترمینال تو روی سرور!', l: 'session opened' },
 ]
 
 function SshAnim() {
@@ -535,7 +609,7 @@ function SshAnim() {
               </p>
               {active && (
                 <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-0.5 text-[9.5px] leading-4 text-zinc-400">
-                  {s.d} — <code dir="ltr" className="font-mono text-emerald-300">{s.l}</code>
+                  {s.d}؛ <code dir="ltr" className="font-mono text-emerald-300">{s.l}</code>
                 </motion.p>
               )}
             </motion.div>
@@ -548,7 +622,7 @@ function SshAnim() {
 }
 
 /* ================================================================
-   انیمیشن ۹: کرون — ساعت کارها
+   انیمیشن ۹: کرون، ساعت کارها
    ================================================================ */
 
 function CronAnim() {
@@ -561,7 +635,7 @@ function CronAnim() {
   ]
   return (
     <div className="rounded-2xl border border-white/10 bg-zinc-950 p-3">
-      <p className="mb-2 text-[11px] font-black text-zinc-200">crontab — پادشاه اتوماسیون (۵ فیلد: دقیقه ساعت روز ماه روز-هفته)</p>
+      <p className="mb-2 text-[11px] font-black text-zinc-200">کرون (Cron) زمان‌بند وظایف لینوکس است؛ در crontab هر کار با ۵ فیلد زمان نوشته می‌شود: دقیقه، ساعت، روزِ ماه، ماه، روزِ هفته</p>
       <div className="flex items-center gap-3">
         <div className="relative grid size-16 shrink-0 place-items-center rounded-full border-2 border-white/10">
           <motion.span
@@ -595,7 +669,7 @@ function CronAnim() {
 }
 
 /* ================================================================
-   انیمیشن ۱۰: LVM — لایه‌های دیسک
+   انیمیشن ۱۰: LVM، لایه‌های دیسک
    ================================================================ */
 
 function LvmAnim() {
@@ -607,7 +681,7 @@ function LvmAnim() {
   ]
   return (
     <div className="rounded-2xl border border-white/10 bg-zinc-950 p-3">
-      <p className="mb-2 text-[11px] font-black text-zinc-200">LVM — آسانسور فضای دیسک: بزرگ کن بدون دردسر</p>
+      <p className="mb-2 text-[11px] font-black text-zinc-200">LVM؛ آسانسور فضای دیسک: بزرگ کن بدون دردسر</p>
       <div className="space-y-1">
         {layers.map((l, i) => (
           <motion.div
@@ -641,12 +715,12 @@ function BootChapter() {
     <div className="space-y-4 text-zinc-300">
       <p>
         وقتی دکمهٔ پاور را می‌زنی، تا لحظه‌ای که لاگین می‌کنی، لینوکس یک <b className="text-zinc-100">زنجیرهٔ دقیق</b> را اجرا می‌کند. هر حلقهٔ این
-        زنجیره یک راز دارد — با انیمیشن زیر قدم‌به‌قدم ببین:
+        زنجیره یک راز دارد؛ با انیمیشن زیر قدم‌به‌قدم ببین:
       </p>
       <BootAnim />
       <H3 color="#f7931e">چرا initramfs لازم است؟</H3>
       <p>
-        هسته برای خواندن دیسک واقعی به <b className="text-zinc-100">درایور</b> نیاز دارد، و درایور گاهی داخل دیسک است — دوراهی! initramfs یک دنیای
+        هسته برای خواندن دیسک واقعی به <b className="text-zinc-100">درایور</b> نیاز دارد، و درایور گاهی داخل دیسک است؛ دوراهی! initramfs یک دنیای
         کوچک در RAM است که این گره را باز می‌کند: اول درایورها را از خودش بالا می‌آورد، بعد دیسک واقعی را mount می‌کند و تحویل systemd می‌دهد.
       </p>
       <TBox
@@ -658,7 +732,7 @@ function BootChapter() {
         دلیل بوت مدرن سریع است) و با فایل‌های <code dir="ltr" className="font-mono text-emerald-300">.service</code> مدیریتشان می‌کند.
       </p>
       <Tip>
-        می‌خواهی این توالی را واقعی ببینی؟ اپ «بوت کرنل واقعی» را باز کن — Alpine را با v86 بوت می‌کند و همهٔ این مراحل را در خروجی dmesg می‌بینی!
+        می‌خواهی این توالی را واقعی ببینی؟ اپ «بوت کرنل واقعی» را باز کن؛ Alpine را با v86 بوت می‌کند و همهٔ این مراحل را در خروجی dmesg می‌بینی!
       </Tip>
     </div>
   )
@@ -683,10 +757,10 @@ function KernelChapter() {
       <H3 color="#8b5cf6">کانتینر = چرخش با نام‌فضاها</H3>
       <p>
         Docker چیزی «جادویی» ندارد: <b className="text-zinc-100">namespace</b> می‌گوید پروسه چه چیزی ببیند (شبکه و درخت پروسه‌های خودش) و
-        <b className="text-zinc-100">cgroup</b> می‌گوید چقدر رم و CPU بخورد. یعنی کانتینر = پروسهٔ محدودشده با مالکیت جدا — کرنل لینوکس خودش ستارهٔ اصلی
+        <b className="text-zinc-100">cgroup</b> می‌گوید چقدر رم و CPU بخورد. یعنی کانتینر = پروسهٔ محدودشده با مالکیت جدا؛ کرنل لینوکس خودش ستارهٔ اصلی
         است.
       </p>
-      <TBox lines={['$ unshare --pid --fork --mount-proc bash', '# در این پوسته، PID خودت = 1 — دنیای جدا!', '$ ps aux']} />
+      <TBox lines={['$ unshare --pid --fork --mount-proc bash', '# در این پوسته، PID خودت = 1؛ دنیای جدا!', '$ ps aux']} />
     </div>
   )
 }
@@ -695,13 +769,13 @@ function FsChapter() {
   return (
     <div className="space-y-4 text-zinc-300">
       <p>
-        در لینوکس همه‌چیز «فایل» است — از متن‌ها تا دیسک، کارت صدا و حتی اطلاعات پروسه‌ها (
+        در لینوکس همه‌چیز «فایل» است؛ از متن‌ها تا دیسک، کارت صدا و حتی اطلاعات پروسه‌ها (
         <code dir="ltr" className="font-mono text-emerald-300">/proc</code>). این ایدهٔ جسورانه، ابزارها را ساده و قدرتمند می‌کند.
       </p>
       <InodeAnim />
       <H3 color="#0ea5a0">journaling یعنی؟</H3>
       <p>
-        ext4 قبل از نوشتن واقعی، «قصد» نوشتن را در یک دفتر (journal) ثبت می‌کند. اگر برق قطع شد، بعد از بوت فقط دفتر مرور می‌شود — به همین دلیل{' '}
+        ext4 قبل از نوشتن واقعی، «قصد» نوشتن را در یک دفتر (journal) ثبت می‌کند. اگر برق قطع شد، بعد از بوت فقط دفتر مرور می‌شود؛ به همین دلیل{' '}
         <code dir="ltr" className="font-mono text-emerald-300">fsck</code> مدرن در چند ثانیه تمام می‌شود.
       </p>
       <H3 color="#0ea5a0">مقایسهٔ بزرگ</H3>
@@ -748,7 +822,7 @@ function NetChapter() {
   return (
     <div className="space-y-4 text-zinc-300">
       <p>
-        شبکه لینوکس از <b className="text-zinc-100">لایه‌های مشخص</b> ساخته شده — ابزار هر لایه جدا است و همین، دیباگ را آسان می‌کند:
+        شبکه لینوکس از <b className="text-zinc-100">لایه‌های مشخص</b> ساخته شده؛ ابزار هر لایه جدا است و همین، دیباگ را آسان می‌کند:
       </p>
       <PacketAnim />
       <H3 color="#14b8a6">جعبه‌ابزار واقعی</H3>
@@ -791,17 +865,17 @@ function ShellChapter() {
   const snippets = [
     {
       t: 'اولین اسکریپت',
-      code: '#!/bin/bash\necho "سلام $USER — خوش آمدی به اتوماسیون!"\ndate',
+      code: '#!/bin/bash\necho "سلام $USER، خوش آمدی به اتوماسیون!"\ndate',
       note: 'خط اول (shebang) می‌گوید با کدام مفسر اجرا شود. بعد chmod +x و اجرا با ./اسکریپت.sh',
     },
     {
       t: 'حلقه روی فایل‌ها',
       code: 'for f in *.txt; do\n  echo "تبدیل: $f"\n  mv "$f" "backup-$f"\ndone',
-      note: '"$f" همیشه داخل گیومه — فایل‌هایی با فاصله به تو لبخند می‌زنند!',
+      note: '"$f" همیشه داخل گیومه؛ فایل‌هایی با فاصله به تو لبخند می‌زنند!',
     },
     {
       t: 'شرط و پارامتر',
-      code: 'if [ -d "/mnt/flash" ]; then\n  echo "فلش وصل است"\nelse\n  echo "فلش نیست — اول وصلش کن"\nfi\necho "اولین آرگومان: $1"',
+      code: 'if [ -d "/mnt/flash" ]; then\n  echo "فلش وصل است"\nelse\n  echo "فلش نیست؛ اول وصلش کن"\nfi\necho "اولین آرگومان: $1"',
       note: '$1، $2 پارامترهای اسکریپت‌اند؛ $0 اسم خودش. -d یعنی «دایرکتوری هست؟»',
     },
     {
@@ -825,7 +899,7 @@ function ShellChapter() {
         ))}
       </div>
       <CronAnim />
-      <H3 color="#e11d48">متغیرهای محیطی — تنظیمات فراگیر</H3>
+      <H3 color="#e11d48">متغیرهای محیطی: تنظیمات فراگیر</H3>
       <TBox
         lines={[
           '$ echo $HOME          # خانهٔ تو',
@@ -833,7 +907,7 @@ function ShellChapter() {
           '$ PATH=$PATH:$HOME/bin  # پوشهٔ اسکریپت‌هایت به مسیر جستجو اضافه شود',
         ]}
       />
-      <Tip>اسکریپت‌های bash را در «ترمینال آموزشی» همین سیستم امتحان کن — ابزارهای آن پایپ واقعی را هم تقلید می‌کنند!</Tip>
+      <Tip>اسکریپت‌های bash را در «ترمینال آموزشی» همین سیستم امتحان کن؛ ابزارهای آن پایپ واقعی را هم تقلید می‌کنند!</Tip>
     </div>
   )
 }
@@ -846,12 +920,12 @@ function SecChapter() {
         <b className="text-zinc-100">رمزنگاری</b> (SSH و به‌روزرسانی‌ها).
       </p>
       <SshAnim />
-      <H3 color="#22c55e">کلید SSH — رمز عبوری که تایپ نمی‌شود</H3>
+      <H3 color="#22c55e">کلید SSH: رمز عبوری که تایپ نمی‌شود</H3>
       <TBox
         lines={[
           '$ ssh-keygen -t ed25519 -C "pengo@sanjab"',
           '$ ssh-copy-id pengo@server.ir     # کلید عمومی را بفرست',
-          '$ ssh pengo@server.ir             # بدون رمز — جادویی!',
+          '$ ssh pengo@server.ir             # بدون رمز؛ جادویی!',
         ]}
       />
       <p className="text-[10.5px] leading-5 text-zinc-400">

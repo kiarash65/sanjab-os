@@ -62,7 +62,7 @@ interface AcademyProgress {
 const PROGRESS_KEY = 'sunjob-academy-v1'
 const EMPTY_PROGRESS: AcademyProgress = { done: [], missions: [], quizBest: 0, certName: '' }
 
-/** حد نصاب قبولی آزمون — ۷۰٪ سؤال‌ها */
+/** حد نصاب قبولی آزمون؛ ۷۰٪ سؤال‌ها */
 const PASS_SCORE = Math.ceil(QUIZ.length * 0.7)
 
 function loadProgress(): AcademyProgress {
@@ -95,17 +95,85 @@ interface ChapterDef {
   subtitle: string
   icon: typeof BookOpen
   tint: string
+  /** پیش‌نیاز در یک جمله؛ اگر نیست، صریح «هیچ پیش‌نیازی ندارد» */
+  prereq?: string
+  /** هدف‌های قابل‌آزمایش: «در پایان این فصل می‌توانید ...» */
+  goal?: string[]
 }
 
 const CHAPTERS: ChapterDef[] = [
-  { id: 'what', title: 'لینوکس چیست؟', subtitle: 'قصهٔ یک سرگرمی که دنیا را گرفت', icon: BookOpen, tint: SUNJOB_PALETTE.orange },
-  { id: 'where', title: 'لینوکس کجاست؟', subtitle: 'از جیب تو تا مریخ', icon: Globe2, tint: SUNJOB_PALETTE.teal },
-  { id: 'distros', title: 'توزیع‌ها', subtitle: 'کدام لینوکس برای تو؟', icon: PackageIcon, tint: SUNJOB_PALETTE.violet },
-  { id: 'install', title: 'نصب لینوکس', subtitle: 'چهار راه مطمئن، قدم‌به‌قدم', icon: Download, tint: SUNJOB_PALETTE.rose },
-  { id: 'terminal', title: 'ترمینال', subtitle: 'قلب تپندهٔ لینوکس + تمرین عملی', icon: SquareTerminal, tint: '#14b8a6' },
-  { id: 'permissions', title: 'دسترسی‌ها', subtitle: 'rwx ،sudo و هنوز حفاظت', icon: ShieldCheck, tint: SUNJOB_PALETTE.violet },
-  { id: 'procs', title: 'فرآیندها و بسته‌ها', subtitle: 'ps ،kill و apt/dnf/pacman', icon: Cpu, tint: SUNJOB_PALETTE.teal },
-  { id: 'quiz', title: 'آزمون و گواهی', subtitle: 'آزمون جامع، یک گواهی باحال', icon: Award, tint: SUNJOB_PALETTE.orange },
+  {
+    id: 'what',
+    title: 'لینوکس چیست؟',
+    subtitle: 'قصهٔ یک سرگرمی که دنیا را گرفت',
+    icon: BookOpen,
+    tint: SUNJOB_PALETTE.orange,
+    prereq: 'هیچ پیش‌نیازی ندارد؛ همین که با کامپیوتر یا گوشی کار کنی کافی است.',
+    goal: ['توضیح بدهی لینوکس چیست و چه فرقی با ویندوز دارد', 'سه دستگاه از زندگی روزمره را نام ببری که داخلشان لینوکس کار می‌کند', 'مفهوم نرم‌افزار متن‌باز را با جملهٔ خودت توضیح بدهی'],
+  },
+  {
+    id: 'where',
+    title: 'لینوکس کجاست؟',
+    subtitle: 'از جیب تو تا مریخ',
+    icon: Globe2,
+    tint: SUNJOB_PALETTE.teal,
+    prereq: 'فصل «لینوکس چیست؟» را خوانده باشی.',
+    goal: ['حداقل چهار دستگاه از اطرافت نشان بدهی که لینوکس رویشان اجرا می‌شود', 'دلیل غلبهٔ لینوکس روی سرورها و گوشی‌های اندرویدی را توضیح بدهی'],
+  },
+  {
+    id: 'distros',
+    title: 'توزیع‌ها',
+    subtitle: 'کدام لینوکس برای تو؟',
+    icon: PackageIcon,
+    tint: SUNJOB_PALETTE.violet,
+    prereq: 'فصل «لینوکس چیست؟» را خوانده باشی.',
+    goal: ['بگویی «توزیع» از چه ساخته شده است', 'تفاوت دو توزیع محبوب را در چرخهٔ انتشار و جامعهٔ کاربری بگویی', 'برای نیاز خودت یک توزیع پیشنهاد بدهی و دلیلش را بگویی'],
+  },
+  {
+    id: 'install',
+    title: 'نصب لینوکس',
+    subtitle: 'چهار راه مطمئن، قدم‌به‌قدم',
+    icon: Download,
+    tint: SUNJOB_PALETTE.rose,
+    prereq: 'فصل «توزیع‌ها» را خوانده باشی و توزیع موردنظرت را انتخاب کرده باشی.',
+    goal: ['چهار راه امتحان‌کردن لینوکس را نام ببری و برای هر کدام یک سناریوی مناسب بگویی', 'برای رایانهٔ خودت راهِ امن شروع‌کردن لینوکس را انتخاب کنی و توجیهش کنی'],
+  },
+  {
+    id: 'terminal',
+    title: 'ترمینال',
+    subtitle: 'قلب تپندهٔ لینوکس + تمرین عملی',
+    icon: SquareTerminal,
+    tint: '#14b8a6',
+    prereq: 'هیچ تجربهٔ ترمینالی لازم نیست؛ فصل‌های قبلی کافی‌اند.',
+    goal: ['هر ۱۰ ماموریت ترمینال را در شبیه‌ساز امن کامل کنی', 'بدون کپی‌کردن، pwd و ls و cd و mkdir را به‌کار ببری', 'تفاوت مسیر مطلق و نسبی را با مثال توضیح بدهی'],
+  },
+  {
+    id: 'permissions',
+    title: 'دسترسی‌ها',
+    subtitle: 'rwx، sudo و هنرِ حفاظت',
+    icon: ShieldCheck,
+    tint: SUNJOB_PALETTE.violet,
+    prereq: 'فصل «ترمینال» را خوانده باشی و با ls کار کرده باشی.',
+    goal: ['معنای rwx را برای صاحب، گروه و بقیه بخوانی', 'کد عددی دسترسی‌ها را بسازی و برعکس آن را بخوانی', 'بگویی sudo چه می‌کند و چرا نباید همه‌جا به‌کار برود'],
+  },
+  {
+    id: 'procs',
+    title: 'فرآیندها و بسته‌ها',
+    subtitle: 'ps، kill و apt/dnf/pacman',
+    icon: Cpu,
+    tint: SUNJOB_PALETTE.teal,
+    prereq: 'فصل «ترمینال» را خوانده باشی.',
+    goal: ['با ps فرآیندهای در حال اجرا را ببینی و با kill یکی را تمام کنی', 'مدیر بستهٔ توزیع خودت را بشناسی و تفاوتش را با نصب اپ در گوشی بگویی'],
+  },
+  {
+    id: 'quiz',
+    title: 'آزمون و گواهی',
+    subtitle: 'آزمون جامع، یک گواهی باحال',
+    icon: Award,
+    tint: SUNJOB_PALETTE.orange,
+    prereq: 'هر شش فصل آموزشی را خوانده باشی و ماموریت‌های ترمینال را تمام کرده باشی.',
+    goal: ['در آزمون جامع دست‌کم ۷۰٪ نمره بگیری', 'برای هر سؤالِ غلط، توضیح درستش را بخوانی و دوباره امتحان بدهی', 'گواهی سان‌جاب را با نام خودت بگیری'],
+  },
   ...DEEP_CHAPTERS,
 ]
 
@@ -217,11 +285,51 @@ function resolvePath(cwd: string, input: string): string {
   return '/' + stack.join('/')
 }
 
+/** سرنخ‌های پلکانی ماموریت: سرنخ ۱ پیش‌فرض دیده می‌شود؛ پاسخ کامل فقط با دکمه */
+function MissionHelp({ mission }: { mission: (typeof TERMINAL_MISSIONS)[number] }) {
+  const [level, setLevel] = useState(1)
+  const [showSolution, setShowSolution] = useState(false)
+  return (
+    <div className="mt-1 space-y-1 pr-5 text-[9.5px] leading-4 text-amber-300/80">
+      {mission.hints.slice(0, level).map((h, i) => (
+        <span key={i} className="block">
+          <span className="font-bold">سرنخ {fa(i + 1)}: </span>
+          {h}
+        </span>
+      ))}
+      {level < mission.hints.length ? (
+        <button
+          type="button"
+          onClick={() => setLevel(level + 1)}
+          className="rounded-md border border-amber-400/30 px-1.5 py-0.5 font-bold text-amber-300 transition hover:bg-amber-400/10"
+        >
+          سرنخ {fa(level + 1)} از {fa(mission.hints.length)}
+        </button>
+      ) : showSolution ? (
+        <span className="block text-zinc-300">
+          <span className="font-bold">پاسخ کامل: </span>
+          <code dir="ltr" className="inline-block whitespace-pre-line rounded bg-black/40 px-1 py-0.5 text-left">
+            {mission.solution}
+          </code>
+        </span>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setShowSolution(true)}
+          className="rounded-md border border-white/15 px-1.5 py-0.5 font-bold text-zinc-300 transition hover:bg-white/10"
+        >
+          دیدن پاسخ کامل
+        </button>
+      )}
+    </div>
+  )
+}
+
 function MiniTerminal({ progress, onMissionDone }: { progress: AcademyProgress; onMissionDone: (id: string) => void }) {
   const [fs, setFs] = useState(makeFs)
   const [cwd, setCwd] = useState(HOME)
   const [lines, setLines] = useState<Line[]>([
-    { kind: 'out', text: 'sanjob-sh 4.0 — ترمینال تمرین آکادمی (هر دستوری بزنی امن است)' },
+    { kind: 'out', text: 'sanjob-sh 4.0؛ ترمینال تمرین آکادمی (هر دستوری بزنی امن است)' },
     { kind: 'out', text: 'با help لیست دستورها را ببین. ماموریت‌ها در پنل کنار منتظرت هستند!' },
   ])
   const [history, setHistory] = useState<string[]>([])
@@ -331,7 +439,7 @@ function MiniTerminal({ progress, onMissionDone }: { progress: AcademyProgress; 
             break
           }
           const entries = listDir(target, long)
-          if (entries.length === 0) push('out', '(خالی — مثل حافظهٔ من بعد از ظهر)')
+          if (entries.length === 0) push('out', '(خالی؛ مثل حافظهٔ من بعد از ظهر)')
           else entries.forEach((e) => push('out', e))
           break
         }
@@ -473,7 +581,7 @@ function MiniTerminal({ progress, onMissionDone }: { progress: AcademyProgress; 
           break
         }
         default:
-          push('err', `«${cmd}» را نمی‌شناسم. help را بزن — یا غلط تایپی بود، دوباره درست بنویس!`)
+          push('err', `«${cmd}» را نمی‌شناسم. help را بزن؛ یا غلط تایپی بود، دوباره درست بنویس!`)
       }
     },
     [cwd, fs, history, listDir, missionIdx, onMissionDone, push]
@@ -576,7 +684,7 @@ function MiniTerminal({ progress, onMissionDone }: { progress: AcademyProgress; 
                   )}
                   <span>{m.brief}</span>
                 </span>
-                {active && <span className="mt-1 block pr-5 text-[9.5px] text-amber-300/70">راهنما: {m.hint}</span>}
+                {active && <MissionHelp mission={m} />}
               </li>
             )
           })}
@@ -687,7 +795,7 @@ function PermissionCalc() {
             className="flex items-start gap-2 rounded-xl border border-rose-500/40 bg-rose-500/10 p-3 text-xs leading-5 text-rose-300"
           >
             <AlertTriangle size={15} className="mt-0.5 shrink-0" aria-hidden />
-            <span>۷۷۷ یعنی همه می‌توانند بخوانند، بنویسند و اجرا کنند — مثل باز گذاشتن در خانه با تابلوی «بفرمایید»! در سرور واقعی هرگز برای فایل‌های معمولی استفاده نشود.</span>
+            <span>۷۷۷ یعنی همه می‌توانند بخوانند، بنویسند و اجرا کنند؛ مثل باز گذاشتن در خانه با تابلوی «بفرمایید»! در سرور واقعی هرگز برای فایل‌های معمولی استفاده نشود.</span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -717,7 +825,7 @@ const FAKE_INSTALL_OUT: Record<string, string[]> = {
     'ساخت درخت وابستگی‌ها… انجام شد',
     'بسته‌های جدید نصب می‌شوند: flameshot',
     'دانلود و نصب…',
-    '✔ flameshot نصب شد — کل ماجرا ۴ ثانیه!',
+    '✔ flameshot نصب شد؛ کل ماجرا ۴ ثانیه!',
   ],
   dnf: [
     '$ sudo dnf install flameshot',
@@ -733,7 +841,7 @@ const FAKE_INSTALL_OUT: Record<string, string[]> = {
     'Packages (1) flameshot-0.10.2-1',
     'Total Download Size: 1.24 MiB',
     ':: Proceed with installation? [Y/n] Y',
-    '✔ نصب شد — آرچ یعنی سرعت، سرعت، سرعت',
+    '✔ نصب شد؛ آرچ یعنی سرعت، سرعت، سرعت',
   ],
 }
 
@@ -813,7 +921,7 @@ function PackageSim() {
         </table>
       </div>
       <p className="text-[11px] leading-5 text-zinc-400">
-        ایدهٔ اصلی: در لینوکس همه‌چیز از یک مخزن (repository) رسمی نصب می‌شود — بدون گشتن در ده سایت و دعوت‌نامه به نصب نرم‌افزارهای جانبی!
+        ایدهٔ اصلی: در لینوکس همه‌چیز از یک مخزن (repository) رسمی نصب می‌شود؛ بدون گشتن در ده سایت و دعوت‌نامه به نصب نرم‌افزارهای جانبی!
       </p>
     </div>
   )
@@ -864,7 +972,7 @@ function DistroQuiz() {
                 </span>
                 <div>
                   <p className="text-sm font-black text-zinc-100">{d.name}</p>
-                  <p className="text-[10px] text-zinc-400">پایه: {d.basedOn} — مدیر بسته: {d.pm}</p>
+                  <p className="text-[10px] text-zinc-400">پایه: {d.basedOn}؛ مدیر بسته: {d.pm}</p>
                 </div>
                 {i === 0 && <Badge className="mr-auto border-transparent bg-emerald-500/20 text-emerald-300">انتخاب اول</Badge>}
               </div>
@@ -956,8 +1064,8 @@ function FinalQuiz({ progress, onScore, onCertName }: { progress: AcademyProgres
           </p>
           <p className="mt-1 text-xs leading-5 text-zinc-300">
             {passed
-              ? 'دفترچه‌ات را ببند و گواهی‌ات را بگیر — تو رسماً یک لینوکسی تازه‌وارد هستی!'
-              : 'نزدیک بود! فصل‌ها را یک مرور سریع کن و دوباره بیا — آزمون مهم نیست، یادگیری مهم است.'}
+              ? 'دفترچه‌ات را ببند و گواهی‌ات را بگیر؛ تو رسماً یک لینوکسی تازه‌وارد هستی!'
+              : 'نزدیک بود! فصل‌ها را یک مرور سریع کن و دوباره بیا؛ آزمون مهم نیست، یادگیری مهم است.'}
           </p>
         </div>
 
@@ -985,7 +1093,7 @@ function FinalQuiz({ progress, onScore, onCertName }: { progress: AcademyProgres
                 maxLength={30}
               />
               <p className="text-[11px] leading-5 text-zinc-300">
-                دورهٔ جامع «آکادمی لینوکس» را با نمرهٔ {fa(score)} از {fa(QUIZ.length)} با موفقیت به پایان رساند —
+                دورهٔ جامع «آکادمی لینوکس» را با نمرهٔ {fa(score)} از {fa(QUIZ.length)} با موفقیت به پایان رساند:
                 <br />
                 شامل ترمینال تعاملی، هسته، شبکه، بش، امنیت و توزیع‌ها
               </p>
@@ -1104,6 +1212,26 @@ function Chapter({
           {done ? 'خوانده شد' : 'خواندم!'}
         </Button>
       </div>
+      {(def.prereq || def.goal) && (
+        <div className="space-y-1.5 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-[11px] leading-5 text-zinc-300">
+          {def.prereq && (
+            <p>
+              <span className="font-bold text-zinc-100">پیش‌نیاز: </span>
+              {def.prereq}
+            </p>
+          )}
+          {def.goal && (
+            <div>
+              <p className="font-bold text-zinc-100">در پایان این فصل می‌توانی:</p>
+              <ul className="mt-0.5 list-disc space-y-0.5 pr-4 text-zinc-400">
+                {def.goal.map((g) => (
+                  <li key={g}>{g}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
       <ReadingShell className="pt-1">{children}</ReadingShell>
     </div>
   )
@@ -1113,7 +1241,7 @@ function Chapter({
    اپ اصلی
    ================================================================ */
 
-/* برگه تقلب به‌صورت Learning Reader کامل — فهرست، فوکوس، پیشرفت و ادامه */
+/* برگه تقلب به‌صورت Learning Reader کامل؛ فهرست، فوکوس، پیشرفت و ادامه */
 const CHEAT_SECTIONS: ReaderSection[] = [
   ...CHEATSHEET.map((g) => ({
     id: g.group,
@@ -1227,7 +1355,7 @@ export default function LinuxAcademyApp() {
         update((p) => ({ ...p, done: p.done.includes('terminal') ? p.done : [...p.done, 'terminal'] }))
         pushToast({
           title: 'همهٔ ماموریت‌های ترمینال انجام شد!',
-          body: 'لینوس تووالدز اگر می‌دید، می‌گفت: «نه بد نیست…» — با اسپانسری سان‌جاب',
+          body: 'لینوس تووالدز اگر می‌دید، می‌گفت: «نه بد نیست…»؛ با اسپانسری سان‌جاب',
           icon: Trophy,
         })
       }
@@ -1280,10 +1408,10 @@ export default function LinuxAcademyApp() {
           </span>
           <div className="min-w-0 flex-1">
             <h1 className="text-base font-black text-white sm:text-lg">
-              آکادمی لینوکس <span className="text-[10px] font-bold text-amber-300">— دورهٔ جامع رایگان</span>
+              آکادمی لینوکس <span className="text-[10px] font-bold text-amber-300">· دورهٔ جامع رایگان</span>
             </h1>
             <p className="hidden text-[11px] text-zinc-300 sm:block">
-              از «لینوکس چیست؟» تا گواهی پایانی — با ترمینال تعاملی و ماموریت‌های واقعی
+              از «لینوکس چیست؟» تا گواهی پایانی؛ با ترمینال تعاملی و ماموریت‌های واقعی
             </p>
             <div className="mt-1.5 flex max-w-xs items-center gap-2">
               <Progress value={pct} className="h-1.5 flex-1" />
@@ -1326,12 +1454,12 @@ export default function LinuxAcademyApp() {
           ))}
         </div>
 
-        {/* محتوا — برگه تقلب با خوانندهٔ کامل رندر می‌شود */}
+        {/* محتوا: برگه تقلب با خوانندهٔ کامل رندر می‌شود */}
         {view === 'cheats' ? (
           <div className="relative min-w-0 flex-1">
             <LearningReader
               readerId="linux-cheats"
-              title="برگه تقلب لینوکس — دستورهای واقعی ترمینال"
+              title="برگه تقلب لینوکس؛ دستورهای واقعی ترمینال"
               sections={CHEAT_SECTIONS}
             />
           </div>
@@ -1355,7 +1483,7 @@ export default function LinuxAcademyApp() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" aria-hidden />
                     <div className="absolute bottom-3 right-4 left-4">
                       <p className="text-sm font-black text-white sm:text-base">سفرت را همین‌جا شروع کن، پنگوئن معلم صبور است!</p>
-                      <p className="mt-0.5 text-[11px] leading-4 text-zinc-300">۱۴ فصل کوتاه، یک ترمینال امن برای تمرین، انیمیشن‌های زندهٔ هسته، آزمون و گواهی پایانی — همه‌چیز آفلاین و بامزه.</p>
+                      <p className="mt-0.5 text-[11px] leading-4 text-zinc-300">۱۴ فصل کوتاه، یک ترمینال امن برای تمرین، انیمیشن‌های زندهٔ هسته، آزمون و گواهی پایانی؛ همه‌چیز آفلاین و بامزه.</p>
                     </div>
                   </div>
 
@@ -1431,7 +1559,7 @@ export default function LinuxAcademyApp() {
                 <Chapter def={CHAPTERS[0]} done={progress.done.includes('what')} onToggleDone={() => toggleDone('what', 'لینوکس چیست؟')}>
                   <div className="space-y-3 text-zinc-300">
                     <p>
-                      <b className="text-zinc-100">لینوکس</b> اسم «هستهٔ» (kernel) یک سیستم‌عامل است — بخشی که بین سخت‌افزار و برنامه‌ها دادوستد می‌کند.
+                      <b className="text-zinc-100">لینوکس</b> اسم «هستهٔ» (kernel) یک سیستم‌عامل است؛ بخشی که بین سخت‌افزار و برنامه‌ها دادوستد می‌کند.
                       چیزی که مردم «لینوکس» صدا می‌زنند در واقع یک <b className="text-zinc-100">توزیع</b> است: هسته + ابزارها + محیط گرافیکی + نصب‌کننده، بسته‌بندی‌شده مثل یک گوشی با رام اختصاصی.
                     </p>
                     <div className="grid gap-2 sm:grid-cols-3">
@@ -1467,7 +1595,7 @@ export default function LinuxAcademyApp() {
                     </div>
 
                     <FunNote>
-                      لینوس در ۱۹۹۱ نوشت «فقط یه سرگرمی است، بزرگ و حرفه‌ای نخواهد شد» — امروز پروژهٔ او بیشتر از هر نرم‌افزار دیگری در دنیا در حال اجراست. نکتهٔ اخلاقی: هرگز underestimate نکن سرگرمی‌ها را!
+                      لینوس در ۱۹۹۱ نوشت «فقط یه سرگرمی است، بزرگ و حرفه‌ای نخواهد شد»؛ امروز پروژهٔ او بیشتر از هر نرم‌افزار دیگری در دنیا در حال اجراست. نکتهٔ اخلاقی: هرگز ارزش سرگرمی‌ها را دستِ‌کم نگیر!
                     </FunNote>
                   </div>
                 </Chapter>
@@ -1512,7 +1640,7 @@ export default function LinuxAcademyApp() {
                       ))}
                     </div>
 
-                    <FunNote>گربهٔ سیستمی ما هم می‌گوید: «میوهٔ لینوکسی نخور، خودت لینوکسی شو» — منظورش این بود که از اوبونتو شروع کن.</FunNote>
+                    <FunNote>گربهٔ سیستمی ما هم می‌گوید: «میوهٔ لینوکسی نخور، خودت لینوکسی شو»؛ منظورش این بود که از اوبونتو شروع کن.</FunNote>
                   </div>
                 </Chapter>
               )}
@@ -1522,7 +1650,7 @@ export default function LinuxAcademyApp() {
                 <Chapter def={CHAPTERS[2]} done={progress.done.includes('distros')} onToggleDone={() => toggleDone('distros', 'توزیع‌ها')}>
                   <div className="space-y-4 text-zinc-300">
                     <p>
-                      «توزیع» یعنی همان بستهٔ کامل آمادهٔ نصب. همه از یک هستهٔ لینوکس استفاده می‌کنند ولی شخصیت‌شان فرق دارد — مثل پیتزافروشی‌هایی که خمیر یکسانی دارند!
+                      «توزیع» یعنی همان بستهٔ کامل آمادهٔ نصب. همه از یک هستهٔ لینوکس استفاده می‌کنند ولی شخصیت‌شان فرق دارد؛ مثل پیتزافروشی‌هایی که خمیر یکسانی دارند!
                     </p>
                     <div className="grid gap-2 sm:grid-cols-2">
                       {DISTROS.map((d, i) => (
@@ -1539,7 +1667,7 @@ export default function LinuxAcademyApp() {
                             </span>
                             <div className="min-w-0 flex-1">
                               <p className="text-xs font-black text-zinc-100">{d.name}</p>
-                              <p className="text-[9.5px] text-zinc-500">پایه: {d.basedOn} — مدیر بسته: {d.pm}</p>
+                              <p className="text-[9.5px] text-zinc-500">پایه: {d.basedOn}؛ مدیر بسته: {d.pm}</p>
                             </div>
                             <DifficultyStars n={d.difficulty} />
                           </div>
@@ -1636,7 +1764,7 @@ export default function LinuxAcademyApp() {
                       در لینوکس «دروازهٔ واقعی قدرت» ترمینال است؛ همان جایی که همه‌چیز با تایپ انجام می‌شود. عبارتی مثل <code dir="ltr" className="rounded bg-zinc-950 px-1.5 py-0.5 font-mono text-[10.5px] text-emerald-300">pengo@sunjob:~$</code> یعنی: کاربر pengo روی ماشین sunjob، در پوشهٔ خانه (~)، آمادهٔ دستور گرفتن ($).
                     </p>
                     <p>
-                      شل (shell) مفسرِ دستورهاست؛ محبوب‌ترینش <b className="text-zinc-100">bash</b> است. ترمینال پایین یک شبیه‌ساز امن است — ۱۰ ماموریت را در آن انجام بده تا فصل کامل شود:
+                      شل (shell) مفسرِ دستورهاست؛ محبوب‌ترینش <b className="text-zinc-100">bash</b> است. ترمینال پایین یک شبیه‌ساز امن است؛ ۱۰ ماموریت را در آن انجام بده تا فصل کامل شود:
                     </p>
                     <MiniTerminal progress={progress} onMissionDone={onMissionDone} />
                   </div>
@@ -1648,7 +1776,7 @@ export default function LinuxAcademyApp() {
                 <Chapter def={CHAPTERS[5]} done={progress.done.includes('permissions')} onToggleDone={() => toggleDone('permissions', 'دسترسی‌ها')}>
                   <div className="space-y-4 text-zinc-300">
                     <p>
-                      در لینوکس هر فایل سه نوع بیننده دارد: <b className="text-zinc-100">مالک</b>، <b className="text-zinc-100">گروه</b> و <b className="text-zinc-100">دیگران</b> — و هر کدام می‌توانند بخوانند (r)، بنویسند (w) یا اجرا کنند (x). با ماشین‌حساب زیر بازی کن:
+                      در لینوکس هر فایل سه نوع بیننده دارد: <b className="text-zinc-100">مالک</b>، <b className="text-zinc-100">گروه</b> و <b className="text-zinc-100">دیگران</b>؛ و هر کدام می‌توانند بخوانند (r)، بنویسند (w) یا اجرا کنند (x). با ماشین‌حساب زیر بازی کن:
                     </p>
                     <PermissionCalc />
                   </div>

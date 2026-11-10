@@ -1,5 +1,5 @@
 /**
- * Skill Registry — ثبت مهارت‌ها، پیش‌نیازها و نگاشت درس‌ها
+ * Skill Registry، ثبت مهارت‌ها، پیش‌نیازها و نگاشت درس‌ها
  *
  * گراف مهارت‌ها باید بدون چرخه باشد (در تست توسعه بررسی شده است).
  * هر مهارت به درس‌های واقعی آکادمی‌ها نگاشت می‌شود تا «تکمیل دوره» و
@@ -11,7 +11,7 @@ export interface SkillDef {
   id: string
   track: TrackId
   title: string
-  /** پیش‌نیازها — id مهارت */
+  /** پیش‌نیازها، id مهارت */
   prereq: string[]
   /** درس‌هایی که این مهارت را می‌آموزند */
   lessons: string[]
@@ -342,7 +342,7 @@ export function skillsOfLesson(track: TrackId, lessonId: string): SkillDef[] {
   )
 }
 
-/** اعتبارسنجی گراف — چرخه و پیش‌نیاز ناموجود پیدا می‌کند (ابزار توسعه) */
+/** اعتبارسنجی گراف، چرخه و پیش‌نیاز ناموجود پیدا می‌کند (ابزار توسعه) */
 export function validateSkillGraph(): string[] {
   const problems: string[] = []
   for (const s of SKILLS) {

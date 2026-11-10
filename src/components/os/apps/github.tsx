@@ -1,6 +1,6 @@
 'use client'
 
-/* «گیت‌هاب» — جستجوی ریپو، ریپوهای من، فایل‌ها، ایسوها و README */
+/* «گیت‌هاب»، جستجوی ریپو، ریپوهای من، فایل‌ها، ایسوها و README */
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
@@ -222,7 +222,7 @@ export default function GitHubApp() {
     pushToast({
       icon: '🔑',
       title: 'گیت‌هاب',
-      body: sessionOnly ? 'توکن فقط برای همین نشست ذخیره شد (با بستن تب پاک می‌شود).' : 'توکن ذخیره شد — پیشنهاد: حداقل‌دسترسی (فقط repo یا public_repo) بده.',
+      body: sessionOnly ? 'توکن فقط برای همین نشست ذخیره شد (با بستن تب پاک می‌شود).' : 'توکن ذخیره شد، پیشنهاد: حداقل‌دسترسی (فقط repo یا public_repo) بده.',
     })
   }
   const clearToken = () => {
@@ -379,7 +379,7 @@ export default function GitHubApp() {
       })
       if (!res.ok) {
         if (res.status === 401) throw new Error('توکن نامعتبر است یا منقضی شده (۴۰۱)')
-        if (res.status === 403) throw new Error('دسترسی رد شد — توکن باید اجازهٔ نوشتن در این مخزن را داشته باشد (۴۰۳)')
+        if (res.status === 403) throw new Error('دسترسی رد شد، توکن باید اجازهٔ نوشتن در این مخزن را داشته باشد (۴۰۳)')
         if (res.status === 404) throw new Error('ایسو برای این مخزن خاموش است یا مخزن پیدا نشد (۴۰۴)')
         if (res.status === 422) throw new Error('عنوان یا متن ایسو نامعتبر است (۴۲۲)')
         throw new Error(`ساخت ایسو شکست خورد (${res.status})`)
@@ -411,7 +411,7 @@ export default function GitHubApp() {
         })
         if (!res.ok) {
           if (res.status === 404) throw new Error('این مخزن فایل README ندارد.')
-          if (res.status === 403) throw new Error('محدودیت نرخ API — کمی صبر کن یا توکن بده (۴۰۳)')
+          if (res.status === 403) throw new Error('محدودیت نرخ API، کمی صبر کن یا توکن بده (۴۰۳)')
           throw new Error(`خواندن README شکست خورد (${res.status})`)
         }
         const text = await res.text()
@@ -454,7 +454,7 @@ export default function GitHubApp() {
           <div className="border-t border-white/10 p-3">
             <p className="mb-2 text-[11px] leading-5 text-zinc-500">
               بدون توکن هم ریپوهای عمومی را می‌بینی (۶۰ درخواست/ساعت)؛ با توکن (fine-grained یا classic با scope repo) ریپوهای خودت و ساخت ایسو باز می‌شود.
-              امنیت: حداقل‌دسترسی بده و بعد از کار <b>revoke</b> کن — ذخیره در مرورگر (localStorage/sessionStorage) در برابر XSS هم‌مبدا محافظت کامل نیست.
+              امنیت: حداقل‌دسترسی بده و بعد از کار <b>revoke</b> کن، ذخیره در مرورگر (localStorage/sessionStorage) در برابر XSS هم‌مبدا محافظت کامل نیست.
             </p>
             <label className="mb-2 flex w-fit cursor-pointer items-center gap-1.5 text-[11px] text-zinc-300">
               <input
@@ -463,7 +463,7 @@ export default function GitHubApp() {
                 onChange={(e) => setSessionOnly(e.target.checked)}
                 className="size-3.5 accent-[#f7931e]"
               />
-              فقط این نشست (با بستن تب پاک شود — امن‌تر)
+              فقط این نشست (با بستن تب پاک شود، امن‌تر)
             </label>
             <div className="flex flex-wrap items-center gap-1.5">
               <div className="relative min-w-40 flex-1">
@@ -637,7 +637,7 @@ export default function GitHubApp() {
                       ) : (
                         <div className="flex flex-1 flex-col items-center justify-center gap-2 p-6 text-center">
                           <FileText className="size-8 text-zinc-600" />
-                          <p className="text-sm text-zinc-300">فایل بزرگ است — از گیت‌هاب دانلود کن</p>
+                          <p className="text-sm text-zinc-300">فایل بزرگ است، از گیت‌هاب دانلود کن</p>
                           {fileView.downloadUrl && (
                             <a href={fileView.downloadUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs text-[#f7931e] hover:underline">
                               دانلود {fileView.name}

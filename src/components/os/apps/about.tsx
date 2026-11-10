@@ -35,7 +35,7 @@ export default function AboutApp() {
     ['محیط دسکتاپ', 'SanjabShell ۴.۰'],
     ['شل', 'sanjob-sh 4.0 (آموزشی + تصحیح غلط)'],
     ['زبان‌های نصب‌شده', 'پایتون، سنجابی، جاوااسکریپت، HTML'],
-    ['آفیس', 'نویسا — خروجی Word و PDF'],
+    ['آفیس', 'نویسا، خروجی Word و PDF'],
     ['پردازنده', 'مغز شما (اختیاری)'],
     ['حافظه', 'همان‌قدر که لازم داری'],
     ['امنیت', 'یک گربه نگهبان + یک سنجابک'],
@@ -55,7 +55,7 @@ export default function AboutApp() {
         </span>
       </h2>
       <p className="mt-1 text-center text-xs leading-5 text-zinc-400">
-        سیستم‌عامل رنگی و بامزهٔ تحت وب — همین‌جا توی مرورگرت زندگی می‌کند.
+        سیستم‌عامل رنگی و بامزهٔ تحت وب، همین‌جا توی مرورگرت زندگی می‌کند.
         <br />
         ترمینال آموزشی، پایتون، نویسا، ماشین‌حساب فول و ۱۰ بازی.
       </p>
@@ -78,7 +78,7 @@ export default function AboutApp() {
             {BRAND.sponsor}
           </span>
           <span className="mt-0.5 block text-[11px] leading-4 text-zinc-400">
-            لوگوی رسمی از {BRAND.sponsorSite} — انتخاب رشته و مشاورهٔ تخصصی
+            لوگوی رسمی از {BRAND.sponsorSite}، انتخاب رشته و مشاورهٔ تخصصی
           </span>
         </span>
         <ExternalLink size={14} className="shrink-0 text-zinc-500" aria-hidden />
@@ -116,7 +116,7 @@ export default function AboutApp() {
       </div>
 
       <p className="mt-3 max-w-xs text-center text-[11px] leading-5 text-zinc-500">
-        طراحی الهام‌گرفته از پروژه‌های Puter، OS.js، daedalOS و win11React —
+        طراحی الهام‌گرفته از پروژه‌های Puter، OS.js، daedalOS و win11React،
         و تصحیح دستورها به سبک thefuck و fish-shell.
       </p>
 

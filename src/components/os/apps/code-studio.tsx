@@ -28,12 +28,12 @@ import { PyodideRunner, type PyOutKind } from '@/lib/os/pyodide'
 import { useGame } from '@/lib/gamification/engine'
 
 /* ------------------------------------------------------------------ */
-/* کداستودیو سان‌جاب — پایتونِ کوچک + سنجابی + جاوااسکریپت + HTML       */
+/* کداستودیو سان‌جاب، پایتونِ کوچک + سنجابی + جاوااسکریپت + HTML       */
 /* ------------------------------------------------------------------ */
 
 type Lang = ScriptLang | 'js' | 'html'
 
-/** حالت اجرای پایتون — مینی‌مترپرتر آفلاین یا CPython واقعی (Pyodide) */
+/** حالت اجرای پایتون، مینی‌مترپرتر آفلاین یا CPython واقعی (Pyodide) */
 type PyMode = 'mini' | 'real'
 
 interface LangMeta {
@@ -49,7 +49,7 @@ const LANGS: LangMeta[] = [
   {
     id: 'python',
     name: 'پایتون',
-    desc: 'پایتون واقعی CPython (Pyodide) یا پایتونِ کوچک آموزشی — با انتخابگر حالت اجرا',
+    desc: 'پایتون واقعی CPython (Pyodide) یا پایتونِ کوچک آموزشی، با انتخابگر حالت اجرا',
     ext: 'py',
     icon: Code2,
     color: '#f7931e',
@@ -89,15 +89,15 @@ const EXAMPLES: Record<Lang, Example[]> = {
   python: [
     {
       title: 'سلام دنیا',
-      code: `# اولین برنامه‌ات — سلام دنیا!\nprint("سلام دنیا!")\nprint("به کداستودیوی سان‌جاب خوش اومدی")\n`,
+      code: `# اولین برنامه‌ات، سلام دنیا!\nprint("سلام دنیا!")\nprint("به کداستودیوی سان‌جاب خوش آمدی")\n`,
     },
     {
       title: 'فیبوناچی',
-      code: `# دنباله فیبوناچی — ۱۰ جمله اول\na, b = 0, 1\nfibs = []\nfor i in range(10):\n    fibs.append(a)\n    a, b = b, a + b\n\nprint("فیبوناچی:", fibs)\n`,
+      code: `# دنباله فیبوناچی، ۱۰ جمله اول\na, b = 0, 1\nfibs = []\nfor i in range(10):\n    fibs.append(a)\n    a, b = b, a + b\n\nprint("فیبوناچی:", fibs)\n`,
     },
     {
       title: 'حدس عددی',
-      code: `# بازی حدس عدد — راز عدد بین ۱ تا ۵۰\nsecret = 27\nguesses = [10, 40, 25, 30, 27]\n\nfor g in guesses:\n    if g == secret:\n        print(f"آفرین! {g} درست بود")\n        break\n    elif g < secret:\n        print(f"{g} کوچیک‌تره!")\n    else:\n        print(f"{g} بزرگ‌تره!")\n`,
+      code: `# بازی حدس عدد، راز عدد بین ۱ تا ۵۰\nsecret = 27\nguesses = [10, 40, 25, 30, 27]\n\nfor g in guesses:\n    if g == secret:\n        print(f"آفرین! {g} درست بود")\n        break\n    elif g < secret:\n        print(f"{g} کوچیک‌تره!")\n    else:\n        print(f"{g} بزرگ‌تره!")\n`,
     },
     {
       title: 'تابع و بازگشت',
@@ -171,7 +171,7 @@ const EXAMPLES: Record<Lang, Example[]> = {
   html: [
     {
       title: 'سلام صفحه',
-      code: `<!doctype html>\n<html dir="rtl">\n  <body style="font-family:sans-serif; background:#fffbf5; text-align:center; padding:40px">\n    <h1 style="color:#f7931e">سلام دنیا!</h1>\n    <p style="color:#1a2744">این صفحه واقعی رندر می‌شه — با اسپانسری سان‌جاب</p>\n  </body>\n</html>\n`,
+      code: `<!doctype html>\n<html dir="rtl">\n  <body style="font-family:sans-serif; background:#fffbf5; text-align:center; padding:40px">\n    <h1 style="color:#f7931e">سلام دنیا!</h1>\n    <p style="color:#1a2744">این صفحه واقعی رندر می‌شه، با اسپانسری سان‌جاب</p>\n  </body>\n</html>\n`,
     },
     {
       title: 'دکمه رنگی',
@@ -220,7 +220,7 @@ export default function CodeStudioApp() {
   const [lang, setLang] = useState<Lang>('python')
   const [code, setCode] = useState(EXAMPLES.python[0].code)
   const [output, setOutput] = useState<{ kind: 'out' | 'err' | 'sys'; text: string }[]>([
-    { kind: 'sys', text: 'کداستودیوی سان‌جاب — یه زبان انتخاب کن و «اجرا» بزن!' },
+    { kind: 'sys', text: 'کداستودیوی سان‌جاب، یه زبان انتخاب کن و «اجرا» بزن!' },
   ])
   const [running, setRunning] = useState(false)
   const [lastMs, setLastMs] = useState<number | null>(null)
@@ -258,7 +258,7 @@ export default function CodeStudioApp() {
         push('sys', 'نکته: از منوی «مثال‌ها» یه نمونه سالم امتحان کن!')
       } else {
         setLastMs(res.ms)
-        push('sys', `✓ اجرا شد در ${res.ms.toFixed(1)} میلی‌ثانیه — آفرین!`)
+        push('sys', `✓ اجرا شد در ${res.ms.toFixed(1)} میلی‌ثانیه، آفرین!`)
         useGame.getState().registerCodeRun('mini-run')
       }
     },
@@ -287,11 +287,11 @@ export default function CodeStudioApp() {
         const r = await runner.run(src, 15000)
         setLastMs(r.ms > 0 ? r.ms : null)
         if (r.ok) {
-          push('sys', `✓ CPython اجرا شد در ${r.ms.toFixed(0)} میلی‌ثانیه — پایتون واقعی!`)
+          push('sys', `✓ CPython اجرا شد در ${r.ms.toFixed(0)} میلی‌ثانیه، پایتون واقعی!`)
           useGame.getState().registerCodeRun('real-run')
         }
       } catch (e) {
-        push('err', `✗ ${e instanceof Error ? e.message : 'بارگذاری پایتون واقعی ناموفق بود — اینترنت را چک کن'}`)
+        push('err', `✗ ${e instanceof Error ? e.message : 'بارگذاری پایتون واقعی ناموفق بود، اینترنت را چک کن'}`)
         push('sys', 'نکته: می‌توانی با حالت «مینی» بدون اینترنت ادامه بدهی')
       }
     },
@@ -327,7 +327,7 @@ export default function CodeStudioApp() {
       }
       workerRef.current = worker
       const killer = window.setTimeout(() => {
-        push('err', '✗ اجرا بیش از ۳ ثانیه طول کشید — حلقه بی‌نهایت داشتی احتمالاً!')
+        push('err', '✗ اجرا بیش از ۳ ثانیه طول کشید، حلقه بی‌نهایت داشتی احتمالاً!')
         worker.terminate()
         setRunning(false)
       }, 3000)
@@ -337,7 +337,7 @@ export default function CodeStudioApp() {
         for (const l of data.logs ?? []) push('out', l)
         if (data.ok) {
           setLastMs(null)
-          push('sys', '✓ اجرا شد — تبریک!')
+          push('sys', '✓ اجرا شد، تبریک!')
         } else {
           push('err', `✗ ${data.error ?? 'خطای ناشناخته'}`)
         }
@@ -367,7 +367,7 @@ export default function CodeStudioApp() {
       runPythonOrSquirrel(code, 'python')
     } else if (lang === 'squirrel') runPythonOrSquirrel(code, 'squirrel')
     else if (lang === 'js') runJs(code)
-    else push('sys', 'HTML اجرا نمی‌خواد — پیش‌نمایش کنتراهه!')
+    else push('sys', 'HTML اجرا نمی‌خواد، پیش‌نمایش کنتراهه!')
     if (lang === 'python' || lang === 'squirrel') setRunning(false)
   }, [code, lang, pyMode, runJs, runPythonOrSquirrel, runRealPython, push])
 
@@ -472,7 +472,7 @@ export default function CodeStudioApp() {
         </span>
       </div>
 
-      {/* انتخابگر موتور پایتون — فقط برای زبان پایتون */}
+      {/* انتخابگر موتور پایتون، فقط برای زبان پایتون */}
       {lang === 'python' && (
         <div className="flex flex-wrap items-center gap-1.5 border-b border-white/10 bg-zinc-900/40 px-2 py-1.5">
           <span className="text-[10px] font-bold text-zinc-500">موتور اجرا:</span>
@@ -483,7 +483,7 @@ export default function CodeStudioApp() {
                 ? 'border-[#f7931e]/60 bg-[#f7931e]/15 text-[#f7931e]'
                 : 'border-white/10 bg-zinc-800/70 text-zinc-400 hover:bg-zinc-700'
             }`}
-            title="مترپرتر آموزشی کوچک — آفلاین و فوری؛ زیرمجموعه‌ای از پایتون"
+            title="مترپرتر آموزشی کوچک، آفلاین و فوری؛ زیرمجموعه‌ای از پایتون"
           >
             مینی (آفلاین)
           </button>
@@ -494,14 +494,14 @@ export default function CodeStudioApp() {
                 ? 'border-emerald-500/60 bg-emerald-500/15 text-emerald-400'
                 : 'border-white/10 bg-zinc-800/70 text-zinc-400 hover:bg-zinc-700'
             }`}
-            title="CPython کامل از طریق Pyodide — نیاز به اینترنت و ~۱۰MB دانلود دارد"
+            title="CPython کامل از طریق Pyodide، نیاز به اینترنت و ~۱۰MB دانلود دارد"
           >
             پایتون واقعی CPython (اینترنت)
           </button>
           <span className="text-[9px] text-zinc-600">
             {pyMode === 'mini'
-              ? 'زیرمجموعه آموزشی — همه دستورهای پایتون را ندارد'
-              : 'CPython کامل — ۱۵ ثانیه محدودیت اجرا و سقف خروجی'}
+              ? 'زیرمجموعه آموزشی، همه دستورهای پایتون را ندارد'
+              : 'CPython کامل، ۱۵ ثانیه محدودیت اجرا و سقف خروجی'}
           </span>
         </div>
       )}
@@ -696,8 +696,8 @@ export default function CodeStudioApp() {
         <span className="text-[9px] text-zinc-600">
           {lang === 'python'
             ? pyMode === 'real'
-              ? 'CPython واقعی از طریق Pyodide v0.26.4 — اجرای کامل پایتون در Worker جدا'
-              : 'پایتونِ کوچک سان‌جاب — مترپرتر آموزشی آفلاین؛ پایتون کامل را با حالت «CPython» امتحان کن'
+              ? 'CPython واقعی از طریق Pyodide v0.26.4، اجرای کامل پایتون در Worker جدا'
+              : 'پایتونِ کوچک سان‌جاب، مترپرتر آموزشی آفلاین؛ پایتون کامل را با حالت «CPython» امتحان کن'
             : 'کداستودیو سان‌جاب'}
         </span>
         <span className="flex items-center gap-1 text-[9px] font-bold text-amber-400/80">

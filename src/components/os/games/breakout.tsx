@@ -158,7 +158,7 @@ export default function BreakoutGame() {
       s.vy = Math.abs(s.vy)
     }
 
-    // برخورد با راکت — زاویه بسته به محل برخورد
+    // برخورد با راکت، زاویه بسته به محل برخورد
     if (
       s.vy > 0 &&
       s.ballY + BALL_R >= PADDLE_Y &&
@@ -335,7 +335,7 @@ export default function BreakoutGame() {
     <GameShell
       emoji="🧱"
       title="آجرشکن"
-      howTo="موس/انگشت یا کلیدهای چپ/راست — توپ رو نذار بیفته!"
+      howTo="موس/انگشت یا کلیدهای چپ/راست، توپ رو نذار بیفته!"
       stats={[
         { label: 'امتیاز', value: score },
         { label: 'جان', value: '❤️'.repeat(lives) },
@@ -358,7 +358,7 @@ export default function BreakoutGame() {
           show={gameOver}
           emoji="💀"
           title="باختی!"
-          subtitle={`امتیاز: ${score} — رکورد: ${best}`}
+          subtitle={`امتیاز: ${score}، رکورد: ${best}`}
           onAction={reset}
         />
       </div>

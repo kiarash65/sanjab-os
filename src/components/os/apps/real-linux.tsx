@@ -1,10 +1,10 @@
 'use client'
 
-/* «لینوکس واقعی» — بوت کرنل واقعی Linux 6.12 (Alpine) داخل مرورگر با شبیه‌ساز v86
+/* «لینوکس واقعی»، بوت کرنل واقعی Linux 6.12 (Alpine) داخل مرورگر با شبیه‌ساز v86
    ── bzImage و initramfs واقعی Alpine 3.21.9 (netboot)
    ── ISO به‌عنوان cdrom وصل می‌شود → modloop + مخزن apk آفلاین در دسترس است
    ── ترمینال سریال سفارشی با پارسر ANSI (رنگ، \r، \b، پاک‌کردن خط)
-   هیچ‌چیز شبیه‌سازی‌شده نیست — dmesg، busybox و apk همه واقعی‌اند. */
+   هیچ‌چیز شبیه‌سازی‌شده نیست، dmesg، busybox و apk همه واقعی‌اند. */
 
 import {
   useCallback,
@@ -252,7 +252,7 @@ class MiniVT {
 
 /* ─── چیپ‌های دستور سریع ─── */
 const QUICK_CMDS: { label: string; cmd: string; hint: string }[] = [
-  { label: 'uname -a', cmd: 'uname -a', hint: 'نسخه هسته — نشانهٔ واقعی بودن!' },
+  { label: 'uname -a', cmd: 'uname -a', hint: 'نسخه هسته، نشانهٔ واقعی بودن!' },
   { label: 'os-release', cmd: 'cat /etc/os-release', hint: 'مشخصات Alpine' },
   { label: 'free -m', cmd: 'free -m', hint: 'حافظهٔ ماشین مجازی' },
   { label: 'ls /media/cdrom', cmd: 'ls /media/cdrom', hint: 'محتوای ISO وصل‌شده' },
@@ -345,7 +345,7 @@ export default function RealLinuxApp() {
       if (stickRef.current) el.scrollTop = el.scrollHeight
     }
 
-    /* پاسخ به پرس‌وجوی موقعیت کرسر (ESC[6n) — ویرایشگر خط شل منتظرش می‌ماند */
+    /* پاسخ به پرس‌وجوی موقعیت کرسر (ESC[6n)، ویرایشگر خط شل منتظرش می‌ماند */
     if (/\x1b\[6n/.test(chunk)) {
       emuRef.current?.serial0_send('\x1b[24;80R')
     }
@@ -566,7 +566,7 @@ export default function RealLinuxApp() {
       await emu.restore_state(buf)
       pushToast({ icon: '⏪', title: 'وضعیت بازیابی شد', body: 'ماشین به لحظه‌ی snapshot برگشت' })
     } catch (e) {
-      pushToast({ icon: '❌', title: 'بازیابی ناموفق بود', body: e instanceof Error ? e.message : 'احتمالاً snapshot از نسخه‌ی دیگری از ایمیج‌هاست — دوباره ذخیره کن' })
+      pushToast({ icon: '❌', title: 'بازیابی ناموفق بود', body: e instanceof Error ? e.message : 'احتمالاً snapshot از نسخه‌ی دیگری از ایمیج‌هاست، دوباره ذخیره کن' })
     } finally {
       setSnapshotBusy(false)
     }
@@ -634,7 +634,7 @@ export default function RealLinuxApp() {
         </span>
         <div className="min-w-0">
           <h2 className="flex items-center gap-1.5 text-sm font-black text-zinc-100">
-            لینوکس واقعی — هستهٔ Alpine
+            لینوکس واقعی، هستهٔ Alpine
             <span className="rounded-full border border-emerald-400/40 bg-emerald-400/10 px-1.5 py-px text-[9px] font-bold text-emerald-300">
               ۶٫۱۲٫۱۱۴
             </span>
@@ -717,19 +717,19 @@ export default function RealLinuxApp() {
               <div className="flex items-center gap-2">
                 <Zap size={16} className="text-emerald-300" aria-hidden />
                 <h3 className="text-sm font-black text-zinc-100">
-                  این یک شبیه‌ساز نیست — کرنل واقعی است!
+                  این یک شبیه‌ساز نیست، کرنل واقعی است!
                 </h3>
               </div>
               <p className="mt-2 text-[11px] leading-5 text-zinc-300">
                 کرنل <b dir="ltr">Linux 6.12.114-0-virt</b> توزیع{' '}
                 <b dir="ltr">Alpine 3.21.9</b> با شبیه‌ساز x86 «v86» (WASM) در همین
                 مرورگر بوت می‌شود. <b>busybox</b> واقعی، <b>apk</b> واقعی،{' '}
-                <b>dmesg</b> واقعی — ISO هم به‌عنوان سی‌دی‌رام وصل است تا مخزن
+                <b>dmesg</b> واقعی؛ ISO هم به‌عنوان سی‌دی‌رام وصل است تا مخزن
                 پکیج‌ها در دسترس باشد.
               </p>
               <ul className="mt-2.5 space-y-1 text-[10px] leading-4 text-zinc-400">
                 <li>• کرنل و initramfs واقعی Alpine (bzImage رسمی)</li>
-                <li>• ورود خودکار به‌عنوان root (بدون رمز — مثل ISO واقعی)</li>
+                <li>• ورود خودکار به‌عنوان root (بدون رمز، مثل ISO واقعی)</li>
                 <li>• پکیج نصب کن: <span dir="ltr" className="font-mono text-teal-300">apk add htop</span></li>
               </ul>
             </div>
@@ -766,7 +766,7 @@ export default function RealLinuxApp() {
       {/* ── ناحیهٔ ترمینال ── */}
       {phase !== 'idle' && (
         <>
-          {/* کانتینر صفحهٔ v86 — همیشه در DOM (v86 موقع ساخت به آن نیاز دارد) */}
+          {/* کانتینر صفحهٔ v86، همیشه در DOM (v86 موقع ساخت به آن نیاز دارد) */}
           <div
             ref={screenHostRef}
             tabIndex={0}
@@ -788,7 +788,7 @@ export default function RealLinuxApp() {
           {showScreen && (
             <div className="border-b border-white/10 bg-black px-2 py-2">
               <p className="mt-1 text-center text-[9px] text-zinc-600">
-                نمایشگر گرافیکی ماشین — برای تایپ مستقیم کلیک کن
+                نمایشگر گرافیکی ماشین، برای تایپ مستقیم کلیک کن
               </p>
             </div>
           )}
@@ -819,13 +819,13 @@ export default function RealLinuxApp() {
                         />
                       </div>
                       <p className="mt-1 font-mono text-[9px] text-zinc-500">
-                        {progress.label} — {progress.pct}٪
+                        {progress.label}، {progress.pct}٪
                       </p>
                     </div>
                   )}
                   {phase === 'running' && !serialLive && (
                     <p className="max-w-56 text-[10px] leading-4 text-zinc-500">
-                      کرنل در حال راه‌اندازی است — ترمینال سریال چند لحظهٔ دیگر
+                      کرنل در حال راه‌اندازی است، ترمینال سریال چند لحظهٔ دیگر
                       روشن می‌شود…
                     </p>
                   )}
@@ -856,14 +856,14 @@ export default function RealLinuxApp() {
             <button
               onClick={() => send('\x03')}
               className="h-7 shrink-0 rounded-lg border border-rose-400/30 bg-rose-500/10 px-2.5 font-mono text-[10px] text-rose-300 transition hover:bg-rose-500/20 active:scale-95"
-              title="ارسال Ctrl+C — قطع دستور جاری"
+              title="ارسال Ctrl+C، قطع دستور جاری"
             >
               ^C
             </button>
             <button
               onClick={() => send('\t')}
               className="h-7 shrink-0 rounded-lg border border-white/10 bg-zinc-800/80 px-2.5 font-mono text-[10px] text-zinc-300 transition hover:bg-zinc-800 active:scale-95"
-              title="ارسال Tab — تکمیل خودکار"
+              title="ارسال Tab، تکمیل خودکار"
             >
               ⇥ Tab
             </button>
@@ -948,7 +948,7 @@ export default function RealLinuxApp() {
               ? bootMsg || 'در حال آماده‌سازی…'
               : phase === 'running'
                 ? serialLive
-                  ? 'ترمینال سریال فعال — واقعی!'
+                  ? 'ترمینال سریال فعال، واقعی!'
                   : bootMsg || 'هسته در حال بوت…'
                 : 'خطا'}
         </span>

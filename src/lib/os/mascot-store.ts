@@ -1,9 +1,9 @@
 /**
- * Sanjabak — پروفایل ماسکوت سنجاب‌اواس
+ * Sanjabak، پروفایل ماسکوت سنجاب‌اواس
  *
  * سنجابک شخصیت همراه SanjabOS است (جایگزین پنگوئن Tux).
  * ساختار لایه‌ای: بدن/خز، چشم، عینک، کلاه، لباس، وسیله، پس‌زمینه.
- * آیتم‌ها با «فعالیت آموزشی واقعی» باز می‌شوند — شرط هر قفل شفاف است،
+ * آیتم‌ها با «فعالیت آموزشی واقعی» باز می‌شوند، شرط هر قفل شفاف است،
  * هیچ Loot Box یا پاداش تصادفی وجود ندارد.
  */
 import { create } from 'zustand'
@@ -241,7 +241,7 @@ export const LAYER_TITLES: Record<MascotLayer, string> = {
 
 const unlockedCache = new Map<string, boolean>()
 
-/** آیا آیتم باز است؟ — شرط‌ها ارزان‌اند و cache می‌شوند */
+/** آیا آیتم باز است؟، شرط‌ها ارزان‌اند و cache می‌شوند */
 export function isUnlocked(item: MascotItem): boolean {
   if (!item.unlock) return true
   const cached = unlockedCache.get(item.id)
@@ -256,7 +256,7 @@ export function isUnlocked(item: MascotItem): boolean {
   return ok
 }
 
-/** پاک‌کردن cache شرط‌ها — بعد از هر رویداد آموزشی */
+/** پاک‌کردن cache شرط‌ها، بعد از هر رویداد آموزشی */
 export function invalidateUnlockCache(): void {
   unlockedCache.clear()
 }

@@ -1,5 +1,5 @@
 /**
- * برنامهٔ روزانه و گزارش هفتگی — همه از دادهٔ واقعی
+ * برنامهٔ روزانه و گزارش هفتگی، همه از دادهٔ واقعی
  *
  * برنامهٔ روز بر اساس: مرورهای سررسید → ادامهٔ درس جاری → تمرین مهارت ضعیف
  * → چالش → پروژه. مدت‌های ۱۰/۲۰/۳۰/۴۵ دقیقه انتخاب کاربر است و برنامه
@@ -23,7 +23,7 @@ export interface PlanItem {
 
 const DAY = 86_400_000
 
-/** درس جاری هر مسیر — اولین درس ناتمام به ترتیب */
+/** درس جاری هر مسیر، اولین درس ناتمام به ترتیب */
 export function currentLessonOfTrack(
   track: TrackId,
   lessonIds: string[],
@@ -35,13 +35,13 @@ export function currentLessonOfTrack(
   return null
 }
 
-/** برنامهٔ امروز — از دادهٔ واقعی کاربر */
+/** برنامهٔ امروز، از دادهٔ واقعی کاربر */
 export function buildDailyPlan(budgetMin: number): PlanItem[] {
   const p = useLearning.getState().profile
   const items: PlanItem[] = []
   const now = Date.now()
 
-  // ۱) مرورهای سررسید — همیشه اولویت اول
+  // ۱) مرورهای سررسید، همیشه اولویت اول
   const due = dueItems(p.review, now, 10)
   for (const r of due.slice(0, 4)) {
     items.push({
@@ -49,8 +49,8 @@ export function buildDailyPlan(budgetMin: number): PlanItem[] {
       kind: 'review',
       title: `مرور «${r.title}»`,
       detail: r.lastCorrect
-        ? 'مرور موفق قبلی — برای تثبیت فاصله‌دار'
-        : 'قبلاً فراموش شده — اولویت تثبیت',
+        ? 'مرور موفق قبلی، برای تثبیت فاصله‌دار'
+        : 'قبلاً فراموش شده، اولویت تثبیت',
       minutes: 2,
       target: { app: 'learning' },
     })
@@ -65,7 +65,7 @@ export function buildDailyPlan(budgetMin: number): PlanItem[] {
         id: 'continue',
         kind: 'continue',
         title: 'ادامهٔ درس جاری',
-        detail: `آخرین مطالعهٔ تو در ${ls.track === 'python' ? 'آکادمی پایتون' : ls.track === 'linux' ? 'آکادمی لینوکس' : ls.track === 'rust' ? 'آکادمی راست' : ls.track === 'ai' ? 'آکادمی هوش مصنوعی' : ls.track === 'powershell' ? 'آکادمی پاورشل' : 'آکادمی الگوریتم'} — درس «${ls.lessonId}»`,
+        detail: `آخرین مطالعهٔ تو در ${ls.track === 'python' ? 'آکادمی پایتون' : ls.track === 'linux' ? 'آکادمی لینوکس' : ls.track === 'rust' ? 'آکادمی راست' : ls.track === 'ai' ? 'آکادمی هوش مصنوعی' : ls.track === 'powershell' ? 'آکادمی پاورشل' : 'آکادمی الگوریتم'}، درس «${ls.lessonId}»`,
         minutes: 10,
         target: { track: ls.track, lessonId: ls.lessonId },
       })
@@ -87,7 +87,7 @@ export function buildDailyPlan(budgetMin: number): PlanItem[] {
       detail:
         st.state === 'familiar'
           ? 'برای رسیدن به سطح «مسلط» یک تمرین عملی لازم است'
-          : 'این مهارت تازه شروع شده — تمرین آن را محکم می‌کند',
+          : 'این مهارت تازه شروع شده، تمرین آن را محکم می‌کند',
       minutes: 8,
       target: { track: def.track, lessonId: def.lessons[0] },
     })
@@ -98,7 +98,7 @@ export function buildDailyPlan(budgetMin: number): PlanItem[] {
     id: 'challenge',
     kind: 'challenge',
     title: 'یک چالش الگوریتمی حل کن',
-    detail: 'پیش‌بینی گام بعدی الگوریتم یا تحلیل پیچیدگی — در آکادمی الگوریتم',
+    detail: 'پیش‌بینی گام بعدی الگوریتم یا تحلیل پیچیدگی، در آکادمی الگوریتم',
     minutes: 6,
     target: { app: 'algorithm-academy' },
   })
@@ -110,13 +110,13 @@ export function buildDailyPlan(budgetMin: number): PlanItem[] {
       id: 'project',
       kind: 'project',
       title: 'پیشرفت در پروژهٔ فعال',
-      detail: `${activeProjects.length} پروژهٔ ناتمام داری — یک مرحله جلو برو`,
+      detail: `${activeProjects.length} پروژهٔ ناتمام داری، یک مرحله جلو برو`,
       minutes: 12,
       target: { app: 'project-lab' },
     })
   }
 
-  // برش با بودجهٔ زمان — اگر وقت کم است، کوتاه ولی مفید
+  // برش با بودجهٔ زمان، اگر وقت کم است، کوتاه ولی مفید
   const out: PlanItem[] = []
   let used = 0
   for (const it of items) {
@@ -129,7 +129,7 @@ export function buildDailyPlan(budgetMin: number): PlanItem[] {
   return out
 }
 
-/** گزارش هفتگی — فقط از رویدادهای واقعی ۷ روز اخیر */
+/** گزارش هفتگی، فقط از رویدادهای واقعی ۷ روز اخیر */
 export interface WeeklyReport {
   lessonsCompleted: number
   exercisesPassed: number
@@ -182,7 +182,7 @@ export function buildWeeklyReport(): WeeklyReport {
   }
 }
 
-/** مسیرهای یادگیری — برای تب Paths داشبورد */
+/** مسیرهای یادگیری، برای تب Paths داشبورد */
 export interface PathSummary {
   track: TrackId
   title: string

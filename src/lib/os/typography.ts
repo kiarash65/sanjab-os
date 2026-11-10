@@ -1,7 +1,7 @@
 /* ================================================================
    سیستم تایپوگرافی سان‌جاب‌اواس
    گزینه‌های فونت، پریست‌ها و اعمال تنظیمات روی CSS Variables
-   هیچ Reload لازم نیست — همه‌چیز runtime اعمال می‌شود.
+   هیچ Reload لازم نیست، همه‌چیز runtime اعمال می‌شود.
    ================================================================ */
 
 import type {
@@ -35,7 +35,7 @@ export interface FontMeta {
   label: string
   designer: string
   license: string
-  /** بازه وزن پشتیبانی‌شده — اسلایدر وزن داخل این بازه clamp می‌شود */
+  /** بازه وزن پشتیبانی‌شده، اسلایدر وزن داخل این بازه clamp می‌شود */
   weightMin: number
   weightMax: number
   /** اگر فونت استاتیک است، وزن‌ها به این مقادیر اسنپ می‌کنند */
@@ -51,7 +51,7 @@ export const FONT_OPTIONS: FontMeta[] = [
     license: 'SIL OFL 1.1',
     weightMin: 100,
     weightMax: 900,
-    note: 'فونت پیشنهادی برای متن‌های آموزشی و مطالعه طولانی — فونت متغیر با همه وزن‌ها',
+    note: 'فونت پیشنهادی برای متن‌های آموزشی و مطالعه طولانی، فونت متغیر با همه وزن‌ها',
   },
   {
     key: 'vazirmatn',
@@ -60,7 +60,7 @@ export const FONT_OPTIONS: FontMeta[] = [
     license: 'SIL OFL 1.1',
     weightMin: 100,
     weightMax: 900,
-    note: 'فونت عمومی و محبوب وب فارسی — فونت متغیر، مناسب متن و رابط',
+    note: 'فونت عمومی و محبوب وب فارسی، فونت متغیر، مناسب متن و رابط',
   },
   {
     key: 'vazirmatn-ui',
@@ -70,7 +70,7 @@ export const FONT_OPTIONS: FontMeta[] = [
     weightMin: 400,
     weightMax: 900,
     weightSnap: [400, 500, 700, 900],
-    note: 'نسخه مخصوص رابط کاربری — هماهنگی بهتر ارتفاع حروف در کنار متن انگلیسی',
+    note: 'نسخه مخصوص رابط کاربری، هماهنگی بهتر ارتفاع حروف در کنار متن انگلیسی',
   },
   {
     key: 'system',
@@ -79,7 +79,7 @@ export const FONT_OPTIONS: FontMeta[] = [
     license: 'متغیر (به دستگاه کاربر بستگی دارد)',
     weightMin: 300,
     weightMax: 800,
-    note: 'فونت خود دستگاه — سریع‌ترین حالت، بدون دانلود',
+    note: 'فونت خود دستگاه، سریع‌ترین حالت، بدون دانلود',
   },
 ]
 
@@ -91,7 +91,7 @@ export const CODE_FONT_OPTIONS: {
   {
     key: 'jetbrains',
     label: 'JetBrains Mono',
-    note: 'مونوی حرفه‌ای با ارقام قابل‌تشخیص — باندل محلی، مجوز OFL',
+    note: 'مونوی حرفه‌ای با ارقام قابل‌تشخیص، باندل محلی، مجوز OFL',
   },
   {
     key: 'system',
@@ -172,7 +172,7 @@ export function applyTypography(s: OSSettings): void {
   st.fontSize = `${uiPx}px`
 }
 
-/** گزارش وضعیت بارگذاری فونت‌ها — برای Developer Mode */
+/** گزارش وضعیت بارگذاری فونت‌ها، برای Developer Mode */
 export function fontStatusReport(): { family: string; loaded: boolean }[] {
   if (typeof document === 'undefined' || !('fonts' in document)) return []
   return [

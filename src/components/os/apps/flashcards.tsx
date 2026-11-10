@@ -275,7 +275,7 @@ function ReviewPanel({ catId, cards, boxes, session, lifetime, onStart, onFlip, 
             این جلسه: {toFa(session.reviewed)} مرور · دقت {toFa(accuracy)}٪
           </p>
           <p className="mt-1 text-[11px] text-zinc-500">
-            مجموع مرورهای همهٔ زمان‌ها: {toFa(lifetime.reviewed)} — این آمار رو هیچ‌جا آپلود نمی‌شه، وعده!
+            مجموع مرورهای همهٔ زمان‌ها: {toFa(lifetime.reviewed)}، این آمار رو هیچ‌جا آپلود نمی‌شه، وعده!
           </p>
           <Button
             onClick={() => onStart(catId)}
@@ -421,13 +421,13 @@ function PersonalManager({ cards, boxes, onAdd, onDelete }: PersonalManagerProps
       <Input
         value={front}
         onChange={(e) => setFront(e.target.value)}
-        placeholder="روی کارت — مثلاً: دستور chmod چه‌کار می‌کنه؟"
+        placeholder="روی کارت، مثلاً: دستور chmod چه‌کار می‌کنه؟"
         className="border-white/10 bg-zinc-950/60 text-sm text-zinc-100 placeholder:text-zinc-600"
       />
       <Textarea
         value={back}
         onChange={(e) => setBack(e.target.value)}
-        placeholder="پشت کارت — جواب کوتاه و مفید"
+        placeholder="پشت کارت، جواب کوتاه و مفید"
         rows={2}
         className="mt-2 resize-none border-white/10 bg-zinc-950/60 text-sm text-zinc-100 placeholder:text-zinc-600"
       />

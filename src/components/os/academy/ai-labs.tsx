@@ -1,11 +1,11 @@
 'use client'
 
 /* ==================================================================
-   آکادمی هوش مصنوعی — آزمایشگاه‌های تعاملی (SanjabOS)
+   آکادمی هوش مصنوعی، آزمایشگاه‌های تعاملی (SanjabOS)
    سه آزمایشگاه خودکفا: TokenizerLab (BPE واقعی روی پیکرهٔ دوزبانه) ·
    AttentionLab (خودتوجهی مقیاس‌شده با اعداد واقعی) · RagLab (بازیابی-
    تولید روی ۶ سند اسباب‌بازی). بدون وابستگی به ai-academy؛ همهٔ
-   محاسبات محلی و قطعی (deterministic) است — بدون سرور.
+   محاسبات محلی و قطعی (deterministic) است، بدون سرور.
    با اسپانسری سان‌جاب
    ================================================================== */
 
@@ -25,7 +25,7 @@ import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 
 /* ================================================================
-   پالت و ابزارهای پایه (فقط رنگ‌های مجاز — آبی/ایندیگو ممنوع)
+   پالت و ابزارهای پایه (فقط رنگ‌های مجاز، آبی/ایندیگو ممنوع)
    ================================================================ */
 
 const AMBER = '#f59e0b'
@@ -73,7 +73,7 @@ function contentTokens(input: string): string[] {
   return tokenizeFa(input).filter((t) => t.length > 1 && !FA_STOPWORDS.has(t))
 }
 
-/** مولد اعداد شبه‌تصادفی دانه‌دار (mulberry32) — خروجی کاملاً قطعی */
+/** مولد اعداد شبه‌تصادفی دانه‌دار (mulberry32)، خروجی کاملاً قطعی */
 function mulberry32(seed: number): () => number {
   let a = seed >>> 0
   return () => {
@@ -119,7 +119,7 @@ function LabCode({ children }: { children: ReactNode }) {
   )
 }
 
-/** برچسب صداقت آموزشی — الزام هر آزمایشگاه */
+/** برچسب صداقت آموزشی، الزام هر آزمایشگاه */
 function HonestyNote({ children }: { children?: ReactNode }) {
   return (
     <div className="mt-3 space-y-1 rounded-xl border border-dashed border-amber-400/30 bg-amber-400/5 p-2.5 text-[10px] leading-5 text-amber-200/85">
@@ -159,7 +159,7 @@ function MiniBar({ pct, color, reduce }: { pct: number; color: string; reduce: b
 }
 
 /* ================================================================
-   آزمایشگاه ۱ — توکنایزر BPE (Byte-Pair Encoding)
+   آزمایشگاه ۱، توکنایزر BPE (Byte-Pair Encoding)
    یادگیری ادغام‌ها روی پیکرهٔ کوچک دوزبانه؛ اعمال قدم‌به‌قدم روی جملهٔ شما
    ================================================================ */
 
@@ -355,7 +355,7 @@ export function TokenizerLab() {
           <ol className="list-inside list-decimal space-y-0.5 text-[10.5px] leading-5 text-zinc-300">
             <li>جمله اول به «واژه» و هر واژه به «نویسه» شکسته می‌شود.</li>
             <li>در کل پیکره، پرتکرارترین جفتِ توکنِ کنارِ هم پیدا و در یک توکن جدید ادغام می‌شود؛ این مرحله بارها تکرار می‌شود.</li>
-            <li>واژه‌نامه = نویسه‌های پایه + توکن‌های ادغامی. GPT هم همین را — در مقیاس میلیاردی — انجام می‌دهد.</li>
+            <li>واژه‌نامه = نویسه‌های پایه + توکن‌های ادغامی. GPT هم همین را، در مقیاس میلیاردی، انجام می‌دهد.</li>
           </ol>
         </div>
 
@@ -389,7 +389,7 @@ export function TokenizerLab() {
           />
           <p className="mt-1.5 text-[9.5px] leading-4 text-zinc-500">
             الفبای پایهٔ پیکره: {fa(baseChars.length)} نویسه · سقف ادغام: {fa(BPE_MAX_MERGES)} · ادغام مجاز فعلی:{' '}
-            <b className="text-amber-300">{fa(maxMerges)}</b> — واژه‌نامه = پایه + ادغام‌ها.
+            <b className="text-amber-300">{fa(maxMerges)}</b>، واژه‌نامه = پایه + ادغام‌ها.
           </p>
           {maxMerges === 0 && (
             <p className="mt-1 text-[9.5px] text-rose-300">
@@ -438,7 +438,7 @@ export function TokenizerLab() {
           {!started ? (
             <p className="text-[10.5px] text-zinc-500">دکمهٔ «اجرا» را بزن تا جمله به نویسه‌ها شکسته شود.</p>
           ) : initWords.length === 0 ? (
-            <p className="text-[10.5px] text-rose-300">متنی برای توکنایز پیدا نشد — جمله‌ای بنویس و اجرا کن.</p>
+            <p className="text-[10.5px] text-rose-300">متنی برای توکنایز پیدا نشد، جمله‌ای بنویس و اجرا کن.</p>
           ) : (
             <div className="flex flex-wrap items-start gap-2">
               {words.map((w, wi) => (
@@ -478,9 +478,9 @@ export function TokenizerLab() {
         {/* خط توضیح گام */}
         <div className="mt-2 rounded-xl border border-amber-400/20 bg-amber-400/5 p-2.5 text-[10.5px] leading-5 text-amber-100/90">
           {!started ? (
-            <p>اول «اجرا»، بعد «گام بعد» — هر گام پرتکرارترین جفت را در پیکره پیدا و همه‌جا ادغام می‌کند.</p>
+            <p>اول «اجرا»، بعد «گام بعد»، هر گام پرتکرارترین جفت را در پیکره پیدا و همه‌جا ادغام می‌کند.</p>
           ) : finished && merges.length === 0 ? (
-            <p>با این اندازهٔ واژه‌نامه ادغامی مجاز نیست — اسلایدر را بالاتر ببر.</p>
+            <p>با این اندازهٔ واژه‌نامه ادغامی مجاز نیست، اسلایدر را بالاتر ببر.</p>
           ) : finished ? (
             <p>
               تمام {fa(merges.length)} ادغامِ مجاز انجام شد. واژه‌نامه نهایی:{' '}
@@ -490,16 +490,16 @@ export function TokenizerLab() {
             lastInfo.hadEffect ? (
               <p>
                 ادغام شماره {fa(step)}: جفت «{lastMerge.a} + {lastMerge.b}» با بسامد {fa(lastMerge.freq)} در پیکره، به
-                توکن «{lastMerge.token}» تبدیل شد — در جملهٔ تو هم {fa(lastInfo.affected)} جایگاه ادغام شد.
+                توکن «{lastMerge.token}» تبدیل شد، در جملهٔ تو هم {fa(lastInfo.affected)} جایگاه ادغام شد.
               </p>
             ) : (
               <p>
                 ادغام شماره {fa(step)}: جفت «{lastMerge.a} + {lastMerge.b}» ({fa(lastMerge.freq)} بار در پیکره) فقط
-                واژه‌نامه را می‌سازد — این جفت در جملهٔ تو نبود.
+                واژه‌نامه را می‌سازد، این جفت در جملهٔ تو نبود.
               </p>
             )
           ) : (
-            <p>توالی فعلی همان نویسه‌های اولیه است — «گام بعد» را بزن.</p>
+            <p>توالی فعلی همان نویسه‌های اولیه است، «گام بعد» را بزن.</p>
           )}
         </div>
 
@@ -538,7 +538,7 @@ export function TokenizerLab() {
                 {step === 0 && (
                   <tr>
                     <td colSpan={5} className="p-3 text-center text-[10px] text-zinc-600">
-                      هنوز ادغامی اعمال نشده — ستون‌ها با هر «گام بعد» پر می‌شوند.
+                      هنوز ادغامی اعمال نشده، ستون‌ها با هر «گام بعد» پر می‌شوند.
                     </td>
                   </tr>
                 )}
@@ -567,7 +567,7 @@ export function TokenizerLab() {
 }
 
 /* ================================================================
-   آزمایشگاه ۲ — خودتوجهی (Self-Attention)
+   آزمایشگاه ۲، خودتوجهی (Self-Attention)
    توجه مقیاس‌شدهٔ واقعی روی ۶ توکن فارسی با بردارهای ثابت ۸بعدی
    ================================================================ */
 
@@ -576,16 +576,16 @@ const ATTN_DK = 8
 
 /**
  * بردارهای تعبیه: ترکیب «مؤلفه معنایی ثابت» (اسم‌ها/فعل/نقش‌نما/حرف اضافه)
- * + «نویز شبه‌تصادفی دانه‌دار» — کاملاً قطعی و تکرارپذیر.
+ * + «نویز شبه‌تصادفی دانه‌دار»، کاملاً قطعی و تکرارپذیر.
  */
 function buildAttentionEmbeddings(): number[][] {
   const groups: number[][] = [
-    [0, 1], // پسر — اسم
-    [0, 1], // توپ — اسم
-    [4, 5], // را — نقش‌نمای مفعول
-    [6, 7], // به — حرف اضافه
-    [0, 1], // دروازه‌بان — اسم
-    [2, 3], // داد — فعل
+    [0, 1], // پسر، اسم
+    [0, 1], // توپ، اسم
+    [4, 5], // را، نقش‌نمای مفعول
+    [6, 7], // به، حرف اضافه
+    [0, 1], // دروازه‌بان، اسم
+    [2, 3], // داد، فعل
   ]
   const lean: Array<Record<number, number>> = [
     {},
@@ -691,7 +691,7 @@ export function AttentionLab() {
         <LabHeader icon={Network} tint={PURPLE} title="آزمایشگاه خودتوجهی" en="Self-Attention · Scaled Dot-Product" />
 
         <p className="text-[10.5px] leading-5 text-zinc-300">
-          جملهٔ نمونه: <b className="text-zinc-100">پسر توپ را به دروازه‌بان داد</b> — هر توکن یک بردار ثابت ۸بعدی دارد.
+          جملهٔ نمونه: <b className="text-zinc-100">پسر توپ را به دروازه‌بان داد</b>، هر توکن یک بردار ثابت ۸بعدی دارد.
           امتیاز توجه = حاصل‌ضرب داخلی دو بردار تقسیم بر √۸، بعد softmax سطر به سطر:
         </p>
         <div className="mt-1.5 flex flex-wrap gap-1.5">
@@ -804,7 +804,7 @@ export function AttentionLab() {
         {/* اسلایدر دما */}
         <div className="mt-2.5 rounded-xl border border-white/10 bg-black/25 p-2.5">
           <div className="mb-1 flex items-center justify-between text-[10px] text-zinc-400">
-            <span>دما (Temperature) — دمای پایین = تمرکز بیشتر</span>
+            <span>دما (Temperature)، دمای پایین = تمرکز بیشتر</span>
             <span dir="ltr" className="font-mono text-zinc-200">
               {fa(+temp.toFixed(1))}
             </span>
@@ -883,7 +883,7 @@ export function AttentionLab() {
 }
 
 /* ================================================================
-   آزمایشگاه ۳ — بازیابی-تولید (RAG)
+   آزمایشگاه ۳، بازیابی-تولید (RAG)
    شباهت کسینوسی روی ۶ سند اسباب‌بازی محصول خیالی «سان‌جاب‌پلاس»
    ================================================================ */
 
@@ -916,7 +916,7 @@ const RAG_EVAL: Array<{ q: string; target: string }> = [
   { q: 'اطلاعات من کجا ذخیره می‌شود؟', target: 'd6' },
 ]
 
-/** پاسخ‌های غلطِ قاطعِ «مدل بی‌سند» — برای نمایش هالوسینیشن */
+/** پاسخ‌های غلطِ قاطعِ «مدل بی‌سند»، برای نمایش هالوسینیشن */
 const RAG_HALLUCINATIONS: Array<{ keys: string[]; text: string }> = [
   { keys: ['قیمت', 'هزینه', 'تومان', 'پلن', 'تعرفه'], text: 'سان‌جاب‌پلاس فقط ۹۹ هزار تومان در ماه هزینه دارد و پلن سازمانی همیشه رایگان است!' },
   { keys: ['گارانتی', 'بازگشت'], text: 'سان‌جاب‌پلاس هیچ گارانتی یا بازگشت وجه‌ای ندارد؛ بعد از خرید همه‌چیز نهایی است.' },
@@ -1128,7 +1128,7 @@ export function RagLab() {
         {/* اسلایدر بخش‌بندی */}
         <div className="mt-2.5 rounded-xl border border-white/10 bg-black/25 p-2.5">
           <div className="mb-1 flex items-center justify-between text-[10px] text-zinc-400">
-            <span>بخش‌بندی اسناد (chunking) — هر سند به چند بخش؟</span>
+            <span>بخش‌بندی اسناد (chunking)، هر سند به چند بخش؟</span>
             <span dir="ltr" className="font-mono text-zinc-200">
               {fa(perDoc)}
             </span>
@@ -1144,7 +1144,7 @@ export function RagLab() {
           <div className="os-scroll max-h-72 space-y-1.5 overflow-y-auto pe-1">
             {ranked.every((r) => r.score === 0) ? (
               <p className="p-3 text-center text-[10px] text-zinc-500">
-                هیچ سندی با این پرسش هم‌پوشانی ندارد — کلمات کلیدی مثل «قیمت» یا «گارانتی» را امتحان کن.
+                هیچ سندی با این پرسش هم‌پوشانی ندارد، کلمات کلیدی مثل «قیمت» یا «گارانتی» را امتحان کن.
               </p>
             ) : (
               ranked
@@ -1209,7 +1209,7 @@ export function RagLab() {
             />
           </div>
           <p className="mt-1.5 text-[9.5px] leading-4 text-zinc-400">
-            با تغییر اسلایدر بخش‌بندی دقت عوض می‌شود: بخش‌های ریزتر سیگنال را متمرکزتر می‌کنند اما ممکن است زمینهٔ جمله از دست برود — دقت را مقایسه کن.
+            با تغییر اسلایدر بخش‌بندی دقت عوض می‌شود: بخش‌های ریزتر سیگنال را متمرکزتر می‌کنند اما ممکن است زمینهٔ جمله از دست برود، دقت را مقایسه کن.
           </p>
         </div>
       </LabCard>
@@ -1241,7 +1241,7 @@ export function RagLab() {
           >
             <div className="flex items-center gap-1.5 text-[10.5px] font-black text-rose-200">
               <AlertTriangle size={13} aria-hidden />
-              پاسخ «مدل بی‌سند» — بدون بازیابی
+              پاسخ «مدل بی‌سند»، بدون بازیابی
             </div>
             <p className="mt-1.5 text-[11.5px] leading-6 text-zinc-100">
               {hallucination ?? 'متأسفم، در این زمینه اطلاعاتی ندارم. (مدل واقعی ممکن است به‌جای سکوت، پاسخی اشتباه بسازد!)'}
@@ -1277,12 +1277,12 @@ export function RagLab() {
               </ol>
               <p className="mt-2 text-[9.5px] leading-4 text-emerald-200/70">
                 این پاسخ «استخراجی» است: جمله‌ها عیناً از اسناد کپی شده‌اند. یک LLM واقعی به‌جای کپی، پاسخ را با زبان
-                خودش بازنویسی و ترکیب می‌کند — و همان‌جاست که ممکن است خطا کند.
+                خودش بازنویسی و ترکیب می‌کند، و همان‌جاست که ممکن است خطا کند.
               </p>
             </motion.div>
           ) : (
             <p className="mt-2.5 text-[10.5px] text-zinc-500">
-              چیزی برای استخراج پیدا نشد — اول یک پرسش با هم‌پوشانی انتخاب کن.
+              چیزی برای استخراج پیدا نشد، اول یک پرسش با هم‌پوشانی انتخاب کن.
             </p>
           )
         ) : (

@@ -66,7 +66,7 @@ export function downloadSettings(): boolean {
 
 type AnySetter = (key: keyof OSSettings, value: unknown) => void
 
-/** تنظیمات فایل را اعتبارسنجی و روی store اعمال می‌کند — بدون بارگذاری دوباره */
+/** تنظیمات فایل را اعتبارسنجی و روی store اعمال می‌کند، بدون بارگذاری دوباره */
 export function importSettingsFromString(json: string): { ok: boolean; count: number; error?: string } {
   let file: SettingsFile
   try {
@@ -153,14 +153,14 @@ export async function importProgressFromFile(file: File) {
   return importProgressFromString(text)
 }
 
-/** حذف فقط داده‌های یادگیری — تنظیمات دست‌نخورده می‌مانند */
+/** حذف فقط داده‌های یادگیری، تنظیمات دست‌نخورده می‌مانند */
 export function resetLearningData(): number {
   const keys = learningKeys()
   keys.forEach((k) => localStorage.removeItem(k))
   return keys.length
 }
 
-/** بازنشانی تنظیمات به پیش‌فرض — داده‌های یادگیری دست‌نخورده */
+/** بازنشانی تنظیمات به پیش‌فرض، داده‌های یادگیری دست‌نخورده */
 export function resetAllSettings(): void {
   const setSetting = useOS.getState().setSetting as unknown as AnySetter
   const d = DEFAULT_SETTINGS

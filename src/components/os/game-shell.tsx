@@ -174,7 +174,7 @@ export function useBestScore(
         } catch {
           /* ignore */
         }
-        // ارسال خودکار رکورد جهانی — فقط وقتی رکورد محلی شکسته شود
+        // ارسال خودکار رکورد جهانی، فقط وقتی رکورد محلی شکسته شود
         if (nb > b && nb > 0 && submittedRef.current !== nb) {
           submittedRef.current = nb
           const name = (getPlayerName() || 'پنگوئن بی‌نام').slice(0, 24)

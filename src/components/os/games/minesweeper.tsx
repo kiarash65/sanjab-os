@@ -19,7 +19,7 @@ interface Cell {
 
 type Status = 'idle' | 'playing' | 'won' | 'lost'
 
-// Number colors — no blue allowed in پنگوئن‌اواس 🐧
+// Number colors، no blue allowed in پنگوئن‌اواس 🐧
 const NUMBER_COLORS: Record<number, string> = {
   1: 'text-emerald-400',
   2: 'text-amber-300',
@@ -131,7 +131,7 @@ export default function MinesweeperGame() {
     } else if (status === 'lost') {
       useOS.getState().pushToast({
         title: '💥 بوووم!',
-        body: 'مین ۱ — شما ۰. دفعه بعد از مسیر امن برو!',
+        body: 'مین ۱، شما ۰. دفعه بعد از مسیر امن برو!',
         icon: '💣',
       })
     }
@@ -274,7 +274,7 @@ export default function MinesweeperGame() {
       <Overlay
         show={status === 'won' || status === 'lost'}
         emoji={status === 'won' ? '🎉' : '💣'}
-        title={status === 'won' ? 'بردی! همه مین‌ها رو دور زدی' : 'بوووم! شدی مined!'}
+        title={status === 'won' ? 'بردی! همه مین‌ها رو دور زدی' : 'بوووم! مین‌زده شدی!'}
         subtitle={
           status === 'won'
             ? `در ${fa(seconds)} ثانیه زمین رو ایمن کردی 🚩`

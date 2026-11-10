@@ -1,7 +1,7 @@
 'use client'
 
 /* ------------------------------------------------------------------ */
-/* «دانلود و به‌روزرسانی» — انتشارهای گیت‌هاب، مقایسهٔ نسخه، فایل‌ها     */
+/* «دانلود و به‌روزرسانی»، انتشارهای گیت‌هاب، مقایسهٔ نسخه، فایل‌ها     */
 /* همهٔ درخواست‌ها سمت کلاینت؛ با تایم‌اوت ۱۰ ثانیه و حافظهٔ نهان ۱۰ دقیقه‌ای */
 /* ------------------------------------------------------------------ */
 
@@ -33,7 +33,7 @@ import { BRAND } from '@/lib/os/brand'
 
 /* ------------------------------- انواع ------------------------------- */
 
-/** دارایی یک انتشار — نگاشت دقیق به پاسخ GitHub Releases API */
+/** دارایی یک انتشار، نگاشت دقیق به پاسخ GitHub Releases API */
 interface GhAsset {
   name: string
   size: number
@@ -42,7 +42,7 @@ interface GhAsset {
   download_count?: number
 }
 
-/** یک انتشار (release) — نگاشت دقیق به پاسخ GitHub Releases API */
+/** یک انتشار (release)، نگاشت دقیق به پاسخ GitHub Releases API */
 interface GhRelease {
   id: number
   tag_name: string
@@ -88,7 +88,7 @@ const faDate = (iso: string | null): string => {
   }
 }
 
-/** حجم انسانی — مگابایت/کیلوبایت با ارقام فارسی */
+/** حجم انسانی، مگابایت/کیلوبایت با ارقام فارسی */
 const humanSize = (bytes: number): string => {
   if (!Number.isFinite(bytes) || bytes <= 0) return '—'
   const mb = bytes / 1048576
@@ -96,7 +96,7 @@ const humanSize = (bytes: number): string => {
   return `${(bytes / 1024).toLocaleString('fa-IR', { maximumFractionDigits: 0 })} کیلوبایت`
 }
 
-/** نگاشت محافظه‌کارانهٔ پاسخ ناشناخته به GhRelease — بدون any */
+/** نگاشت محافظه‌کارانهٔ پاسخ ناشناخته به GhRelease، بدون any */
 function isGhRelease(v: unknown): v is GhRelease {
   if (typeof v !== 'object' || v === null) return false
   const r = v as Record<string, unknown>
@@ -135,7 +135,7 @@ function saveCache(data: GhRelease[]): void {
     const payload: ReleasesCache = { t: Date.now(), data }
     localStorage.setItem(CACHE_KEY, JSON.stringify(payload))
   } catch {
-    /* حافظه پر یا غیرفعال — مهم نیست */
+    /* حافظه پر یا غیرفعال، مهم نیست */
   }
 }
 
@@ -156,7 +156,7 @@ function compareVersions(a: number[], b: number[]): number {
   return 0
 }
 
-/** برچسب نوع فایل بر اساس نام واقعی دارایی — بدون حدس */
+/** برچسب نوع فایل بر اساس نام واقعی دارایی، بدون حدس */
 function assetType(name: string): { label: string; cls: string } | null {
   if (/sha256|checksum/i.test(name))
     return { label: 'چک‌سام', cls: 'border-cyan-400/40 bg-cyan-400/10 text-cyan-300' }
@@ -173,7 +173,7 @@ function assetType(name: string): { label: string; cls: string } | null {
 
 /* --------------------- رندر امن متن انتشار (بدون innerHTML) --------------------- */
 
-/** تبدیل URL ها و `کد`ها به المان‌های امن — هیچ innerHTML ای در کار نیست */
+/** تبدیل URL ها و `کد`ها به المان‌های امن، هیچ innerHTML ای در کار نیست */
 function linkify(text: string): ReactNode[] {
   const parts = text.split(/(https?:\/\/[^\s)"'<>]+|`[^`]+`)/g)
   return parts.map((part, i) => {
@@ -326,13 +326,13 @@ export default function DownloadsApp() {
     return 'unknown' as const
   }, [latest])
 
-  /* دارایی‌های کلیدی نسخهٔ آخر — فقط نام‌های واقعی، بدون حدس */
+  /* دارایی‌های کلیدی نسخهٔ آخر، فقط نام‌های واقعی، بدون حدس */
   const exeAsset = useMemo(() => latest?.assets.find((a) => /\.exe$/i.test(a.name)) ?? null, [latest])
   const zipAsset = useMemo(() => latest?.assets.find((a) => /\.zip$/i.test(a.name)) ?? null, [latest])
   const targzAsset = useMemo(() => latest?.assets.find((a) => /\.tar\.gz$/i.test(a.name)) ?? null, [latest])
   const sumsAsset = useMemo(() => latest?.assets.find((a) => /sha256|checksum/i.test(a.name)) ?? null, [latest])
 
-  /* کپی چک‌سام‌ها — با سقف ۶۴ کیلوبایت */
+  /* کپی چک‌سام‌ها، با سقف ۶۴ کیلوبایت */
   const [ckBusy, setCkBusy] = useState(false)
   const [ckDone, setCkDone] = useState(false)
   const [ckErr, setCkErr] = useState('')
@@ -378,7 +378,7 @@ export default function DownloadsApp() {
               <div className="min-w-0">
                 <h2 className="text-base font-black text-zinc-100">دانلود و به‌روزرسانی</h2>
                 <p className="mt-0.5 text-[10.5px] leading-5 text-zinc-400">
-                  انتشارهای رسمی از مخزن گیت‌هاب — با حافظهٔ نهان محلی ۱۰ دقیقه‌ای
+                  انتشارهای رسمی از مخزن گیت‌هاب، با حافظهٔ نهان محلی ۱۰ دقیقه‌ای
                 </p>
               </div>
               <Button
@@ -406,14 +406,14 @@ export default function DownloadsApp() {
                   {cmp === 'equal' && (
                     <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-400/10 px-2.5 py-1 text-[10.5px] font-black text-emerald-300">
                       <CircleCheck size={12} aria-hidden />
-                      به‌روز هستی — آخرین انتشار: {latest.tag_name}
+                      به‌روز هستی، آخرین انتشار: {latest.tag_name}
                     </span>
                   )}
                   {cmp === 'newer' && (
                     <>
                       <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-400/40 bg-amber-400/10 px-2.5 py-1 text-[10.5px] font-black text-amber-300">
                         <TriangleAlert size={12} aria-hidden />
-                        به‌روزرسانی در دسترس — انتشار: {latest.tag_name}
+                        به‌روزرسانی در دسترس، انتشار: {latest.tag_name}
                       </span>
                       <a
                         href={latest.html_url}
@@ -451,7 +451,7 @@ export default function DownloadsApp() {
             )}
             {status === 'ok' && cacheAt > 0 && (
               <p className="mt-2 text-[10px] text-zinc-500">
-                داده از حافظهٔ نهان محلی (ذخیره: {faDate(new Date(cacheAt).toISOString())}) — تا ۱۰ دقیقه بدون درخواست تازه.
+                داده از حافظهٔ نهان محلی (ذخیره: {faDate(new Date(cacheAt).toISOString())})، تا ۱۰ دقیقه بدون درخواست تازه.
               </p>
             )}
           </header>
@@ -509,7 +509,7 @@ export default function DownloadsApp() {
                       )}
                     </div>
                     <p className="mt-0.5 truncate text-[10.5px] text-zinc-500">
-                      {latest.name ?? 'بدون عنوان'} — انتشار: {faDate(latest.published_at)}
+                      {latest.name ?? 'بدون عنوان'}، انتشار: {faDate(latest.published_at)}
                     </p>
                   </div>
                   <a
@@ -539,7 +539,7 @@ export default function DownloadsApp() {
                   {latest.assets.length === 0 && (
                     <p className="flex items-start gap-1.5 rounded-xl border border-amber-400/30 bg-amber-400/10 p-2.5 text-[10.5px] leading-5 text-amber-200">
                       <Info className="mt-0.5 size-3.5 shrink-0" aria-hidden />
-                      برای این نسخه هنوز فایل ساخته نشده — به‌محض انتشار اینجا دیده می‌شود.
+                      برای این نسخه هنوز فایل ساخته نشده، به‌محض انتشار اینجا دیده می‌شود.
                     </p>
                   )}
 
@@ -587,7 +587,7 @@ export default function DownloadsApp() {
                   {sumsAsset && (
                     <div className="rounded-xl border border-cyan-400/30 bg-cyan-400/10 p-3">
                       <p className="text-[10.5px] leading-5 text-cyan-200">
-                        فایل تأیید صحت پیدا شد: <span dir="ltr" className="font-mono">{sumsAsset.name}</span> —
+                        فایل تأیید صحت پیدا شد: <span dir="ltr" className="font-mono">{sumsAsset.name}</span>،
                         بعد از دانلود، امضای فایل را با آن مقایسه کن.
                       </p>
                       {ckErr && (
@@ -619,12 +619,12 @@ export default function DownloadsApp() {
                     <div className="rounded-xl border border-white/10 bg-zinc-950/60 px-3">
                       <p className="pt-3 text-[10px] font-black text-zinc-400">راهنمای نصب به تفکیک پلتفرم</p>
                       <Accordion type="single" collapsible className="mt-1">
-                        {/* ویندوز — exe */}
+                        {/* ویندوز، exe */}
                         <AccordionItem value="win-exe">
                           <AccordionTrigger className="py-3 text-[11px] font-black text-zinc-200 hover:no-underline">
                             <span className="flex items-center gap-1.5">
                               <FileDown size={12} className="text-rose-300" aria-hidden />
-                              ویندوز — نصاب exe
+                              ویندوز، نصاب exe
                             </span>
                           </AccordionTrigger>
                           <AccordionContent className="pb-4">
@@ -637,23 +637,23 @@ export default function DownloadsApp() {
                                 <li>روی فایل دانلودشده دوبار کلیک کن تا نصاب اجرا شود.</li>
                                 <li>
                                   اگر Windows Smart Screen هشدار داد: روی «More info» بزن و بعد
-                                  «Run anyway» را انتخاب کن — چون نصاب هنوز امضای دیجیتال ندارد.
+                                  «Run anyway» را انتخاب کن، چون نصاب هنوز امضای دیجیتال ندارد.
                                 </li>
                               </ol>
                             ) : (
                               <p className="rounded-lg border border-amber-400/30 bg-amber-400/10 p-2.5 text-[10.5px] leading-5 text-amber-200">
-                                در این نسخه فایل exe یافت نشد — راهنمای ویندوز فعلاً قابل ارائه نیست.
+                                در این نسخه فایل exe یافت نشد، راهنمای ویندوز فعلاً قابل ارائه نیست.
                               </p>
                             )}
                           </AccordionContent>
                         </AccordionItem>
 
-                        {/* ویندوز — zip پرتابل */}
+                        {/* ویندوز، zip پرتابل */}
                         <AccordionItem value="win-zip">
                           <AccordionTrigger className="py-3 text-[11px] font-black text-zinc-200 hover:no-underline">
                             <span className="flex items-center gap-1.5">
                               <FileArchive size={12} className="text-amber-300" aria-hidden />
-                              ویندوز — نسخهٔ پرتابل (بدون نصب)
+                              ویندوز، نسخهٔ پرتابل (بدون نصب)
                             </span>
                           </AccordionTrigger>
                           <AccordionContent className="pb-4">
@@ -663,23 +663,23 @@ export default function DownloadsApp() {
                                   فایل <span dir="ltr" className="font-mono text-amber-200">{zipAsset.name}</span> را
                                   دانلود کن ({humanSize(zipAsset.size)}).
                                 </li>
-                                <li>محتوای آرشیو را در پوشه‌ای دلخواه استخراج کن — نیازی به نصب نیست.</li>
+                                <li>محتوای آرشیو را در پوشه‌ای دلخواه استخراج کن، نیازی به نصب نیست.</li>
                                 <li>فایل اجرای اصلی داخل پوشه را اجرا کن؛ نسخهٔ پرتابل هیچ ردپایی در رجیستری نمی‌گذارد.</li>
                               </ol>
                             ) : (
                               <p className="rounded-lg border border-amber-400/30 bg-amber-400/10 p-2.5 text-[10.5px] leading-5 text-amber-200">
-                                در این نسخه فایل zip یافت نشد — نسخهٔ پرتابل فعلاً منتشر نشده است.
+                                در این نسخه فایل zip یافت نشد، نسخهٔ پرتابل فعلاً منتشر نشده است.
                               </p>
                             )}
                           </AccordionContent>
                         </AccordionItem>
 
-                        {/* لینوکس — tar.gz */}
+                        {/* لینوکس، tar.gz */}
                         <AccordionItem value="linux-targz">
                           <AccordionTrigger className="py-3 text-[11px] font-black text-zinc-200 hover:no-underline">
                             <span className="flex items-center gap-1.5">
                               <HardDrive size={12} className="text-emerald-300" aria-hidden />
-                              لینوکس — بستهٔ tar.gz
+                              لینوکس، بستهٔ tar.gz
                             </span>
                           </AccordionTrigger>
                           <AccordionContent className="pb-4">
@@ -702,7 +702,7 @@ export default function DownloadsApp() {
                               </>
                             ) : (
                               <p className="rounded-lg border border-amber-400/30 bg-amber-400/10 p-2.5 text-[10.5px] leading-5 text-amber-200">
-                                در این نسخه فایل tar.gz یافت نشد — بستهٔ لینوکس فعلاً منتشر نشده است.
+                                در این نسخه فایل tar.gz یافت نشد، بستهٔ لینوکس فعلاً منتشر نشده است.
                                 (روش نصب مستقیم از مخزن، در برنامهٔ «نسخه لینوکس واقعی» توضیح داده شده.)
                               </p>
                             )}
@@ -723,7 +723,7 @@ export default function DownloadsApp() {
                     <div className="min-w-0">
                       <p className="text-[11px] font-black text-emerald-200">نسخهٔ مرورگر: همین سایت</p>
                       <p className="mt-0.5 text-[10.5px] leading-5 text-emerald-200/75">
-                        اگر همین حالا سان‌جاب‌اواس را در مرورگر می‌بینی، نسخهٔ مرورگر را داری —
+                        اگر همین حالا سان‌جاب‌اواس را در مرورگر می‌بینی، نسخهٔ مرورگر را داری،
                         چیزی برای دانلود نیست؛ به‌روزرسانی‌اش با خود سایت انجام می‌شود.
                       </p>
                     </div>
@@ -771,7 +771,7 @@ export default function DownloadsApp() {
         )}
 
         <p className="pb-2 text-center text-[10px] leading-5 text-zinc-600">
-          داده‌ها مستقیم از api.github.com خوانده می‌شود — بدون سرور واسط و بدون هیچ داده‌ای از تو.
+          داده‌ها مستقیم از api.github.com خوانده می‌شود، بدون سرور واسط و بدون هیچ داده‌ای از تو.
         </p>
       </div>
     </div>

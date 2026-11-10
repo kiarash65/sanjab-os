@@ -1,7 +1,7 @@
 'use client'
 
 /* ------------------------------------------------------------------ */
-/* مرکز پیشرفت سان‌جاب — نمایش XP، سطح، استریک، مأموریت روزانه و      */
+/* مرکز پیشرفت سان‌جاب، نمایش XP، سطح، استریک، مأموریت روزانه و      */
 /* دستاوردها. داده‌ها از موتور گیمیفیکیشن مرکزی می‌آیند.              */
 /* ------------------------------------------------------------------ */
 
@@ -55,7 +55,7 @@ export default function ProgressCenterApp() {
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-sm font-black text-zinc-100">
-              سطح {fa(level)} — سنجابکِ در حال رشد
+              سطح {fa(level)}، سنجابکِ در حال رشد
             </p>
             <p className="mt-0.5 text-[11px] text-zinc-400">
               {fa(game.xp)} XP · تا سطح بعد {fa(Math.max(0, nextFloor - game.xp))} XP
@@ -175,7 +175,7 @@ export default function ProgressCenterApp() {
           ))}
           {game.events.length === 0 && (
             <p className="py-3 text-center text-[11px] text-zinc-500">
-              هنوز چیزی اینجاست نشده — برو یه درس بگذران یا یه بازی کن!
+              هنوز چیزی اینجاست نشده، برو یه درس بگذران یا یه بازی کن!
             </p>
           )}
         </div>

@@ -15,7 +15,7 @@ const PHOTOS: Photo[] = [
   {
     src: '/photos/tux-astronaut.png',
     title: 'پنگوئن فضانورد',
-    desc: 'سفر کهکشانی با لباس گرم — مقصد: ماهی‌یخ نپتون',
+    desc: 'سفر کهکشانی با لباس گرم، مقصد: ماهی‌یخ نپتون',
   },
   {
     src: '/photos/penguin-party.png',
@@ -30,7 +30,7 @@ const PHOTOS: Photo[] = [
   {
     src: '/photos/ice-city.png',
     title: 'شهر یخی',
-    desc: 'پایتخت پنگوئن‌ها — جمعیت: ۱۲۴ پنگوئن و ۱ گربه',
+    desc: 'پایتخت پنگوئن‌ها، جمعیت: ۱۲۴ پنگوئن و ۱ گربه',
   },
   {
     src: '/wallpapers/aurora-night.png',
@@ -111,7 +111,7 @@ export default function PhotosApp() {
           {PHOTOS.length.toLocaleString('fa-IR')} عکس
         </span>
         <p className="min-w-0 flex-1 truncate text-left text-[10px] text-zinc-500">
-          روی عکس کلیک کن — می‌تونی هر عکسی رو کاغذدیواری کنی
+          روی عکس کلیک کن، می‌تونی هر عکسی رو کاغذدیواری کنی
         </p>
       </header>
 

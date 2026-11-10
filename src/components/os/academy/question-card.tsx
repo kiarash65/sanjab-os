@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * QuestionCard — کارت سؤال استاندارد آزمون سنجاب‌اواس
+ * QuestionCard، کارت سؤال استاندارد آزمون سنجاب‌اواس
  * همهٔ انواع سؤال بانک را رندر می‌کند: تک‌انتخابی، چندانتخابی، درست/غلط،
  * جای‌خالی، مرتب‌سازی، پیش‌بینی خروجی، یافتن باگ و تکمیل کد.
  * بازخورد چندلایه + سیستم راهنمای مرحله‌ای را پوشش می‌دهد.
@@ -21,7 +21,7 @@ interface Props {
   question: Question
   /** نام مهارت برای بازخورد */
   skillTitle?: string
-  /** بعد از پاسخ — برای ثبت نتیجه */
+  /** بعد از پاسخ، برای ثبت نتیجه */
   onAnswered?: (correct: boolean, hintsUsed: number) => void
   /** سؤال بعدی */
   onNext?: () => void
@@ -274,7 +274,7 @@ export default function QuestionCard({ question, skillTitle, onAnswered, onNext,
           )}
           {graded.skillHint && (
             <p className="mt-1 text-[11px] text-zinc-400">
-              مهارت مرتبط: «{graded.skillHint}» — برای تثبیت، مرور همین مهارت را در تب «مرور» انجام بده.
+              مهارت مرتبط: «{graded.skillHint}»، برای تثبیت، مرور همین مهارت را در تب «مرور» انجام بده.
             </p>
           )}
           {!graded.correct && ratio > 0 && ratio < 1 && (

@@ -1,7 +1,7 @@
 'use client'
 
 /* ================================================================
-   Settings Center — مرکز تنظیمات سان‌جاب‌اواس
+   Settings Center، مرکز تنظیمات سان‌جاب‌اواس
    ۱۲ دسته: ظاهر، تایپوگرافی و مطالعه، دسترس‌پذیری، میزکار، اعلان‌ها،
    یادگیری، هوش مصنوعی، حریم خصوصی، ذخیره‌سازی، میان‌برها،
    توسعه‌دهنده (فقط با Developer Mode) و درباره.
@@ -226,7 +226,7 @@ function Pills<T extends string | number>({
   )
 }
 
-/** دکمه خطرناک دومرحله‌ای — اول کلیک، بعد تأیید */
+/** دکمه خطرناک دومرحله‌ای، اول کلیک، بعد تأیید */
 function ConfirmButton({
   label,
   confirmLabel,
@@ -406,7 +406,7 @@ function TypographySection() {
       </SectionCard>
 
       <SectionCard title="اندازه متن مطالعه" icon={Gauge} tone="#14b8a6">
-        <Row title="اندازه پیش‌فرض" desc="بین ۱۳ تا ۲۲ پیکسل — همهٔ درس‌ها پیروی می‌کنند" stack>
+        <Row title="اندازه پیش‌فرض" desc="بین ۱۳ تا ۲۲ پیکسل، همهٔ درس‌ها پیروی می‌کنند" stack>
           <Pills
             value={settings.fontSize}
             options={sizePresets}
@@ -492,7 +492,7 @@ function TypographySection() {
         </Row>
       </SectionCard>
 
-      <SectionCard title="پیش‌نمایش زنده" icon={Eye} tone="#a855f7" desc="همین الان با تنظیمات فعلی سیستم رندر شده است — تغییر بده و همین‌جا ببین.">
+      <SectionCard title="پیش‌نمایش زنده" icon={Eye} tone="#a855f7" desc="همین الان با تنظیمات فعلی سیستم رندر شده است، تغییر بده و همین‌جا ببین.">
         <TypographyPreview />
       </SectionCard>
 
@@ -599,7 +599,7 @@ function DesktopSection() {
         </Row>
       </SectionCard>
       <SectionCard title="آیکن‌های میزکار" icon={MonitorPlay} tone="#14b8a6">
-        <Row title="به‌هم‌ریختن آیکن‌ها" desc="همان‌قدر بامزه که بی‌فایده است — مال خودت">
+        <Row title="به‌هم‌ریختن آیکن‌ها" desc="همان‌قدر بامزه که بی‌فایده است، مال خودت">
           <Button
             size="sm"
             variant="outline"
@@ -675,7 +675,7 @@ function LearningSection() {
           </div>
           <Progress value={pct} aria-label="پیشرفت هدف روزانه" />
           {todayMin !== null && todayMin >= goal && (
-            <p className="mt-2 text-[11px] font-bold text-emerald-300">هدف امروز کامل شد — دستت درد نکند! 🎉</p>
+            <p className="mt-2 text-[11px] font-bold text-emerald-300">هدف امروز کامل شد، دستت درد نکند! 🎉</p>
           )}
         </div>
       </SectionCard>
@@ -688,7 +688,7 @@ function LearningSection() {
         </p>
       </SectionCard>
       <SectionCard title="مربی سنجاب" icon={GraduationCap} tone="#14b8a6" desc="دستیار هوشمند یادگیری با حالت‌های توضیح، سقراطی، سرنخ، دیباگ و آزمون. کلید API هرگز ارسال نمی‌شود و خاموش‌کردن کامل ممکن است.">
-        <Row title="مربی فعال باشد؟" desc="اپ «مربی سنجاب» در منو ظاهر شود — همهٔ بخش‌های آموزشی بدون مربی هم کامل کار می‌کنند">
+        <Row title="مربی فعال باشد؟" desc="اپ «مربی سنجاب» در منو ظاهر شود، همهٔ بخش‌های آموزشی بدون مربی هم کامل کار می‌کنند">
           <Switch checked={settings.coachEnabled} onCheckedChange={(v) => setSetting('coachEnabled', v)} aria-label="فعال بودن مربی سنجاب" />
         </Row>
         <p className="text-[11px] leading-5 text-zinc-500">
@@ -713,7 +713,7 @@ function AiSection() {
 
   return (
     <SectionCard
-      title="هوش‌یار — موتور هوش مصنوعی سان‌جاب‌اواس"
+      title="هوش‌یار، موتور هوش مصنوعی سان‌جاب‌اواس"
       icon={Bot}
       tone="#22c55e"
       desc="هوش‌یار با کلید شخصی خودت کار می‌کند؛ کلید فقط در مرورگر خودت می‌ماند و در پشتیبان‌گیری عمداً کنار گذاشته می‌شود. پریست آمادهٔ GLM (چی‌پو) هم در تنظیمات هوش‌یار هست."
@@ -765,7 +765,7 @@ function PrivacySection() {
 
   return (
     <>
-      <SectionCard title="خروجی و ورودی تنظیمات" icon={Download} tone="#22c55e" desc="تنظیمات (ظاهر، تایپوگرافی، دسترس‌پذیری…) در یک فایل JSON — بدون هیچ دادهٔ خصوصی.">
+      <SectionCard title="خروجی و ورودی تنظیمات" icon={Download} tone="#22c55e" desc="تنظیمات (ظاهر، تایپوگرافی، دسترس‌پذیری…) در یک فایل JSON، بدون هیچ دادهٔ خصوصی.">
         <div className="flex flex-wrap gap-2">
           <Button
             size="sm"
@@ -799,7 +799,7 @@ function PrivacySection() {
               pushToast({
                 icon: res.ok ? '✅' : '❌',
                 title: res.ok ? 'تنظیمات اعمال شد' : 'ورود ناموفق',
-                body: res.ok ? `${res.count} تنظیم برگشت — بدون ری‌استارت` : (res.error ?? 'خطای ناشناخته'),
+                body: res.ok ? `${res.count} تنظیم برگشت، بدون ری‌استارت` : (res.error ?? 'خطای ناشناخته'),
               })
               e.target.value = ''
             }}
@@ -841,7 +841,7 @@ function PrivacySection() {
               pushToast({
                 icon: res.ok ? '✅' : '❌',
                 title: res.ok ? 'بازیابی انجام شد' : 'بازیابی ناموفق',
-                body: res.ok ? `${res.count} کلید برگشت — برای اعمال کامل، سیستم را ری‌استارت کن` : (res.error ?? 'خطای ناشناخته'),
+                body: res.ok ? `${res.count} کلید برگشت، برای اعمال کامل، سیستم را ری‌استارت کن` : (res.error ?? 'خطای ناشناخته'),
               })
               e.target.value = ''
             }}
@@ -857,7 +857,7 @@ function PrivacySection() {
               pushToast({
                 icon: '🎓',
                 title: ok ? 'پیشرفت خروجی گرفت' : 'خروجی ناموفق',
-                body: ok ? 'فقط داده‌های یادگیری — سبک و تمیز' : 'مرورگرت اجازه نداد',
+                body: ok ? 'فقط داده‌های یادگیری، سبک و تمیز' : 'مرورگرت اجازه نداد',
               })
             }}
             className="border-white/15 text-zinc-200 hover:bg-white/10"
@@ -891,7 +891,7 @@ function PrivacySection() {
         </div>
       </SectionCard>
 
-      <SectionCard title="منطقهٔ خطر" icon={Trash2} tone="#f43f5e" desc="بازنشانی ظاهر و تنظیمات، داده‌های آموزشی را پاک نمی‌کند — دو چیز جدا هستند.">
+      <SectionCard title="منطقهٔ خطر" icon={Trash2} tone="#f43f5e" desc="بازنشانی ظاهر و تنظیمات، داده‌های آموزشی را پاک نمی‌کند، دو چیز جدا هستند.">
         <div className="flex flex-wrap gap-2">
           <ConfirmButton
             label="بازنشانی تنظیمات سیستم"
@@ -908,7 +908,7 @@ function PrivacySection() {
             icon={Eraser}
             onConfirm={() => {
               const n = resetLearningData()
-              pushToast({ icon: '🧹', title: 'داده‌های آموزشی پاک شدند', body: `${n} کلید حذف شد — پیشرفت از صفر شروع می‌شود` })
+              pushToast({ icon: '🧹', title: 'داده‌های آموزشی پاک شدند', body: `${n} کلید حذف شد، پیشرفت از صفر شروع می‌شود` })
             }}
           />
           <ConfirmButton
@@ -983,7 +983,7 @@ function StorageSection() {
                 n += keys.length
               }
               sessionStorage.clear()
-              pushToast({ icon: '🧽', title: 'کش‌ها پاک شدند', body: `${n} کش + session — سیستم سبک‌تر شد` })
+              pushToast({ icon: '🧽', title: 'کش‌ها پاک شدند', body: `${n} کش + session، سیستم سبک‌تر شد` })
             } catch {
               pushToast({ icon: '😬', title: 'پاک‌سازی ناموفق', body: 'مرورگرت اجازه نداد' })
             }
@@ -1012,7 +1012,7 @@ const SHORTCUTS: { keys: string; desc: string }[] = [
 
 function ShortcutsSection() {
   return (
-    <SectionCard title="کلیدهای میان‌بر سراسری" icon={Keyboard} tone="#38bdf8" desc="همهٔ میان‌برهای واقعی سیستم — در ترمینال و اپ‌های کدنویسی هم میان‌برهای محلی داریم.">
+    <SectionCard title="کلیدهای میان‌بر سراسری" icon={Keyboard} tone="#38bdf8" desc="همهٔ میان‌برهای واقعی سیستم، در ترمینال و اپ‌های کدنویسی هم میان‌برهای محلی داریم.">
       <div className="overflow-hidden rounded-xl border border-white/10">
         <table className="w-full text-[12px]">
           <thead>
@@ -1201,7 +1201,7 @@ function DeveloperSection() {
         </Row>
       </SectionCard>
 
-      <SectionCard title="وضعیت فونت‌ها" icon={Type} tone="#f7931e" desc="باید همه «بارگذاری شد» باشند — وگرنه فونت جایگزین نمایش داده می‌شود.">
+      <SectionCard title="وضعیت فونت‌ها" icon={Type} tone="#f7931e" desc="باید همه «بارگذاری شد» باشند، وگرنه فونت جایگزین نمایش داده می‌شود.">
         {fonts.map((f) => (
           <Row key={f.family} title={f.family} desc={f.loaded ? 'بارگذاری شد' : 'هنوز بارگذاری نشده'}>
             {f.loaded ? <CheckCircle2 className="size-5 text-emerald-400" aria-label="بارگذاری شد" /> : <XCircle className="size-5 text-amber-400" aria-label="بارگذاری نشده" />}
@@ -1219,7 +1219,7 @@ function DeveloperSection() {
         ))}
       </SectionCard>
 
-      <SectionCard title="محیط اجرا و گزارش فنی" icon={Info} tone="#38bdf8" desc="گزارش برای ارسال به تیم توسعه — کلیدها و داده‌های شخصی داخلش نیستند.">
+      <SectionCard title="محیط اجرا و گزارش فنی" icon={Info} tone="#38bdf8" desc="گزارش برای ارسال به تیم توسعه، کلیدها و داده‌های شخصی داخلش نیستند.">
         <Row title="محیط" desc={env ? `${env.platform ?? '?'} · ${env.language} · ${env.onLine ? 'آنلاین' : 'آفلاین'} · ${env.hardwareConcurrency} هسته` : '—'}>
           <Badge variant="outline" className="border-white/15 text-zinc-300" dir="ltr">
             env
@@ -1257,14 +1257,14 @@ function AboutSection() {
     pushToast({
       icon: Info,
       title: 'تور خوش‌آمدگویی',
-      body: 'تور همین الان از اول شروع می‌شه — برو و یه گشت بزن!',
+      body: 'تور همین الان از اول شروع می‌شه، برو و یه گشت بزن!',
     })
   }
   return (
     <>
       <SectionCard title="سان‌جاب‌اواس" icon={Info} tone="#f7931e">
         <p className="text-[12px] leading-6 text-zinc-300">
-          نسخه <span dir="ltr">{OS_VERSION}</span> — کد‌نام «{OS_CODENAME}»
+          نسخه <span dir="ltr">{OS_VERSION}</span>، کد‌نام «{OS_CODENAME}»
         </p>
         <p className="text-[11.5px] leading-6 text-zinc-400">
           یک سیستم‌عامل کامل و بامزه در مرورگر: ترمینال آموزشی، پایتون، آکادمی‌های لینوکس/راست/هوش مصنوعی/پاورشل، آفیس، بازی و هوش‌یار.
@@ -1294,7 +1294,7 @@ function AboutSection() {
         title="تور خوش‌آمدگویی"
         icon={Sparkles}
         tone="#f7931e"
-        desc="بار اول که سیستم بالا می‌آید، یک تور کوتاه همه‌چیز را نشان می‌دهد — میزکار، منوی شروع، آکادمی و هوش‌یار."
+        desc="بار اول که سیستم بالا می‌آید، یک تور کوتاه همه‌چیز را نشان می‌دهد، میزکار، منوی شروع، آکادمی و هوش‌یار."
       >
         <Row title="دیدن دوبارهٔ تور" desc="راهنمای گشتن در سان‌جاب‌اواس، از اول">
           <Button size="sm" className="h-8 rounded-lg bg-[#f7931e] px-3 text-[11px] font-black text-zinc-950 hover:bg-[#f7931e]/85" onClick={replayTour}>
@@ -1302,7 +1302,7 @@ function AboutSection() {
           </Button>
         </Row>
       </SectionCard>
-      <SectionCard title="اعتبار فونت‌ها" icon={Type} tone="#a855f7" desc="همهٔ فونت‌ها محلی باندل شده‌اند و با مجوز آزاد SIL OFL 1.1 منتشر شده‌اند — جزئیات کامل در public/fonts و docs/TYPOGRAPHY-SETTINGS-UPGRADE.md">
+      <SectionCard title="اعتبار فونت‌ها" icon={Type} tone="#a855f7" desc="همهٔ فونت‌ها محلی باندل شده‌اند و با مجوز آزاد SIL OFL 1.1 منتشر شده‌اند، جزئیات کامل در public/fonts و docs/TYPOGRAPHY-SETTINGS-UPGRADE.md">
         {FONT_OPTIONS.filter((f) => f.key !== 'system').map((f) => (
           <Row key={f.key} title={f.label} desc={`${f.designer} · ${f.license}`}>
             <Badge variant="outline" className="border-white/15 text-zinc-400" dir="ltr">
@@ -1341,7 +1341,7 @@ export default function SettingsApp() {
 
   return (
     <div className="flex h-full min-h-0 w-full" dir="rtl">
-      {/* ریل دسته‌بندی‌ها — در موبایل افقی */}
+      {/* ریل دسته‌بندی‌ها، در موبایل افقی */}
       <nav
         aria-label="دسته‌بندی تنظیمات"
         className="os-scroll flex shrink-0 gap-1 overflow-x-auto border-e border-white/10 bg-zinc-950/60 p-2 max-lg:absolute max-lg:inset-x-0 max-lg:top-0 max-lg:z-20 max-lg:border-b lg:w-52 lg:flex-col lg:overflow-y-auto"
@@ -1383,7 +1383,7 @@ export default function SettingsApp() {
             </span>
             {active.label}
           </h2>
-          <p className="mt-0.5 text-[11px] text-zinc-500">{active.hint} — تغییرات فوری اعمال و ذخیره می‌شوند</p>
+          <p className="mt-0.5 text-[11px] text-zinc-500">{active.hint}، تغییرات فوری اعمال و ذخیره می‌شوند</p>
         </header>
         <div className="space-y-3 pb-6">
           {cat === 'appearance' && <AppearanceSection />}

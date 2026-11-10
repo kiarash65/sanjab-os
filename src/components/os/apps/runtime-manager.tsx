@@ -1,7 +1,7 @@
 'use client'
 
 /* ------------------------------------------------------------------ */
-/* «مدیریت اجراکننده‌ها» — فهرست صادقانه موتورهای اجرایی سان‌جاب‌اواس    */
+/* «مدیریت اجراکننده‌ها»، فهرست صادقانه موتورهای اجرایی سان‌جاب‌اواس    */
 /* قاعدهٔ صداقت: هیچ موتور وبی «نیتیو» معرفی نمی‌شود. برچسب‌ها:          */
 /* «مرورگر» / «شبیه‌ساز آموزشی» / «دسکتاپ» / «برنامه‌ریزی‌شده»            */
 /* ------------------------------------------------------------------ */
@@ -42,7 +42,7 @@ import { useGame } from '@/lib/gamification/engine'
 
 /* ------------------------------- انواع ------------------------------- */
 
-/** برچسب نوع موتور — قاعدهٔ صداقت سیستم‌عامل */
+/** برچسب نوع موتور، قاعدهٔ صداقت سیستم‌عامل */
 type RuntimeKind = 'مرورگر' | 'شبیه‌ساز آموزشی' | 'دسکتاپ' | 'برنامه‌ریزی‌شده'
 
 /** وضعیت زندهٔ هر موتور در همین جلسه */
@@ -89,7 +89,7 @@ const STATE_STYLE: Record<RuntimeState, string> = {
 
 const faNum = (n: number): string => n.toLocaleString('fa-IR')
 
-/** اسکلت محو-شدن هنگام ورود به دید — با احترام به reduced-motion */
+/** اسکلت محو-شدن هنگام ورود به دید، با احترام به reduced-motion */
 function FadeIn({ children, className }: { children: ReactNode; className?: string }) {
   const reduce = useReducedMotion()
   return (
@@ -132,7 +132,7 @@ function StatePill({ state }: { state: RuntimeState }) {
   )
 }
 
-/** فهرست توانمندی‌ها و محدودیت‌ها — صادقانه و دوستونه */
+/** فهرست توانمندی‌ها و محدودیت‌ها، صادقانه و دوستونه */
 function CapList({
   title,
   items,
@@ -222,7 +222,7 @@ function RuntimeCard({
 
 /* ---------------------- تشخیص زندهٔ محیط میزبان ---------------------- */
 
-/** خواندن امن شناسه‌های محیط — بدون فرض وجود navigator */
+/** خواندن امن شناسه‌های محیط، بدون فرض وجود navigator */
 function readEnv(): EnvInfo {
   if (typeof navigator === 'undefined') return { webgpu: false, cores: 0, online: true }
   return {
@@ -347,7 +347,7 @@ export default function RuntimeManagerApp() {
           </header>
         </FadeIn>
 
-        {/* ---------------------- ۱) پایتون واقعی — Pyodide ---------------------- */}
+        {/* ---------------------- ۱) پایتون واقعی؛ Pyodide ---------------------- */}
         <FadeIn>
           <PyodideCard />
         </FadeIn>
@@ -357,12 +357,12 @@ export default function RuntimeManagerApp() {
           <MiniPythonCard />
         </FadeIn>
 
-        {/* ---------------------- ۳) لینوکس واقعی — v86 + Alpine ---------------------- */}
+        {/* ---------------------- ۳) لینوکس واقعی، v86 + Alpine ---------------------- */}
         <FadeIn>
           <RealLinuxCard />
         </FadeIn>
 
-        {/* ---------------------- ۴) راست — شبیه‌ساز آموزشی ---------------------- */}
+        {/* ---------------------- ۴) راست، شبیه‌ساز آموزشی ---------------------- */}
         <FadeIn>
           <RustCard />
         </FadeIn>
@@ -378,7 +378,7 @@ export default function RuntimeManagerApp() {
         </FadeIn>
 
         <p className="pb-2 text-center text-[10px] leading-5 text-zinc-600">
-          این فهرست عمداً صادقانه نگه داشته می‌شود — اگر موتوری «شبیه‌ساز» است، همان می‌نویسیم؛
+          این فهرست عمداً صادقانه نگه داشته می‌شود، اگر موتوری «شبیه‌ساز» است، همان می‌نویسیم؛
           اگر «نیتیو» نیست، هرگز ادعای نیتیو بودن نمی‌کنیم.
         </p>
       </div>
@@ -424,11 +424,11 @@ function PyodideCard() {
     }
 
     try {
-      /* بارگیری از CDN پین‌شده — فقط با اقدام صریح کاربر */
+      /* بارگیری از CDN پین‌شده، فقط با اقدام صریح کاربر */
       await runner.ensure((t) => setProgress(t))
       setState('آماده')
 
-      /* دو آزمایش واقعی — خروجی از مسیر onOut می‌آید، نه مقدار بازگشتی */
+      /* دو آزمایش واقعی، خروجی از مسیر onOut می‌آید، نه مقدار بازگشتی */
       const snippets = ['print(2**64)', 'import sys; print(sys.version)']
       const times: number[] = []
       let allOk = true
@@ -441,7 +441,7 @@ function PyodideCard() {
 
       if (allOk) {
         setState('آزمایش شد')
-        /* پاداش گیمیفیکیشن — idempotent است و فقط یک‌بار امتیاز می‌دهد */
+        /* پاداش گیمیفیکیشن، idempotent است و فقط یک‌بار امتیاز می‌دهد */
         useGame.getState().award(
           'runtime:pyodide:quick-test',
           15,
@@ -469,11 +469,11 @@ function PyodideCard() {
     <RuntimeCard
       icon={Terminal}
       gradient="from-amber-400 to-orange-500"
-      name="پایتون واقعی — Pyodide 0.26.4"
-      version="CPython 3.12 کامپایل‌شده به WebAssembly — مفسر کامل پایتون، داخل مرورگر"
+      name="پایتون واقعی؛ Pyodide 0.26.4"
+      version="CPython 3.12 کامپایل‌شده به WebAssembly، مفسر کامل پایتون، داخل مرورگر"
       kind="مرورگر"
       state={state}
-      size="حدود ۱۰ مگابایت از CDN — فقط در نخستین اجرا"
+      size="حدود ۱۰ مگابایت از CDN، فقط در نخستین اجرا"
     >
       <div className="flex flex-wrap gap-4">
         <CapList
@@ -489,7 +489,7 @@ function PyodideCard() {
           title="محدودیت‌ها (صادقانه)"
           tone="limits"
           items={[
-            'بدون نخ‌ها (threads) — محیط WASM تک‌نخه است',
+            'بدون نخ‌ها (threads)، محیط WASM تک‌نخه است',
             'تایم‌اوت ۱۵ ثانیه برای هر اجرا',
             'بارگیری نخست نیاز به اینترنت دارد (حدود ۱۰ مگابایت)',
           ]}
@@ -524,7 +524,7 @@ function PyodideCard() {
         </p>
       )}
 
-      {/* خطای صادقانه — قرمز، بدون پنهان‌کاری */}
+      {/* خطای صادقانه، قرمز، بدون پنهان‌کاری */}
       {error && (
         <div
           role="alert"
@@ -535,7 +535,7 @@ function PyodideCard() {
         </div>
       )}
 
-      {/* خروجی واقعی — LTR و مونواسپیس */}
+      {/* خروجی واقعی؛ LTR و مونواسپیس */}
       {lines.length > 0 && (
         <div className="overflow-hidden rounded-xl border border-white/10 bg-black/60">
           <div className="flex items-center gap-2 border-b border-white/10 bg-zinc-900/80 px-3 py-1.5">
@@ -576,14 +576,14 @@ function MiniPythonCard() {
       icon={GraduationCap}
       gradient="from-emerald-400 to-cyan-500"
       name="پایتون مینی (آفلاین)"
-      version="مفسر زیرمجموعهٔ آموزشی — کاملاً داخلی، بدون هیچ بارگیری"
+      version="مفسر زیرمجموعهٔ آموزشی، کاملاً داخلی، بدون هیچ بارگیری"
       kind="شبیه‌ساز آموزشی"
       state="آماده"
-      size="چند ده کیلوبایت — جاسازی‌شده در خود سیستم‌عامل"
+      size="چند ده کیلوبایت، جاسازی‌شده در خود سیستم‌عامل"
     >
       <p className="rounded-xl border border-purple-400/25 bg-purple-400/10 p-2.5 text-[10.5px] leading-5 text-purple-200">
-        صداقت با کاربر: این یک <b>زیرمجموعهٔ آموزشی</b> است — همهٔ امکانات CPython را ندارد و جای
-        پایتون واقعی را نمی‌گیرد. برای پایتون کامل و واقعی از کارت «پایتون واقعی — Pyodide» بالا
+        صداقت با کاربر: این یک <b>زیرمجموعهٔ آموزشی</b> است، همهٔ امکانات CPython را ندارد و جای
+        پایتون واقعی را نمی‌گیرد. برای پایتون کامل و واقعی از کارت «پایتون واقعی؛ Pyodide» بالا
         استفاده کن.
       </p>
 
@@ -592,7 +592,7 @@ function MiniPythonCard() {
           title="توانمندی‌ها"
           tone="caps"
           items={[
-            'بدون اینترنت — همیشه و همه‌جا در دسترس',
+            'بدون اینترنت، همیشه و همه‌جا در دسترس',
             'شاخهٔ کوچکی از سینتکس پایتون برای یادگیری مفاهیم پایه',
             'اجرای فوری بدون هیچ بارگیری',
           ]}
@@ -617,7 +617,7 @@ function MiniPythonCard() {
           <p className="mt-2 rounded-xl border border-white/10 bg-zinc-950/60 p-3 text-[10.5px] leading-5 text-zinc-400">
             هدف این مفسر، آموزش گام‌به‌گام مفاهیم پایتون داخل آکادمی است: متغیر، شرط، حلقه و
             تابع. اگر به کلاس، وراثت یا کتابخانه‌های واقعی نیاز داری، همان‌طور که بالای کارت
-            نوشتیم، مسیر درست «پایتون واقعی — Pyodide» است — نه این مفسر کوچک.
+            نوشتیم، مسیر درست «پایتون واقعی؛ Pyodide» است، نه این مفسر کوچک.
           </p>
         )}
       </div>
@@ -637,7 +637,7 @@ function RealLinuxCard() {
     pushToast({
       icon: Cpu,
       title: 'لینوکس واقعی در حال باز شدن',
-      body: 'پنجرهٔ «بوت کرنل واقعی» باز شد — نخستین بوت ممکن است کمی طول بکشد.',
+      body: 'پنجرهٔ «بوت کرنل واقعی» باز شد، نخستین بوت ممکن است کمی طول بکشد.',
     })
   }, [pushToast])
 
@@ -645,19 +645,19 @@ function RealLinuxCard() {
     <RuntimeCard
       icon={Cpu}
       gradient="from-orange-400 to-rose-500"
-      name="لینوکس واقعی — v86 + Alpine"
-      version="کرنل 6.12.114-virt — Alpine 3.21.9 — ماشین مجازی کامل داخل مرورگر"
+      name="لینوکس واقعی، v86 + Alpine"
+      version="کرنل 6.12.114-virt؛ Alpine 3.21.9، ماشین مجازی کامل داخل مرورگر"
       kind="مرورگر"
       state="آماده"
-      size="حدود ۶۰ مگابایت — دارایی‌های محلی، بدون بارگیری از اینترنت"
+      size="حدود ۶۰ مگابایت، دارایی‌های محلی، بدون بارگیری از اینترنت"
     >
       <div className="flex flex-wrap gap-4">
         <CapList
           title="توانمندی‌ها"
           tone="caps"
           items={[
-            'کرنل لینوکس واقعی که واقعاً بوت می‌شود — نه شبیه‌سازی دستوری',
-            'ذخیرهٔ Snapshot در IndexedDB — ادامه از همان‌جا که رها کردی',
+            'کرنل لینوکس واقعی که واقعاً بوت می‌شود، نه شبیه‌سازی دستوری',
+            'ذخیرهٔ Snapshot در IndexedDB، ادامه از همان‌جا که رها کردی',
             'پکیج‌منیجر apk داخل خود لینوکس',
           ]}
         />
@@ -665,8 +665,8 @@ function RealLinuxCard() {
           title="محدودیت‌ها (صادقانه)"
           tone="limits"
           items={[
-            'معماری i686 است، نه x86_64 — بسته‌های ۳۲بیتی',
-            'شتاب‌دهی KVM وجود ندارد — بوت کندتر از ماشین مجازی دسکتاپ',
+            'معماری i686 است، نه x86_64، بسته‌های ۳۲بیتی',
+            'شتاب‌دهی KVM وجود ندارد، بوت کندتر از ماشین مجازی دسکتاپ',
             'شبکه از طریق Relay می‌گذرد و محدودیت‌های خودش را دارد',
           ]}
         />
@@ -696,7 +696,7 @@ function RealLinuxCard() {
         {noteOpen && (
           <p className="mt-2 rounded-xl border border-white/10 bg-zinc-950/60 p-3 text-[10.5px] leading-5 text-zinc-400">
             موتور v86 کد ماشین x86 را در مرورگر با WebAssembly اجرا می‌کند؛ یعنی کرنل واقعی لینوکس
-            روی مجازی‌ساز واقعی بوت می‌شود. این «مرورگر» است نه فلز لخت (bare-metal) — ولی برخلاف
+            روی مجازی‌ساز واقعی بوت می‌شود. این «مرورگر» است نه فلز لخت (bare-metal)، ولی برخلاف
             شبیه‌سازهای آموزشی، اینجا یک کرنل واقعی در حال اجراست.
           </p>
         )}
@@ -705,7 +705,7 @@ function RealLinuxCard() {
   )
 }
 
-/* ------------------ کارت ۴: راست — شبیه‌ساز آموزشی + rustc نیتیو ------------------ */
+/* ------------------ کارت ۴: راست، شبیه‌ساز آموزشی + rustc نیتیو ------------------ */
 
 function RustCard() {
   const [noteOpen, setNoteOpen] = useState(false)
@@ -713,15 +713,15 @@ function RustCard() {
     <RuntimeCard
       icon={Binary}
       gradient="from-rose-400 to-orange-500"
-      name="راست — شبیه‌ساز آموزشی"
-      version="اجرای گام‌به‌گام مفاهیم Rust در آکادمی — نه کامپایلر واقعی rustc"
+      name="راست، شبیه‌ساز آموزشی"
+      version="اجرای گام‌به‌گام مفاهیم Rust در آکادمی، نه کامپایلر واقعی rustc"
       kind="شبیه‌ساز آموزشی"
       state="آماده"
-      size="داخلی — بخشی از آکادمی راست سان‌جاب‌اواس"
+      size="داخلی، بخشی از آکادمی راست سان‌جاب‌اواس"
     >
       <p className="rounded-xl border border-purple-400/25 bg-purple-400/10 p-2.5 text-[10.5px] leading-5 text-purple-200">
         صداقت با کاربر: اینجا کامپایلر rustc یا cargo اجرا نمی‌شود. یک شبیه‌ساز آموزشی است که
-        زیرمجموعهٔ کوچکی از رفتار Rust را برای درس‌ها تقلید می‌کند — مثلاً مفهوم مالکیت (ownership)
+        زیرمجموعهٔ کوچکی از رفتار Rust را برای درس‌ها تقلید می‌کند، مثلاً مفهوم مالکیت (ownership)
         را با مثال‌های از پیش تعریف‌شده نشان می‌دهد.
       </p>
 
@@ -731,7 +731,7 @@ function RustCard() {
           tone="caps"
           items={[
             'تمرین تعاملی مفاهیم پایه: مالکیت، borrow، struct و enum',
-            'بازخورد فوری درون آکادمی — بدون نصب هیچ‌چیز',
+            'بازخورد فوری درون آکادمی، بدون نصب هیچ‌چیز',
           ]}
         />
         <CapList
@@ -753,7 +753,7 @@ function RustCard() {
         {noteOpen && (
           <p className="mt-2 rounded-xl border border-white/10 bg-zinc-950/60 p-3 text-[10.5px] leading-5 text-zinc-400">
             مسیر پیشنهادی ما: مفاهیم را اینجا یاد بگیر، بعد برای کامپایل واقعی، rustc و cargo را
-            روی دسکتاپ نصب کن — پیوند رسمی در نوار نارنجی پایین همین کارت آمده است.
+            روی دسکتاپ نصب کن، پیوند رسمی در نوار نارنجی پایین همین کارت آمده است.
           </p>
         )}
       </div>
@@ -773,7 +773,7 @@ function RustCard() {
           </span>
         </div>
         <p className="mt-1.5 text-[10.5px] leading-5 text-amber-200/80">
-          rustc و cargo هیچ‌وقت داخل مرورگر اجرا نمی‌شوند — فقط روی لینوکس/ویندوز/مک به‌صورت
+          rustc و cargo هیچ‌وقت داخل مرورگر اجرا نمی‌شوند، فقط روی لینوکس/ویندوز/مک به‌صورت
           نیتیو. سان‌جاب‌اواس نسخهٔ مرورگری‌اش را ادعا نمی‌کند.
         </p>
         <div className="mt-2 flex flex-wrap gap-2">
@@ -813,7 +813,7 @@ function LocalAiCard({ webgpu }: { webgpu: boolean }) {
       icon={Brain}
       gradient="from-purple-400 to-rose-500"
       name="هوش مصنوعی محلی (WebLLM/llama.cpp)"
-      version="اجرای مدل‌های زبانی کوچک روی خود دستگاه — بدون ارسال داده به سرور"
+      version="اجرای مدل‌های زبانی کوچک روی خود دستگاه، بدون ارسال داده به سرور"
       kind="برنامه‌ریزی‌شده"
       state="برنامه‌ریزی‌شده"
       size="به‌ازای هر مدل: از حدود ۵۰۰ مگابایت به بالا"
@@ -825,8 +825,8 @@ function LocalAiCard({ webgpu }: { webgpu: boolean }) {
         </p>
         <p className={`text-[11px] font-black ${webgpu ? 'text-emerald-300' : 'text-zinc-500'}`}>
           {webgpu
-            ? 'WebGPU: فعال — دستگاه شما برای اجرای آینده واجد شرایط است.'
-            : 'WebGPU: موجود نیست — وقتی این قابلیت برسد، روی این دستگاه کار نخواهد کرد.'}
+            ? 'WebGPU: فعال، دستگاه شما برای اجرای آینده واجد شرایط است.'
+            : 'WebGPU: موجود نیست، وقتی این قابلیت برسد، روی این دستگاه کار نخواهد کرد.'}
         </p>
       </div>
 
@@ -841,7 +841,7 @@ function LocalAiCard({ webgpu }: { webgpu: boolean }) {
             <span dir="ltr" className="shrink-0 font-mono text-zinc-300">
               {name}
             </span>
-            <span className="font-bold text-zinc-500">{size} — فقط برای اطلاع، قابل دانلود نیست</span>
+            <span className="font-bold text-zinc-500">{size}، فقط برای اطلاع، قابل دانلود نیست</span>
           </div>
         ))}
       </div>
@@ -859,7 +859,7 @@ function LocalAiCard({ webgpu }: { webgpu: boolean }) {
           <TooltipContent>به‌زودی</TooltipContent>
         </Tooltip>
         <p className="mt-2 text-[10px] leading-5 text-zinc-500">
-          وضعیت صادقانه: «برنامه‌ریزی‌شده» — هنوز هیچ مدلی در این نسخه دانلود یا اجرا نمی‌شود.
+          وضعیت صادقانه: «برنامه‌ریزی‌شده»، هنوز هیچ مدلی در این نسخه دانلود یا اجرا نمی‌شود.
         </p>
       </div>
     </RuntimeCard>
@@ -881,7 +881,7 @@ function HostShellCard() {
     >
       <p className="rounded-xl border border-amber-400/25 bg-amber-400/10 p-2.5 text-[10.5px] leading-5 text-amber-200">
         در مرورگر موجود نیست؛ در نسخهٔ دسکتاپ از طریق پل محلی (local bridge) ارائه می‌شود. مرورگرها
-        به دلایل امنیتی اجازهٔ اجرای مستقیم PowerShell یا bash میزبان را نمی‌دهند — و ما این محدودیت
+        به دلایل امنیتی اجازهٔ اجرای مستقیم PowerShell یا bash میزبان را نمی‌دهند، و ما این محدودیت
         را دور نمی‌زنیم و وانمود هم نمی‌کنیم.
       </p>
 

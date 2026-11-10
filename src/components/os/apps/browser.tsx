@@ -1,8 +1,8 @@
 'use client'
 
-/* «سفربُر» — مرورگر چندتبی سان‌جاب‌اواس
+/* «سفربُر»، مرورگر چندتبی سان‌جاب‌اواس
    تب‌ها، جستجوی ویکی‌پدیا (CORS باز)، بوکمارک، تاریخچه و زوم.
-   برخی سایت‌ها اجازهٔ فریم نمی‌دهند (X-Frame-Options) — برای آن‌ها دکمهٔ باز کردن بیرونی داریم. */
+   برخی سایت‌ها اجازهٔ فریم نمی‌دهند (X-Frame-Options)، برای آن‌ها دکمهٔ باز کردن بیرونی داریم. */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -43,14 +43,14 @@ interface WikiResult {
 const TILES: { title: string; desc: string; url: string; color: string; letter: string }[] = [
   {
     title: 'نقشهٔ تهران',
-    desc: 'OpenStreetMap — تعاملی و آزاد',
+    desc: 'OpenStreetMap، تعاملی و آزاد',
     url: 'https://www.openstreetmap.org/export/embed.html?bbox=51.20%2C35.58%2C51.65%2C35.86&layer=mapnik',
     color: '#0ea5a0',
     letter: 'ن',
   },
   {
     title: 'ویکی‌پدیا فارسی',
-    desc: 'دانشنامهٔ آزاد — نسخهٔ موبایل',
+    desc: 'دانشنامهٔ آزاد، نسخهٔ موبایل',
     url: 'https://fa.m.wikipedia.org/wiki/صفحهٔ_اصلی',
     color: '#8b5cf6',
     letter: 'و',
@@ -157,7 +157,7 @@ export default function BrowserApp() {
     setAddr(active?.url ?? '')
     setLoading(false)
     setWikiResults(null)
-    // اگر آدرس عوض شد، فریم دوباره لود می‌شود — وضعیت «سایت رفریم نمی‌شود» ریست
+    // اگر آدرس عوض شد، فریم دوباره لود می‌شود، وضعیت «سایت رفریم نمی‌شود» ریست
     setFrameBlocked(false)
   }, [active?.id, active?.url, active?.key])
 

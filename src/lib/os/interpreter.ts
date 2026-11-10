@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------ */
 /* موتور اجرای زبان‌های آموزشی «سان‌جاب‌او‌اس»                          */
 /* پایتونِ کوچک (mini-python) + زبان سنجابی                            */
-/* بدون وابستگی — کاملاً آفلاین و در مرورگر                            */
+/* بدون وابستگی، کاملاً آفلاین و در مرورگر                            */
 /* ------------------------------------------------------------------ */
 
 export type ScriptLang = 'python' | 'squirrel'
@@ -184,7 +184,7 @@ function lexLine(src: string, line: number, kw: Record<string, string>, allF = f
         buf += c
         i++
       }
-      if (!closed) throw new LangError('رشته بسته نشده — کوتیشن یادت رفته!', line)
+      if (!closed) throw new LangError('رشته بسته نشده، کوتیشن یادت رفته!', line)
       if (buf || parts.length === 0) parts.push(buf)
       raw = ''
       void raw
@@ -759,7 +759,7 @@ class ExprParser {
           }
           e = { k: 'method', obj: e, name: nameTok.v, args, line: t.line }
         } else {
-          // attribute بدون پرانتز — فقط برای math.pi و امثالش
+          // attribute بدون پرانتز، فقط برای math.pi و امثالش
           e = { k: 'method', obj: e, name: `@${nameTok.v}`, args: [], line: t.line }
         }
         continue
@@ -789,7 +789,7 @@ class ExprParser {
       throw new LangError(`«${t.v}» اینجا جاش نیست`, t.line)
     }
     if (t.t === 'ident') {
-      // لیست / دیکشنری؟ — نه، فقط متغیر. لیست با [ شروع می‌شود.
+      // لیست / دیکشنری؟، نه، فقط متغیر. لیست با [ شروع می‌شود.
       return { k: 'var', name: t.v, line: t.line }
     }
     if (t.t === 'op' && t.v === '(') {
@@ -952,7 +952,7 @@ class Runtime {
   tick(line: number) {
     this.steps++
     if (this.steps > MAX_STEPS) {
-      throw new LangError('برنامه زیادی طول کشید — شاید حلقه بی‌نهایت داری؟', line)
+      throw new LangError('برنامه زیادی طول کشید، شاید حلقه بی‌نهایت داری؟', line)
     }
   }
 
@@ -1071,7 +1071,7 @@ class Runtime {
           return
         }
         if (st.mod === 'random' || st.mod === 'time' || st.mod === 'os' || st.mod === 'sys') {
-          return // بی‌صدا قبول — برای آموزش بد نیست
+          return // بی‌صدا قبول، برای آموزش بد نیست
         }
         throw new LangError(`ماژول «${st.mod}» توی پایتونِ کوچیک ما نیست!`, st.line)
       }
@@ -1079,7 +1079,7 @@ class Runtime {
   }
 
   iterate(it: unknown, line: number): unknown[] {
-    if (typeof it === 'number') throw new LangError('عدد قابل حلقه‌زدن نیست — از بازه() استفاده کن', line)
+    if (typeof it === 'number') throw new LangError('عدد قابل حلقه‌زدن نیست، از بازه() استفاده کن', line)
     if (typeof it === 'string') return [...it]
     if (Array.isArray(it)) return it
     if (it instanceof Map) return [...it.keys()]
@@ -1111,7 +1111,7 @@ class Runtime {
           if (fn === 'pi') return Math.PI
           if (fn === 'e') return Math.E
         }
-        throw new LangError(`متغیر «${e.name}» پیدا نشد — اسمش رو درست نوشتی؟`, e.line)
+        throw new LangError(`متغیر «${e.name}» پیدا نشد، اسمش رو درست نوشتی؟`, e.line)
       }
       case 'list':
         return e.items.map((x) => this.eval(x, env))
@@ -1466,7 +1466,7 @@ class Runtime {
         throw new LangError('برعکس‌سازی روی این نوع ممکن نیست', e.line)
       }
       case 'input':
-        throw new LangError('ورودی از کاربر (input) توی نسخهٔ مرورگریمون نداریم — از متغیر استفاده کن!', e.line)
+        throw new LangError('ورودی از کاربر (input) توی نسخهٔ مرورگریمون نداریم، از متغیر استفاده کن!', e.line)
       case 'sqrt': {
         const n = this.num(args[0], e.line)
         if (n < 0) throw new LangError('جذر عدد منفی؟! اینجا جهان اعداد حقیقیه', e.line)
@@ -1527,7 +1527,7 @@ class Runtime {
           return Math.abs(n)
       }
     }
-    throw new LangError(`تابع «${e.name}» وجود نداره — املاش چک کن!`, e.line)
+    throw new LangError(`تابع «${e.name}» وجود نداره، املاش چک کن!`, e.line)
   }
 }
 
@@ -1593,7 +1593,7 @@ export function runScript(code: string, lang: ScriptLang): RunResult {
 /** توضیح قابلیت‌ها برای نمایش در اپ */
 export const LANG_INFO: Record<ScriptLang, string> = {
   python:
-    'پایتونِ کوچک سان‌جاب — متغیر، شرط (اگه/وگرنه)، حلقه for و while، تابع def، لیست، دیکشنری، رشته و f-string. بدون input!',
+    'پایتونِ کوچک سان‌جاب، متغیر، شرط (اگه/وگرنه)، حلقه for و while، تابع def، لیست، دیکشنری، رشته و f-string. بدون input!',
   squirrel:
     'زبان سنجابی! مثل پایتونه ولی کلیدواژه‌ها فارسی‌اند: اگه، وگرنه، پس، برای x در بازه(n)، تاوقتی، تابع، برگردون، چاپ، طول، بازه. رشته‌ها همیشه {متغیر} را جای‌گذاری می‌کنند.',
 }

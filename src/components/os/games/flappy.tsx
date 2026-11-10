@@ -275,7 +275,7 @@ export default function FlappyGame() {
     <GameShell
       emoji="🐤"
       title="پنگوئن پرنده"
-      howTo="کلیک/لمس یا Space — بپر و از لوله‌ها رد شو!"
+      howTo="کلیک/لمس یا Space، بپر و از لوله‌ها رد شو!"
       stats={[
         { label: 'امتیاز', value: score },
         { label: 'رکورد', value: best },
@@ -288,14 +288,14 @@ export default function FlappyGame() {
           width={W}
           height={H}
           onPointerDown={flap}
-          aria-label={started ? 'پنگوئن پرنده — بازی در جریان' : 'پنگوئن پرنده — برای شروع بزن'}
+          aria-label={started ? 'پنگوئن پرنده، بازی در جریان' : 'پنگوئن پرنده، برای شروع بزن'}
           className="h-auto w-full max-w-[380px] touch-none select-none rounded-xl border border-white/10"
         />
         <Overlay
           show={gameOver}
           emoji="💀"
           title="آخ! خوردی به لوله!"
-          subtitle={`امتیاز: ${score} — رکورد: ${best}`}
+          subtitle={`امتیاز: ${score}، رکورد: ${best}`}
           onAction={reset}
         />
       </div>

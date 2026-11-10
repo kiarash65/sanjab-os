@@ -1,5 +1,5 @@
 /**
- * موتور تسلط بر مهارت‌ها — Skill Mastery Engine
+ * موتور تسلط بر مهارت‌ها؛ Skill Mastery Engine
  *
  * چهار معیار جدا نگه داشته می‌شوند و هیچ‌کدام جای دیگری استفاده نمی‌شود:
  *   1) Course Completion  → lessons[track][lessonId].done (در store.ts)
@@ -7,7 +7,7 @@
  *   3) Knowledge Retention→ آیتم‌های مرور فاصله‌دار (review.ts)
  *   4) Practical Perf.    → شواهد exercise-pass / project-*
  *
- * قواعد ارتقا (شفاف و مستند — از شواهد واقعی، نه از نمرهٔ کل):
+ * قواعد ارتقا (شفاف و مستند، از شواهد واقعی، نه از نمرهٔ کل):
  *   امتیاز شواهد = Σ وزن × ضریب تازگی (شواهد >45 روز: نصف)
  *   attempted  : حداقل ۱ شواهد
  *   familiar   : امتیاز ≥ 3
@@ -57,7 +57,7 @@ export function analyzeEvidence(evidence: SkillEvidence[], now: number = Date.no
 
   for (const ev of evidence) {
     const ageDays = (now - ev.at) / DAY
-    // شواهد تازه کامل، شواهد قدیمی نصف — تازگی دانش مهم است
+    // شواهد تازه کامل، شواهد قدیمی نصف، تازگی دانش مهم است
     const recency = ageDays > RECENCY_HALF_LIFE_DAYS ? 0.5 : 1
     score += EVIDENCE_WEIGHT[ev.kind] * recency
     kinds.add(ev.kind)
@@ -91,7 +91,7 @@ export function computeMastery(
 
   if (a.score < 7 || a.kinds.size < 2 || !hasPractice) return 'familiar'
 
-  // تسلط کامل — نیاز به یادآوری فاصله‌دار در روزی متفاوت از تکمیل درس
+  // تسلط کامل، نیاز به یادآوری فاصله‌دار در روزی متفاوت از تکمیل درس
   const recallOnDifferentDay =
     a.lastReviewCorrectAt !== undefined &&
     a.lastLessonCompleteAt !== undefined &&
@@ -118,13 +118,13 @@ function sameDay(a: number, b: number): boolean {
   )
 }
 
-/** حداکثر یک سطح تنزل — پاسخ غلط نباید شدید جریمه کند */
+/** حداکثر یک سطح تنزل، پاسخ غلط نباید شدید جریمه کند */
 export function demoteOne(state: MasteryState): MasteryState {
   const i = MASTERY_ORDER.indexOf(state)
   return MASTERY_ORDER[Math.max(0, i - 1)]
 }
 
-/** توضیح «چرا هنوز مسلط نشدی» — برای نمایش در Skill Map */
+/** توضیح «چرا هنوز مسلط نشدی»، برای نمایش در Skill Map */
 export function masteryGap(
   evidence: SkillEvidence[],
   state: MasteryState,
@@ -137,10 +137,10 @@ export function masteryGap(
     return 'برای «آشنا» شدن، چند فعالیت بیشتر (درس، تمرین یا آزمون) لازم است.'
   if (state === 'familiar')
     return hasPracticeKind(a.kinds)
-      ? 'امتیاز یا تنوع شواهد برای «مسلط» کافی نیست — تمرین و آزمون بیشتر کمک می‌کند.'
+      ? 'امتیاز یا تنوع شواهد برای «مسلط» کافی نیست، تمرین و آزمون بیشتر کمک می‌کند.'
       : 'یک تمرین عملی یا آزمون لازم است تا «مسلط» شوی.'
   // proficient
-  if (a.recentFailure) return 'یک مرور اخیر فراموشی داشت — بعد از مرور موفق دوباره امتحان کن.'
+  if (a.recentFailure) return 'یک مرور اخیر فراموشی داشت، بعد از مرور موفق دوباره امتحان کن.'
   if (!a.lastReviewCorrectAt) return 'یک مرور فاصله‌دار موفق برای تثبیت یادگیری لازم است.'
   return 'شواهد بیشتری (چالش یا پروژه) برای «تسلط کامل» لازم است.'
 }

@@ -27,7 +27,7 @@ import {
 import { aiComplete, hasAICfg, loadAICfg } from '@/lib/os/integrations'
 
 /* ------------------------------------------------------------------ */
-/* پنگوئن‌شل ۴.۰ — پایپ، زنجیره، متغیرها، فیلترها و ۲۸ ماموریت آموزشی  */
+/* پنگوئن‌شل ۴.۰، پایپ، زنجیره، متغیرها، فیلترها و ۲۸ ماموریت آموزشی  */
 /* ------------------------------------------------------------------ */
 
 type LineType = 'in' | 'out' | 'ok' | 'err' | 'warn' | 'sys' | 'dim'
@@ -79,7 +79,7 @@ const MAN: Record<string, { u: string; d: string }> = {
   open: { u: 'open نام‌اپ', d: 'برنامه‌ای را از دل ترمینال باز می‌کند. مثلاً: open snake' },
   wallpaper: { u: 'wallpaper [کلید]', d: 'کاغذدیواری عوض می‌کند. بدون پارامتر، لیست می‌دهد.' },
   ps: { u: 'ps', d: 'پنجره‌های باز = پروسه‌های در حال اجرا. مثل htop ولی بامزه‌تر.' },
-  kill: { u: 'kill شمارهPID', d: 'یک پروسه را می‌بندد. اول با ps شماره‌اش را پیدا کن.' },
+  kill: { u: 'kill شمارهٔ PID', d: 'یک فرایند را می‌بندد. اول با ps شماره‌اش را پیدا کن.' },
   sudo: { u: 'sudo دستور', d: 'اجرا با دسترسی مدیر. (superuser do) با پنگوئن‌ها مهربان باش.' },
   apt: { u: 'apt install بسته', d: 'نصب بسته (خیالی). خب یه چیزی که نباشه!' },
   /* ---------- نسخه ۴.۰: متن و فیلتر ---------- */
@@ -99,7 +99,7 @@ const MAN: Record<string, { u: string; d: string }> = {
   id: { u: 'id', d: 'کاربر و گروه‌های تو با شماره‌های UID/GID.' },
   ln: { u: 'ln -s هدف نام‌پیوند', d: 'یک پیوند نمادین به فایل یا پوشه می‌سازد.' },
   du: { u: 'du [مسیر]', d: 'حجم اشغالی مسیر را تخمین می‌زند.' },
-  which: { u: 'which دستور', d: 'می‌گوید دستور کجای سیستم ساکن است — یا alias است.' },
+  which: { u: 'which دستور', d: 'می‌گوید دستور کجای سیستم ساکن است، یا alias است.' },
   file: { u: 'file فایل', d: 'نوع واقعی فایل را حدس می‌زند. جادویی ولی خوانا.' },
   stat: { u: 'stat فایل', d: 'مشخصات کامل فایل: نوع، حجم، دسترسی.' },
   less: { u: 'less فایل', d: 'مثل cat ولی با ادعای صفحه‌بندی. اینجا همه‌چیز جا می‌شود.' },
@@ -110,44 +110,44 @@ const MAN: Record<string, { u: string; d: string }> = {
   jobs: { u: 'jobs', d: 'کارهای معلق در پس‌زمینه.' },
   systemctl: { u: 'systemctl status سرویس', d: 'وضعیت سرویس‌های (خیالی) سیستم را می‌گوید.' },
   journalctl: { u: 'journalctl', d: 'لاگ‌های اخیر هسته را نشان می‌دهد.' },
-  crontab: { u: 'crontab', d: 'برنامه زمانی کارها. ما همSchedule داریم!' },
-  tar: { u: 'tar czf بسته.tar.gz فایل‌ها', d: 'بسته‌بندی (خیالی). سرعتش بی‌نظیره چون هیچی منتقل نمی‌شود.' },
+  crontab: { u: 'crontab', d: 'برنامهٔ زمانی کارها؛ ما هم cron داریم!' },
+  tar: { u: 'tar czf بسته.tar.gz فایل‌ها', d: 'بسته‌بندی (خیالی). چون هیچی منتقل نمی‌شود، سریع‌ترین آرشیو دنیاست.' },
   zip: { u: 'zip بسته.zip فایل', d: 'زیپ کردن (خیالی).' },
   wget: { u: 'wget آدرس', d: 'دانلود با نوار پیشرفت. فایل‌ها به بُعد خیالی منتقل می‌شوند.' },
   ssh: { u: 'ssh user@host', d: 'اتصال به ماشین دیگر… البته اینجا مرورگریم، ولی تلاش‌مان را می‌کنیم.' },
   ip: { u: 'ip a', d: 'کارت‌های شبکه و آدرس‌ها. آدرس‌مان خیلی بامزه است.' },
   nano: { u: 'nano فایل', d: 'ویرایشگر ساده. اینجا به «نویسا» راهنمایی‌ات می‌کند.' },
-  vim: { u: 'vim فایل', d: 'ویرایشگر افسانه‌ای. برای خروج: :q! — موفق باشی.' },
+  vim: { u: 'vim فایل', d: 'ویرایشگر افسانه‌ای. برای خروج: :q!، موفق باشی.' },
   sleep: { u: 'sleep ثانیه', d: 'مکث. حداکثر ۵ ثانیه، چون بیشترش بی‌ادبیه.' },
   env: { u: 'env', d: 'متغیرهای محیطی فعلی.' },
   ai: { u: 'ai', d: 'اپ «هوش‌یار» را باز می‌کند تا کلید API خودت را وصل کنی.' },
   /* ---------- نسخه ۵.۰: شبکه و سخت‌افزار و امنیت ---------- */
-  htop: { u: 'htop', d: 'مانیتور زنده و رنگی پروسه‌ها — همان top ولی با گراف.' },
-  traceroute: { u: 'traceroute مقصد', d: 'مسیر بسته‌ها تا مقصد، هاپ به هاپ.' },
+  htop: { u: 'htop', d: 'مانیتور زنده و رنگی پروسه‌ها، همان top ولی با گراف.' },
+  traceroute: { u: 'traceroute مقصد', d: 'مسیر بسته‌ها تا مقصد، هاپ به هاپ؛ هاپ یعنی هر مسیریاب (router) سر راه.' },
   netstat: { u: 'netstat یا ss -tulpn', d: 'پورت‌های باز و اتصال‌های فعال.' },
   iptables: { u: 'iptables -L', d: 'جدید قواعد فایروال کرنل (netfilter).' },
   ufw: { u: 'ufw status | ufw enable', d: 'فایروال سادهٔ اوبونتو (Uncomplicated Firewall).' },
   mount: { u: 'mount', d: 'سیستم‌فایل‌های متصل و نقاط اتصال را نشان می‌دهد.' },
   lsblk: { u: 'lsblk', d: 'درخت دیسک‌ها و پارتیشن‌ها.' },
-  lscpu: { u: 'lscpu', d: 'مشخصات پردازنده — تعداد هسته‌ها را واقعی از دستگاهت می‌خواند!' },
+  lscpu: { u: 'lscpu', d: 'مشخصات پردازنده، تعداد هسته‌ها را واقعی از دستگاهت می‌خواند!' },
   lsusb: { u: 'lsusb', d: 'دستگاه‌های USB متصل (خیالی و بامزه).' },
   lspci: { u: 'lspci', d: 'دستگاه‌های روی گذرگاه PCI (کارت گرافیک و…).' },
   vmstat: { u: 'vmstat', d: 'خلاصهٔ حافظه، swap و CPU.' },
   gzip: { u: 'gzip فایل | gunzip فایل', d: 'فشرده‌سازی با الگوریتم معروف gzip و باز کردنش.' },
   unzip: { u: 'unzip بسته.zip', d: 'باز کردن بستهٔ زیپ (خیالی).' },
-  sha256sum: { u: 'sha256sum فایل', d: 'اثر انگشت رمزنگاری فایل — برای چک سلامت دانلودها.' },
-  base64: { u: 'base64 متن | base64 -d متن', d: 'کدگذاری و کدگشایی base64 — واقعی کار می‌کند!' },
+  sha256sum: { u: 'sha256sum فایل', d: 'اثر انگشت رمزنگاری فایل، برای چک سلامت دانلودها.' },
+  base64: { u: 'base64 متن | base64 -d متن', d: 'کدگذاری و کدگشایی base64، واقعی کار می‌کند!' },
   killall: { u: 'killall نام‌پروسه', d: 'همهٔ پروسه‌های با آن نام را می‌بندد (پنجره‌های واقعی!).' },
   pgrep: { u: 'pgrep نام', d: 'شمارهٔ پروسه‌های حاوی آن نام.' },
   pacman: { u: 'pacman -S بسته', d: 'مدیر بستهٔ آرچ. اینجا مهمان هستیم، apt صاحبخانه است!' },
   dnf: { u: 'dnf install بسته', d: 'مدیر بستهٔ فدورا/Red Hat.' },
-  apk: { u: 'apk add بسته', d: 'مدیر بستهٔ Alpine — همان که در «بوت کرنل واقعی» واقعی اجرا می‌شود!' },
-  timedatectl: { u: 'timedatectl', d: 'ساعت و منطقهٔ زمانی سیستم — با دادهٔ واقعی مرورگر.' },
+  apk: { u: 'apk add بسته', d: 'مدیر بستهٔ Alpine، همان که در «بوت کرنل واقعی» واقعی اجرا می‌شود!' },
+  timedatectl: { u: 'timedatectl', d: 'ساعت و منطقهٔ زمانی سیستم، با دادهٔ واقعی مرورگر.' },
   hostnamectl: { u: 'hostnamectl', d: 'نام و مشخصات میزبان.' },
   useradd: { u: 'sudo useradd نام', d: 'کاربر جدید می‌سازد. بعدش با passwd برایش رمز بگذار.' },
   passwd: { u: 'passwd [کاربر]', d: 'تغییر رمز عبور. هیچ‌وقت 123456 نگذار!' },
   su: { u: 'su [کاربر]', d: 'عوض کردن هویت. su root یعنی تبدیل به مدیر.' },
-  xxd: { u: 'xxd فایل', d: 'نمای هگز فایل — زبان مشترک ماشین‌ها.' },
+  xxd: { u: 'xxd فایل', d: 'نمای هگز فایل، زبان مشترک ماشین‌ها.' },
 }
 
 const MAN_KEYS = Object.keys(MAN)
@@ -165,7 +165,7 @@ interface Mission {
 const MISSIONS: Mission[] = [
   { id: 'm1', title: 'کجاییم؟', brief: 'دستور pwd را اجرا کن تا مسیر فعلی را ببینی.', hint: 'فقط بنویس: pwd', match: /^\s*pwd\s*$/ },
   { id: 'm2', title: 'لیست کن', brief: 'با ls ببین توی خانه‌ات چی هست.', hint: 'فقط بنویس: ls', match: /^\s*ls(\s+-[a-zA-Z]+)*\s*$/ },
-  { id: 'm3', title: 'با جزئیات', brief: 'حالا ls -la را بزن تا فایل‌های مخفی هم معلوم شوند.', hint: 'فلگ a یعنی all — حتی .secret هم پیدا می‌شود', match: /^\s*ls\s+-[a-zA-Z]+\s*$/ },
+  { id: 'm3', title: 'با جزئیات', brief: 'حالا ls -la را بزن تا فایل‌های مخفی هم معلوم شوند.', hint: 'فلگ a یعنی all، حتی .secret هم پیدا می‌شود', match: /^\s*ls\s+-[a-zA-Z]+\s*$/ },
   { id: 'm4', title: 'پرواز به عکس‌ها', brief: 'با cd برو داخل پوشه «عکس‌ها».', hint: 'بنویس: cd عکس‌ها', match: /^\s*cd\s+(['"]?)(عکس‌ها|~\/عکس‌ها)\1\s*$/ },
   { id: 'm5', title: 'برگرد خانه', brief: 'با cd .. یک پوشه عقب برگرد.', hint: 'نقطه‌نقطه یعنی پوشه مادر', match: /^\s*cd\s+\.\.\s*$/ },
   { id: 'm6', title: 'کتاب‌خوان', brief: 'محتوای فایل «خوش‌آمد.txt» را با cat بخوان.', hint: 'بنویس: cat خوش‌آمد.txt', match: /^\s*cat\s+(['"]?)خوش‌آمد\.txt\1\s*$/ },
@@ -176,16 +176,16 @@ const MISSIONS: Mission[] = [
   { id: 'm11', title: 'تغییر نام', brief: 'مار.txt را به «مار_کوچولو.txt» تغییر نام بده (با mv).', hint: 'بنویس: mv مزرعه/مار.txt مزرعه/مار_کوچولو.txt', match: /^\s*mv\s+(['"]?)(~\/)?مزرعه\/مار\.txt\1\s+(['"]?)(~\/)?مزرعه\/مار_کوچولو\.txt\3\s*$/ },
   { id: 'm12', title: 'جاروبرقی', brief: 'مار_کوچولو.txt را با rm پاک کن.', hint: 'بنویس: rm مزرعه/مار_کوچولو.txt', match: /^\s*rm\s+(['"]?)(~\/)?مزرعه\/مار_کوچولو\.txt\1\s*$/ },
   { id: 'm13', title: 'جنگل‌نگار', brief: 'کل درخت خانه‌ات را با tree ببین.', hint: 'بنویس: tree', match: /^\s*tree(\s+(~|\/home\/pengo))?\s*$/ },
-  { id: 'm14', title: 'مدرک‌خوان', brief: 'راهنمای دستور ls را با man بخوان — همیشه راهنما بخوان!', hint: 'بنویس: man ls', match: /^\s*man\s+ls\s*$/ },
+  { id: 'm14', title: 'مدرک‌خوان', brief: 'راهنمای دستور ls را با man بخوان، همیشه راهنما بخوان!', hint: 'بنویس: man ls', match: /^\s*man\s+ls\s*$/ },
   /* ---------- فصل ۳: جستجو و متن ---------- */
   { id: 'm15', title: 'جستجوگر', brief: 'دنبال هر چیزی که اسمش «راز» است بگرد: find راز', hint: 'بنویس: find راز', match: /^\s*find\s+(['"]?)راز\1\s*$/ },
   { id: 'm16', title: 'شکارچی کلمه', brief: 'توی «رازها.txt» دنبال کلمه «رمز» بگرد: grep رمز رازها.txt', hint: 'grep الگو فایل', match: /^\s*grep\s+(['"]?)رمز\1\s+(['"]?)رازها\.txt\2\s*$/ },
-  { id: 'm17', title: 'لوله‌کش', brief: 'اولین پایپ زندگی‌ات: cat رازها.txt | grep رمز', hint: 'خروجی cat می‌رود داخل grep — با |', match: /^\s*cat\s+\S+\s*\|\s*grep\s+\S+\s*$/ },
-  { id: 'm18', title: 'شمارنده', brief: 'بنویس: ls | wc — ببین چند چیز در خانه داری.', hint: 'پایپ به wc', match: /^\s*ls(\s+-[a-zA-Z]+)?\s*\|\s*wc\s*$/ },
+  { id: 'm17', title: 'لوله‌کش', brief: 'اولین پایپ زندگی‌ات: cat رازها.txt | grep رمز', hint: 'خروجی cat می‌رود داخل grep، با |', match: /^\s*cat\s+\S+\s*\|\s*grep\s+\S+\s*$/ },
+  { id: 'm18', title: 'شمارنده', brief: 'بنویس: ls | wc، ببین چند چیز در خانه داری.', hint: 'پایپ به wc', match: /^\s*ls(\s+-[a-zA-Z]+)?\s*\|\s*wc\s*$/ },
   { id: 'm19', title: 'مرتب‌ساز', brief: 'برنامه امروزت را مرتب کن: sort برنامه_امروز.txt', hint: 'بنویس: sort برنامه_امروز.txt', match: /^\s*sort\s+(['"]?)برنامه_امروز\.txt\1\s*$/ },
   { id: 'm20', title: 'یکتاساز', brief: 'تکراری‌ها را حذف کن: sort رازها.txt | uniq', hint: 'ترکیب کلاسیک: sort بعد uniq', match: /^\s*sort\s+\S+\s*\|\s*uniq\s*$/ },
   /* ---------- فصل ۴: پوستهٔ حرفه‌ای ---------- */
-  { id: 'm21', title: 'میان‌برساز', brief: 'یک اسم مستعار بساز: alias fish="echo یومی!"', hint: 'alias اسم="دستور" — اسم لاتین', match: /^\s*alias\s+\w+\s*=/ },
+  { id: 'm21', title: 'میان‌برساز', brief: 'یک اسم مستعار بساز: alias fish="echo یومی!"', hint: 'alias اسم="دستور"، اسم لاتین', match: /^\s*alias\s+\w+\s*=/ },
   { id: 'm22', title: 'متغیرساز', brief: 'متغیر بساز و چاپ کن: export NAME=Pengo بعد echo $NAME', hint: 'اول export، بعد echo $NAME', match: /^\s*echo\s+\$[A-Za-z_]/ },
   { id: 'm23', title: 'کلیدساز', brief: 'به اسکریپت اجازه اجرا بده: chmod +x پروژه‌ها/hello.sh', hint: '+x یعنی executable', match: /^\s*chmod\s+(\+x|[1-7]{3})\s+(['"]?)(~\/)?پروژه‌ها\/hello\.sh\2\s*$/ },
   { id: 'm24', title: 'پروسه‌یاب', brief: 'ببین چه پروسه‌هایی باز است: ps', hint: 'هر پنجره یک پروسه', match: /^\s*ps\s*$/ },
@@ -214,21 +214,21 @@ const levelOf = (xp: number): string => {
 
 /* فصل‌های دورهٔ آموزش ترمینال */
 const CHAPTERS: { title: string; ids: string[] }[] = [
-  { title: 'فصل ۱ — قدم‌های اول', ids: ['m1', 'm2', 'm3', 'm4', 'm5'] },
+  { title: 'فصل ۱، قدم‌های اول', ids: ['m1', 'm2', 'm3', 'm4', 'm5'] },
   {
-    title: 'فصل ۲ — فایل‌بازی',
+    title: 'فصل ۲، فایل‌بازی',
     ids: ['m6', 'm7', 'm8', 'm9', 'm10', 'm11', 'm12', 'm13', 'm14'],
   },
   {
-    title: 'فصل ۳ — جستجو و متن',
+    title: 'فصل ۳، جستجو و متن',
     ids: ['m15', 'm16', 'm17', 'm18', 'm19', 'm20'],
   },
   {
-    title: 'فصل ۴ — پوستهٔ حرفه‌ای',
+    title: 'فصل ۴، پوستهٔ حرفه‌ای',
     ids: ['m21', 'm22', 'm23', 'm24', 'm25'],
   },
   {
-    title: 'فصل ۵ — سیستم و دستیار',
+    title: 'فصل ۵، سیستم و دستیار',
     ids: ['m26', 'm27', 'm28'],
   },
 ]
@@ -316,7 +316,7 @@ const ENV_DEFAULTS: Record<string, string> = {
   SPONSOR: 'sunjob.ir',
 }
 
-/* حالت پایپ — وقتی silent است خروجی به‌جای صفحه در بافر می‌رود */
+/* حالت پایپ، وقتی silent است خروجی به‌جای صفحه در بافر می‌رود */
 const PIPE: { stdin: string[] | null; out: string[]; silent: boolean } = {
   stdin: null,
   out: [],
@@ -530,9 +530,9 @@ interface PendingFix {
 
 export default function TerminalApp() {
   const [lines, setLines] = useState<Line[]>(() => [
-    mkLine('sys', 'پنگوئن‌شل ۴.۰ — حالا با پایپ | ، زنجیره && و ; ، متغیرها و ۲۸ ماموریت!'),
+    mkLine('sys', 'پنگوئن‌شل ۴.۰، حالا با پایپ | ، زنجیره && و ; ، متغیرها و ۲۸ ماموریت!'),
     mkLine('dim', 'شروع: learn start  |  سوالی؟: ask سوال  |  راهنما: help'),
-    mkLine('dim', 'غلط تایپی بزنی اصلاحش می‌کنم. امتحان کن: lss — و Ctrl+R برای جستجو در تاریخچه'),
+    mkLine('dim', 'غلط تایپی بزنی اصلاحش می‌کنم. امتحان کن: lss، و Ctrl+R برای جستجو در تاریخچه'),
   ])
   const [cwd, setCwd] = useState<string>(HOME)
   const [input, setInput] = useState('')
@@ -653,7 +653,7 @@ export default function TerminalApp() {
     return byHist ?? null
   }, [input, history])
 
-  // غلطِ تکراری که قبلاً اصلاح شده — فوراً نوار پیشنهاد را نشان بده
+  // غلطِ تکراری که قبلاً اصلاح شده، فوراً نوار پیشنهاد را نشان بده
   const exactFix = useMemo<PendingFix | null>(() => {
     const t = input.trim()
     if (!t || t.includes(' ') || ALL_COMMANDS.includes(t)) return null
@@ -711,7 +711,7 @@ export default function TerminalApp() {
         body: 'هر ۲۸ ماموریت کامل شد. هسته به تو افتخار می‌کند.',
       })
     } else {
-      push('dim', `ماموریت بعدی: «${next.title}» — ${next.brief}`)
+      push('dim', `ماموریت بعدی: «${next.title}»، ${next.brief}`)
     }
   }
 
@@ -741,7 +741,7 @@ export default function TerminalApp() {
       .map((s) => s.trim())
       .filter(Boolean)
     if (segs.length < 2) {
-      push('err', 'پایپ ناقص — بین دو دستور | بگذار: ls | wc')
+      push('err', 'پایپ ناقص، بین دو دستور | بگذار: ls | wc')
       return
     }
     let stdin: string[] | null = null
@@ -826,7 +826,7 @@ export default function TerminalApp() {
         } else {
           const ok = fs.writeFile(target, (append ? '' : '') + text + '\n', append)
           if (ok) push('ok', `نوشته شد در ${prettyPath(target)} ${append ? '(اضافه شد)' : ''}`)
-          else push('err', 'نشد بنویسم — پوشه مقصد وجود دارد؟')
+          else push('err', 'نشد بنویسم، پوشه مقصد وجود دارد؟')
         }
       }
       checkMission(raw)
@@ -836,7 +836,7 @@ export default function TerminalApp() {
     switch (base) {
       /* ---------------- آموزش ---------------- */
       case 'help': {
-        push('sys', 'دستورها — با «man دستور» جزئیات بگیر:')
+        push('sys', 'دستورها، با «man دستور» جزئیات بگیر:')
         const groups: [string, string[]][] = [
           ['آموزش', ['learn', 'ask', 'ai', 'man', 'help']],
           ['فایل‌ها', ['ls', 'cd', 'pwd', 'cat', 'mkdir', 'touch', 'echo', 'rm', 'cp', 'mv', 'tree', 'find', 'ln', 'du', 'stat', 'file']],
@@ -871,10 +871,10 @@ export default function TerminalApp() {
           if (sub === 'status' || sub === '')
             push(
               'dim',
-              `امتیاز: ${tutor.xp} — سطح: ${levelOf(tutor.xp)}`
+              `امتیاز: ${tutor.xp}، سطح: ${levelOf(tutor.xp)}`
             )
         } else if (sub === 'list') {
-          push('sys', `نقشهٔ ماموریت‌ها — ${tutor.done.length}/${MISSIONS.length} کامل شده:`)
+          push('sys', `نقشهٔ ماموریت‌ها، ${tutor.done.length}/${MISSIONS.length} کامل شده:`)
           for (const ch of CHAPTERS) {
             push('warn', `📚 ${ch.title}`)
             for (const id of ch.ids) {
@@ -939,7 +939,7 @@ export default function TerminalApp() {
               cfg
             )
             pushMany('out', answer.trim())
-            push('dim', '(با کلید هوش مصنوعی خودت جواب گرفتی — چه حرفه‌ای!)')
+            push('dim', '(با کلید هوش مصنوعی خودت جواب گرفتی، چه حرفه‌ای!)')
           } catch (e) {
             push('err', e instanceof Error ? e.message : 'کلید هوش‌یار جواب نداد')
           }
@@ -972,11 +972,11 @@ export default function TerminalApp() {
         const targetPath = rest[0] ? normalizePath(cwd, rest[0]) : cwd
         const node = getNode(fs.fs, targetPath)
         if (!node) {
-          push('err', `ls: به «${rest[0]}» نمی‌رسم — چنین مسیری نیست`)
+          push('err', `ls: به «${rest[0]}» نمی‌رسم، چنین مسیری نیست`)
           const parent = getNode(fs.fs, parentOf(targetPath))
           if (parent && parent.type === 'dir') {
             const near = nearestName(baseName(targetPath), Object.keys(parent.children))
-            if (near) push('dim', `نزدیک‌ترین: «${near}» — شاید غلط تایپی بود؟`)
+            if (near) push('dim', `نزدیک‌ترین: «${near}»، شاید غلط تایپی بود؟`)
           }
           break
         }
@@ -992,7 +992,7 @@ export default function TerminalApp() {
             a.localeCompare(b)
           )
         if (entries.length === 0) {
-          push('dim', '(خالی — مثل وعده‌های عید)')
+          push('dim', '(خالی، مثل وعده‌های عید)')
           break
         }
         if (long) {
@@ -1059,7 +1059,7 @@ export default function TerminalApp() {
           }
           if (node.kind === 'img') {
             push('out', `[عکس: ${baseName(p)}]`)
-            push('dim', 'ترمینال عکس نشان نمی‌دهد — با «open photos» ببینش!')
+            push('dim', 'ترمینال عکس نشان نمی‌دهد، با «open photos» ببینش!')
             continue
           }
           if (node.kind === 'audio') {
@@ -1082,7 +1082,7 @@ export default function TerminalApp() {
           break
         }
         if (fs.mkdir(p)) push('ok', `پوشه «${baseName(p)}» ساخته شد`)
-        else push('err', 'ساخته نشد — مسیر والد موجود است؟')
+        else push('err', 'ساخته نشد، مسیر والد موجود است؟')
         break
       }
       case 'touch': {
@@ -1098,7 +1098,7 @@ export default function TerminalApp() {
             continue
           }
           if (fs.writeFile(p, '')) push('ok', `فایل «${baseName(p)}» ساخته شد`)
-          else push('err', `«${a}» ساخته نشد — پوشه مقصد هست؟`)
+          else push('err', `«${a}» ساخته نشد، پوشه مقصد هست؟`)
         }
         break
       }
@@ -1117,7 +1117,7 @@ export default function TerminalApp() {
             continue
           }
           if (node.type === 'dir' && !rec) {
-            push('err', '«' + baseName(p) + '» پوشه است — با rm -r پاکش کن')
+            push('err', '«' + baseName(p) + '» پوشه است، با rm -r پاکش کن')
             continue
           }
           if (fs.remove(p)) push('ok', `«${baseName(p)}» به خانه گربه‌ها فرستاده شد`)
@@ -1144,7 +1144,7 @@ export default function TerminalApp() {
         const ok = base === 'cp' ? fs.copy(src, dst) : fs.move(src, dst)
         if (ok)
           push('ok', `${base === 'cp' ? 'کپی' : 'جابه‌جا'} شد: ${baseName(src)} ← ${prettyPath(dst)}`)
-        else push('err', 'انجام نشد — مقصد معتبر است؟')
+        else push('err', 'انجام نشد، مقصد معتبر است؟')
         break
       }
       case 'tree': {
@@ -1207,7 +1207,7 @@ export default function TerminalApp() {
       case 'grep': {
         const pattern = (args[0] ?? '').replace(/^["']|["']$/g, '')
         if (!pattern) {
-          push('err', 'کاربرد: grep الگو [فایل] — یا: cat فایل | grep الگو')
+          push('err', 'کاربرد: grep الگو [فایل]، یا: cat فایل | grep الگو')
           break
         }
         const src = readInputLines(args[1])
@@ -1247,7 +1247,7 @@ export default function TerminalApp() {
 
       /* ---------------- سیستم ---------------- */
       case 'whoami':
-        push('ok', 'pengo — مدیر ارشد بامزگی (سطح دسترسی: همه‌چیز، چون خانه خودت است)')
+        push('ok', 'pengo، مدیر ارشد بامزگی (سطح دسترسی: همه‌چیز، چون خانه خودت است)')
         break
       case 'hostname':
         push('out', 'sanjob-os')
@@ -1275,7 +1275,7 @@ export default function TerminalApp() {
         break
       case 'uptime': {
         const mins = os.bootAt ? Math.max(1, Math.round((Date.now() - os.bootAt) / 60000)) : 0
-        push('out', `بالا اومدی: ${mins} دقیقه — بار سیستم: 0.08 (خیلی آروم، چون خوابیم)`)
+        push('out', `بالا اومدی: ${mins} دقیقه، بار سیستم: 0.08 (خیلی آروم، چون خوابیم)`)
         break
       }
       case 'df':
@@ -1296,7 +1296,7 @@ export default function TerminalApp() {
         Object.entries(envRef.current).forEach(([k, v]) =>
           push('out', `${k}=${v}`)
         )
-        push('dim', 'متغیر بساز: export NAME=value — بعد echo $NAME')
+        push('dim', 'متغیر بساز: export NAME=value، بعد echo $NAME')
         break
       }
       case 'history':
@@ -1304,7 +1304,7 @@ export default function TerminalApp() {
         break
       case 'ps': {
         push('out', '  PID  اپ              عنوان')
-        if (os.windows.length === 0) push('dim', '(پروسه‌ای نیست — همه خواب‌اند)')
+        if (os.windows.length === 0) push('dim', '(پروسه‌ای نیست، همه خواب‌اند)')
         os.windows.forEach((w) => {
           const app = getApp(w.appId)
           push(
@@ -1340,7 +1340,7 @@ export default function TerminalApp() {
 
       /* ---------------- گراف ---------------- */
       case 'apps':
-        push('sys', 'اپ‌های نصب‌شده — با «open شناسه» بازشان کن:')
+        push('sys', 'اپ‌های نصب‌شده، با «open شناسه» بازشان کن:')
         push(
           'out',
           APPS.map((a) => a.id).join('  ')
@@ -1364,7 +1364,7 @@ export default function TerminalApp() {
       }
       case 'wallpaper': {
         if (!args[0]) {
-          push('sys', 'کاغذدیواری‌ها — با کلید ست کن:')
+          push('sys', 'کاغذدیواری‌ها، با کلید ست کن:')
           WALLPAPERS.forEach((w) => push('out', `  ${w.key.padEnd(14)} ${w.name}`))
           break
         }
@@ -1395,10 +1395,10 @@ export default function TerminalApp() {
           `Uptime:  ${mins} دقیقه`,
           `Windows: ${os.windows.length} پنجره باز`,
           `Theme:   ${os.settings.accent} (پالت سان‌جاب)`,
-          `AI:      ${hasAICfg() ? 'هوش‌یار وصل است (کلید خودت)' : 'هوش‌یار بی‌کلید — با open ai وصلش کن'}`,
-          `Sponsor: sunjob.ir — با اسپانسری سان‌جاب`,
-          `XP:      ${tutor.xp} (${levelOf(tutor.xp)}) — ${tutor.done.length}/${MISSIONS.length} ماموریت`,
-          `Sponsor: sunjob.ir — با اسپانسری سان‌جاب`,
+          `AI:      ${hasAICfg() ? 'هوش‌یار وصل است (کلید خودت)' : 'هوش‌یار بی‌کلید، با open ai وصلش کن'}`,
+          `Sponsor: sunjob.ir، با اسپانسری سان‌جاب`,
+          `XP:      ${tutor.xp} (${levelOf(tutor.xp)})، ${tutor.done.length}/${MISSIONS.length} ماموریت`,
+          `Sponsor: sunjob.ir، با اسپانسری سان‌جاب`,
           `Memory:  12MiB / 64MiB (عمدتاً میم)`,
         ]
         info.forEach((l) => push('out', l))
@@ -1407,7 +1407,7 @@ export default function TerminalApp() {
       case 'sunjob': {
         push('sys', SQUIRREL_ART)
         push('ok', '⚡ سان‌جاب (sunjob.ir) اسپانسیر رسمی این سیستم‌عامله!')
-        push('out', 'مشاوره انتخاب رشته و کنکور رو ازشون بگیرید — پالت رنگی سیستم هم هدیهٔ اونهاست.')
+        push('out', 'مشاوره انتخاب رشته و کنکور رو ازشون بگیرید، پالت رنگی سیستم هم هدیهٔ اونهاست.')
         break
       }
       case 'python': {
@@ -1462,11 +1462,11 @@ export default function TerminalApp() {
       case 'sanjabak':
       case 'tux':
         push('sys', SQUIRREL_ART)
-        push('ok', 'این سنجابک است، ماسکات رسمی سان‌جاب‌اواس — Tux بازنشسته شد و حالا مشاور افتخاری است :)')
+        push('ok', 'این سنجابک است، ماسکات رسمی سان‌جاب‌اواس؛ Tux بازنشسته شد و حالا مشاور افتخاری است :)')
         break
       case 'ping': {
         const host = args[0] || 'penguin.os'
-        push('out', `PING ${host} (42.42.42.42) — تونل کوانتومی پنگوئنی:`)
+        push('out', `PING ${host} (42.42.42.42)، تونل کوانتومی پنگوئنی:`)
         for (let i = 1; i <= 4; i++) {
           push('out', `reply from 42.42.42.42: bytes=32 time=${40 + Math.floor(Math.random() * 20)}ms TTL=256`)
         }
@@ -1506,7 +1506,7 @@ export default function TerminalApp() {
         if (args[0] === 'install' || args[0] === 'update') {
           const pkg = args[1] ?? 'bizarreness'
           if (['python', 'python3', 'node', 'nodejs', 'js', 'javascript', 'html'].includes(pkg.toLowerCase())) {
-            push('ok', `«${pkg}» از قبل نصبه! توی کداستودیو منتظرته — دارم بازش می‌کنم…`)
+            push('ok', `«${pkg}» از قبل نصبه! توی کداستودیو منتظرته، دارم بازش می‌کنم…`)
             setTimeout(() => launch('code'), 600)
             break
           }
@@ -1566,7 +1566,7 @@ export default function TerminalApp() {
             if (y) push('ok', `> ${y}`)
           }
         }
-        push('dim', changes === 0 ? 'دو فایل یکسان‌اند — دوقلو!' : `${changes} تفاوت پیدا شد`)
+        push('dim', changes === 0 ? 'دو فایل یکسان‌اند، دوقلو!' : `${changes} تفاوت پیدا شد`)
         break
       }
       case 'cut': {
@@ -1604,7 +1604,7 @@ export default function TerminalApp() {
       case 'sed': {
         const m = (args[0] ?? '').match(/^s(.)(.+?)\1(.*?)\1([gi]*)$/)
         if (!m) {
-          push('err', 'کاربرد: sed s/قدیم/جدید/ [فایل] — یا با پایپ')
+          push('err', 'کاربرد: sed s/قدیم/جدید/ [فایل]، یا با پایپ')
           break
         }
         const from = m[2]
@@ -1638,7 +1638,7 @@ export default function TerminalApp() {
           break
         }
         if (!/^[\d+\-*/().%^]+$/.test(exprStr)) {
-          push('err', 'فقط عدد و عملگر قبول است — ریاضی، نه شعبده‌بازی!')
+          push('err', 'فقط عدد و عملگر قبول است، ریاضی، نه شعبده‌بازی!')
           break
         }
         try {
@@ -1777,12 +1777,12 @@ export default function TerminalApp() {
           push('err', 'پیدا نشد')
           break
         }
-        if (node.type === 'dir') push('out', `${args[0]}: directory — پوشه`)
+        if (node.type === 'dir') push('out', `${args[0]}: directory، پوشه`)
         else if (node.kind === 'exe') push('out', `${args[0]}: ELF بامزه ۶۴-بیتی، قابل اجرا`)
-        else if (node.kind === 'img') push('out', `${args[0]}: image — عکس`)
-        else if (node.kind === 'audio') push('out', `${args[0]}: audio — صدا`)
+        else if (node.kind === 'img') push('out', `${args[0]}: image، عکس`)
+        else if (node.kind === 'audio') push('out', `${args[0]}: audio، صدا`)
         else if (node.kind === 'pdf') push('out', `${args[0]}: PDF document`)
-        else push('out', `${args[0]}: ASCII text — متن ساده`)
+        else push('out', `${args[0]}: ASCII text، متن ساده`)
         break
       }
       case 'stat': {
@@ -1819,7 +1819,7 @@ export default function TerminalApp() {
           Object.entries(aliasRef.current).forEach(([k, v]) =>
             push('out', `  ${k}='${v}'`)
           )
-          push('dim', 'بساز با: alias fish="echo یومی!" — برای همیشه یادم می‌ماند')
+          push('dim', 'بساز با: alias fish="echo یومی!"، برای همیشه یادم می‌ماند')
           break
         }
         const m = argStr.match(/^(\w+)\s*=\s*["']?(.+?)["']?$/)
@@ -1852,11 +1852,11 @@ export default function TerminalApp() {
         }
         envRef.current[m[1]] = m[2].replace(/^["']|["']$/g, '')
         saveMap('pengo-env-v1', envRef.current)
-        push('ok', `${m[1]}=${envRef.current[m[1]]} — حالا با echo $${m[1]} صدایش کن`)
+        push('ok', `${m[1]}=${envRef.current[m[1]]}، حالا با echo $${m[1]} صدایش کن`)
         break
       }
       case 'top': {
-        push('sys', 'top — سان‌جاب‌او‌اس (بامزه‌ترین پروسه‌ها اول)')
+        push('sys', 'top، سان‌جاب‌او‌اس (بامزه‌ترین پروسه‌ها اول)')
         push('out', '  PID  CPU%  پروسه')
         if (os.windows.length === 0) push('dim', '(سیستم آروم و خواب‌آلود)')
         os.windows.forEach((w, i) => {
@@ -1870,18 +1870,18 @@ export default function TerminalApp() {
           'out',
           os.windows.some((w) => w.minimized)
             ? 'چند پروسه خوابیده در پس‌زمینه (کمینه‌شده)'
-            : 'بدون کار معلق — سیستم سرحال است'
+            : 'بدون کار معلق، سیستم سرحال است'
         )
         break
       case 'systemctl': {
         const sub2 = args[0] ?? 'status'
         const unit = args[1] ?? 'fun.service'
         if (sub2 === 'status') {
-          push('sys', `● ${unit} — فعال و سرحال`)
+          push('sys', `● ${unit}، فعال و سرحال`)
           push('out', '   Loaded: loaded (/lib/systemd/system/بامزگی.service)')
           push('out', '   Active: active (running) از لحظه بوت')
         } else if (sub2 === 'restart' || sub2 === 'stop' || sub2 === 'start') {
-          push('ok', `${unit} ${sub2 === 'stop' ? 'خوابانده شد' : 'راه افتاد'} — یونیت‌های ما هرگز واقعاً نمی‌میرند`)
+          push('ok', `${unit} ${sub2 === 'stop' ? 'خوابانده شد' : 'راه افتاد'}، یونیت‌های ما هرگز واقعاً نمی‌میرند`)
         } else push('err', 'مثال: systemctl status fun.service')
         break
       }
@@ -1889,7 +1889,7 @@ export default function TerminalApp() {
         const log = getNode(fs.fs, '/var/log/kernel.log')
         push('sys', '-- لاگ‌های اخیر هسته --')
         if (log && log.type === 'file') pushMany('out', log.content)
-        else push('dim', 'لاگ خالی — سیستم خیلی آرام است')
+        else push('dim', 'لاگ خالی، سیستم خیلی آرام است')
         break
       }
       case 'crontab':
@@ -1903,7 +1903,7 @@ export default function TerminalApp() {
         setBusy(true)
         push('out', `در حال ${base === 'zip' ? 'زیپ' : 'تار'} کردن ${args.filter((a) => !a.startsWith('-'))[0] ?? 'همه‌چیز'}…`)
         setTimeout(() => {
-          push('ok', 'بسته شد! (خیالی بود — اینجا دیسک سخت نداریم، قلب‌مان را داریم)')
+          push('ok', 'بسته شد! (خیالی بود، اینجا دیسک سخت نداریم، قلب‌مان را داریم)')
           setBusy(false)
         }, 800)
         break
@@ -1915,7 +1915,7 @@ export default function TerminalApp() {
         setTimeout(() => push('out', '▕░░░░░░░░░░▏ ۱۰٪'), 250)
         setTimeout(() => push('out', '▕▓▓▓▓▓░░░░▏ ۵۰٪'), 550)
         setTimeout(() => {
-          push('ok', `«${f}» دانلود شد — ۱۰۰٪ (به گوشه‌ای خیالی از حافظه)`)
+          push('ok', `«${f}» دانلود شد، ۱۰۰٪ (به گوشه‌ای خیالی از حافظه)`)
           setBusy(false)
         }, 900)
         break
@@ -1926,9 +1926,9 @@ export default function TerminalApp() {
         break
       case 'ip':
       case 'ifconfig':
-        push('out', 'lo0:   127.0.0.1     — خانه، شیرین خانه')
-        push('out', 'en0:   42.42.42.42   — تونل کوانتومی پنگوئنی (فعال)')
-        push('out', 'tux0:  10.0.cute.1   — کارت شبکه بامزگی')
+        push('out', 'lo0:   127.0.0.1، خانه، شیرین خانه')
+        push('out', 'en0:   42.42.42.42، تونل کوانتومی پنگوئنی (فعال)')
+        push('out', 'tux0:  10.0.cute.1، کارت شبکه بامزگی')
         break
       case 'nano':
       case 'vim':
@@ -1936,8 +1936,8 @@ export default function TerminalApp() {
         push(
           'warn',
           base === 'vim'
-            ? 'به vim خوش آمدی! برای خروج: :q! — موفق باشی، ۹۰٪ کاربران همین‌جا گم می‌شوند.'
-            : `${base} اینجا نصب نیست — ولی «نویسا» داریم که خیلی مهربان‌تر است!`
+            ? 'به vim خوش آمدی! برای خروج: :q!، موفق باشی، ۹۰٪ کاربران همین‌جا گم می‌شوند.'
+            : `${base} اینجا نصب نیست، ولی «نویسا» داریم که خیلی مهربان‌تر است!`
         )
         setTimeout(() => launch('writer'), 700)
         break
@@ -1953,27 +1953,27 @@ export default function TerminalApp() {
         break
       }
       case 'ai':
-        push('ok', 'هوش‌یار باز شد — کلید API خودت را آنجا وصل کن!')
+        push('ok', 'هوش‌یار باز شد، کلید API خودت را آنجا وصل کن!')
         launch('ai-chat')
         break
 
       /* ---------------- نسخه ۵.۰: شبکه، سخت‌افزار و امنیت ---------------- */
       case 'htop': {
-        push('sys', 'htop — مانیتور زنده و رنگی (نسخهٔ بی‌استرس)')
+        push('sys', 'htop، مانیتور زنده و رنگی (نسخهٔ بی‌استرس)')
         push('out', '  PID  CPU%  MEM%  پروسه')
-        if (os.windows.length === 0) push('dim', '(هیچ پروسه‌ای بجز خود ما — سیستم در حال مدیتیشن)')
+        if (os.windows.length === 0) push('dim', '(هیچ پروسه‌ای بجز خود ما، سیستم در حال مدیتیشن)')
         os.windows.forEach((w, i) => {
           push(
             'out',
             `${String(pidOf(w.id)).padStart(5)}  ${String(2 + ((i * 11) % 19)).padStart(3)}%  ${String(4 + ((i * 5) % 12)).padStart(3)}%  ${w.title}`
           )
         })
-        push('dim', 'نکته: F10 برای خروج — ولی اینجا هیچ‌وقت لازم نمی‌شود!')
+        push('dim', 'نکته: F10 برای خروج، ولی اینجا هیچ‌وقت لازم نمی‌شود!')
         break
       }
       case 'traceroute': {
         const dest = args[0] ?? 'penguin.os'
-        push('sys', `traceroute به ${dest} — حداکثر ۳۰ هاپ`)
+        push('sys', `traceroute به ${dest}، حداکثر ۳۰ هاپ`)
         const hops = [
           ' 1   gateway.local        0.4 ms',
           ' 2   10.10.0.1            8.2 ms',
@@ -1993,7 +1993,7 @@ export default function TerminalApp() {
         push('out', 'Proto  Local           State   یادداشت')
         push('out', 'tcp    127.0.0.1:3000  LISTEN  (همین سایتی که الان باز است!)')
         push('out', 'tcp    0.0.0.0:443     ESTAB   (تونل امن پنگوئن)')
-        push('out', 'udp    0.0.0.0:53      —       (DNS؛ اسم‌ها را به عدد ترجمه می‌کند)')
+        push('out', 'udp    0.0.0.0:53، (DNS؛ اسم‌ها را به عدد ترجمه می‌کند)')
         break
       case 'iptables':
         push('sys', 'Chain INPUT (policy ACCEPT)')
@@ -2003,7 +2003,7 @@ export default function TerminalApp() {
         push('dim', 'یادت باشد: ACCEPT یعنی راه بده، DROP یعنی بی‌خبر رد کن!')
         break
       case 'ufw':
-        if (args[0] === 'enable') push('ok', 'فایروال فعال شد — حالا این سیستم مثل قلعه است!')
+        if (args[0] === 'enable') push('ok', 'فایروال فعال شد، حالا این سیستم مثل قلعه است!')
         else if (args[0] === 'status') {
           push('sys', 'Status: active')
           push('out', '22/tcp   ALLOW   anywhere')
@@ -2027,7 +2027,7 @@ export default function TerminalApp() {
         push('out', 'Architecture:        x86_64')
         push('out', `CPU(s):              ${navigator.hardwareConcurrency || 8}  ← واقعی از دستگاهت!`)
         push('out', 'Model name:          بسته به دستگاه تو')
-        push('out', 'Virtualization:      داخل مرورگر — پس همیشه بله!')
+        push('out', 'Virtualization:      داخل مرورگر، پس همیشه بله!')
         break
       case 'lsusb':
         push('out', 'Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub')
@@ -2050,8 +2050,8 @@ export default function TerminalApp() {
         setBusy(true)
         push('out', base === 'gzip' ? `فشرده‌سازی ${f} …` : `باز کردن ${f} …`)
         setTimeout(() => {
-          if (base === 'gzip') push('ok', `«${f}.gz» آماده — حدود ۶۰٪ کوچکتر شد (تقریباً!)`)
-          else push('ok', 'باز شد — دمِ فشرده‌ساز گرم!')
+          if (base === 'gzip') push('ok', `«${f}.gz» آماده، حدود ۶۰٪ کوچکتر شد (تقریباً!)`)
+          else push('ok', 'باز شد، دمِ فشرده‌ساز گرم!')
           setBusy(false)
         }, 600)
         break
@@ -2059,7 +2059,7 @@ export default function TerminalApp() {
       case 'unzip':
         push('out', `Archive: ${args[0] ?? 'بسته.zip'}`)
         push('out', '  extracting: فندق‌ها.txt')
-        push('ok', 'باز شد — خوش آمدی به مهمانی!')
+        push('ok', 'باز شد، خوش آمدی به مهمانی!')
         break
       case 'sha256sum':
       case 'md5sum': {
@@ -2072,7 +2072,7 @@ export default function TerminalApp() {
               : 'd41d8cd98f00b204e9800998ecf8427e'
           }  ${f}`
         )
-        push('dim', 'اثر انگشت فایل — اگر بعد از دانلود با نسخهٔ رسمی فرق داشت، مشکل‌دار است!')
+        push('dim', 'اثر انگشت فایل، اگر بعد از دانلود با نسخهٔ رسمی فرق داشت، مشکل‌دار است!')
         break
       }
       case 'base64': {
@@ -2101,7 +2101,7 @@ export default function TerminalApp() {
         )
         if (victim) {
           useOS.getState().closeWindow(victim.id)
-          push('ok', `«${victim.title}» بسته شد — بدون قید و شرط`)
+          push('ok', `«${victim.title}» بسته شد، بدون قید و شرط`)
         } else push('err', `پروسه‌ای به نام «${name}» در حال اجرا نیست. با ps نگاه کن`)
         break
       }
@@ -2113,13 +2113,13 @@ export default function TerminalApp() {
         break
       }
       case 'pacman':
-        push('warn', 'پنگوئن: «آنجا آرچ است! من Debian/Ubuntu-سان‌جابی هستم» — ولی apt را امتحان کن، همان کار را می‌کند.')
+        push('warn', 'پنگوئن: «آنجا آرچ است! من Debian/Ubuntu-سان‌جابی هستم»، ولی apt را امتحان کن، همان کار را می‌کند.')
         break
       case 'dnf':
         push('warn', 'اینجا apt صاحبخانه است؛ dnf مهمان فدورایی است که هنوز نرسیده!')
         break
       case 'apk':
-        push('ok', 'Alpine! همان که در اپ «بوت کرنل واقعی» واقعاً اجرا می‌شود — آنجا apk add واقعی کار می‌کند!')
+        push('ok', 'Alpine! همان که در اپ «بوت کرنل واقعی» واقعاً اجرا می‌شود، آنجا apk add واقعی کار می‌کند!')
         launch('real-linux')
         break
       case 'timedatectl':
@@ -2135,7 +2135,7 @@ export default function TerminalApp() {
         push('out', '            Kernel: مرورگر-سازگار و بامزه')
         break
       case 'useradd':
-        if (args[0]) push('ok', `کاربر «${args[0]}» ساخته شد — حالا passwd ${args[0]} را بزن`)
+        if (args[0]) push('ok', `کاربر «${args[0]}» ساخته شد، حالا passwd ${args[0]} را بزن`)
         else push('err', 'مثال: sudo useradd pengo2')
         break
       case 'passwd':
@@ -2145,7 +2145,7 @@ export default function TerminalApp() {
         break
       case 'su':
         push('out', 'Password: ••••••••')
-        push('ok', 'هویت عوض شد — الان مدیر هستی. «با قدرت بزرگ، مسئولیت بزرگ می‌آید»')
+        push('ok', 'هویت عوض شد، الان مدیر هستی. «با قدرت بزرگ، مسئولیت بزرگ می‌آید»')
         break
       case 'xxd': {
         const target = args[0]
@@ -2156,7 +2156,7 @@ export default function TerminalApp() {
           .map((ch) => ch.charCodeAt(0).toString(16).padStart(2, '0'))
           .join(' ')
         push('out', `00000000:  ${hex}  |${content5.slice(0, 12)}|`)
-        push('dim', 'نمای هگز — زبان مشترک ماشین‌ها!')
+        push('dim', 'نمای هگز، زبان مشترک ماشین‌ها!')
         break
       }
 
@@ -2172,7 +2172,7 @@ export default function TerminalApp() {
         if (fixedFull) {
           if (!nested) setPendingFix({ from: base, fixed: fixedFull })
           push('err', `پنگوئن‌شل: دستور «${base}» را نمی‌شناسم`)
-          push('dim', `اما گمان می‌کنم منظورت «${fixedFull}» بود — Enter بزن تا اجرایش کنم، یا از نوار بالا استفاده کن.`)
+          push('dim', `اما گمان می‌کنم منظورت «${fixedFull}» بود؛ Enter بزن تا اجرایش کنم، یا از نوار بالا استفاده کن.`)
         } else {
           push('err', `پنگوئن‌شل: دستور «${base}» پیدا نشد`)
           push('dim', 'بنویس help، یا از دستیار بپرس: ask ' + base)
@@ -2400,7 +2400,7 @@ export default function TerminalApp() {
           <span className={`min-w-0 flex-1 truncate ${revMatch ? 'text-zinc-200' : 'text-rose-300'}`}>
             {revMatch ?? 'پیدا نشد'}
           </span>
-          <span className="hidden text-zinc-500 sm:inline">Enter=اجرا — Esc=خروج</span>
+          <span className="hidden text-zinc-500 sm:inline">Enter=اجرا؛ Esc=خروج</span>
         </div>
       )}
 
@@ -2457,7 +2457,7 @@ export default function TerminalApp() {
           >
             <X size={12} />
           </button>
-          <span className="text-amber-200/50">اصلاح‌ها یاد گرفته می‌شوند — دفعه بعد خودکار پیشنهاد می‌دهم</span>
+          <span className="text-amber-200/50">اصلاح‌ها یاد گرفته می‌شوند، دفعه بعد خودکار پیشنهاد می‌دهم</span>
         </div>
       )}
 
@@ -2500,7 +2500,7 @@ export default function TerminalApp() {
         <canvas
           ref={canvasRef}
           className="absolute inset-0 z-10 cursor-pointer bg-black/95"
-          aria-label="انیمیشن ماتریکس — برای خروج کلیک کن"
+          aria-label="انیمیشن ماتریکس، برای خروج کلیک کن"
         />
       )}
     </div>

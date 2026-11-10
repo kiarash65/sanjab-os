@@ -54,7 +54,7 @@ const NOTIFS: { icon: LucideIcon; title: string; body: string }[] = [
   {
     icon: Lightbulb,
     title: 'راهنما',
-    body: 'ترمینال را باز کن، بنویس learn start تا ترمینال را بازی‌کنان یاد بگیری. یا کداستودیو را امتحان کن — پایتون داریم!',
+    body: 'ترمینال را باز کن، بنویس learn start تا ترمینال را بازی‌کنان یاد بگیری. یا کداستودیو را امتحان کن، پایتون داریم!',
   },
   {
     icon: Package,
@@ -79,12 +79,12 @@ const NOTIFS: { icon: LucideIcon; title: string; body: string }[] = [
   {
     icon: Target,
     title: 'دستور روز',
-    body: 'ترمینال را باز کن و غلط تایپی بده — خودش اصلاحش می‌کند!',
+    body: 'ترمینال را باز کن و غلط تایپی بده، خودش اصلاحش می‌کند!',
   },
   {
     icon: Wifi,
     title: 'باتری',
-    body: '۹۹٪ — یک درصد کم شد فقط برای اینکه استرس داشته باشی.',
+    body: '۹۹٪، یک درصد کم شد فقط برای اینکه استرس داشته باشی.',
   },
   {
     icon: Bell,
@@ -277,13 +277,13 @@ export default function OSRoot() {
       <div className="absolute inset-0 bg-black/10" aria-hidden />
       <DesktopIcons />
       <Sanjabak />
-      {/* واترمارک اسپانسری — لوگوی رسمی سان‌جاب */}
+      {/* واترمارک اسپانسری، لوگوی رسمی سان‌جاب */}
       <a
         href="https://sunjob.ir"
         target="_blank"
         rel="noreferrer"
         className="pengo-fadein pointer-events-auto fixed bottom-14 left-3 z-[5] hidden items-center gap-2 rounded-full border border-white/10 bg-black/35 px-2.5 py-1.5 backdrop-blur-md transition hover:border-[#f7931e]/50 sm:flex"
-        title="اسپانسیر سیستم: سان‌جاب — sunjob.ir"
+        title="اسپانسیر سیستم: سان‌جاب، sunjob.ir"
       >
         <img
           src="/brand/sunjob-logo.webp"

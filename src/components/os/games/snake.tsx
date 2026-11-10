@@ -316,7 +316,7 @@ export default function SnakeGame() {
       <GameShell
         emoji="🐍"
         title="مار"
-        howTo="کلیدهای جهت‌دار یا WASD — روی موبایل از دکمه‌ها استفاده کن"
+        howTo="کلیدهای جهت‌دار یا WASD، روی موبایل از دکمه‌ها استفاده کن"
         stats={[
           { label: 'امتیاز', value: score },
           { label: 'رکورد', value: best },

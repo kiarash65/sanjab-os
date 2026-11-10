@@ -2278,7 +2278,7 @@ function LessonView({
           </div>
         </section>
 
-        {lesson.id === 'ps-1' && <PipelineDiagram />}
+        {lesson.id === 'ps-7' && <PipelineDiagram />}
 
         <section>
           <SectionTitle icon={SquareTerminal} color="#06b6d4">

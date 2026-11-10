@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware'
 import { useOS } from '@/lib/os/store'
 
 /* ------------------------------------------------------------------ */
-/* موتور گیمیفیکیشن سان‌جاب‌اواس — یک موتور مرکزی برای همه آکادمی‌ها    */
+/* موتور گیمیفیکیشن سان‌جاب‌اواس، یک موتور مرکزی برای همه آکادمی‌ها    */
 /* XP، دستاورد، مأموریت روزانه، استریک (زنجیره روزهای فعال)           */
 /* رویدادها idempotent هستند: هر event-id فقط یک‌بار امتیاز می‌دهد     */
 /* ------------------------------------------------------------------ */
@@ -21,7 +21,7 @@ export interface Achievement {
   id: string
   title: string
   desc: string
-  /** شرط بر اساس آمار — اگر true شد دستاورد باز می‌شود */
+  /** شرط بر اساس آمار، اگر true شد دستاورد باز می‌شود */
   check: (s: GameStats) => boolean
 }
 
@@ -72,7 +72,7 @@ export function todayKey(d = new Date()): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-/** مأموریت روزانه — از روی تاریخ به‌صورت قطعی انتخاب می‌شود */
+/** مأموریت روزانه، از روی تاریخ به‌صورت قطعی انتخاب می‌شود */
 export function questOfTheDay(day = todayKey()): (typeof QUEST_POOL)[number] {
   let h = 0
   for (const ch of day) h = (h * 31 + ch.charCodeAt(0)) >>> 0
@@ -109,7 +109,7 @@ function toastAward(label: string, xp: number) {
       body: label,
     })
   } catch {
-    /* خارج از محیط دسکتاپ — نادیده */
+    /* خارج از محیط دسکتاپ، نادیده */
   }
 }
 
@@ -132,7 +132,7 @@ function checkAchievements(get: () => GameStore, set: (p: Partial<GameStore>) =>
       xp: s2.xp + 10,
       events: [...s2.events, { id: `ach:${a.id}`, label: `دستاورد: ${a.title}`, xp: 10, at: Date.now() }],
     })
-    toastAward(`دستاورد باز شد: «${a.title}» — ${a.desc}`, 10)
+    toastAward(`دستاورد باز شد: «${a.title}»، ${a.desc}`, 10)
   }
 }
 
@@ -214,7 +214,7 @@ export const useGame = create<GameStore>()(
           streakCount: count,
           streakBest: Math.max(st.streakBest, count),
         })
-        if (count >= 3) toastAward(`زنجیره ${count} روزه فعال است — ادامه بده!`, 0)
+        if (count >= 3) toastAward(`زنجیره ${count} روزه فعال است، ادامه بده!`, 0)
       },
 
       resetAll: () =>

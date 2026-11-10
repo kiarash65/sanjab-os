@@ -1,5 +1,5 @@
 /* ================================================================
-   اطلاعات نسخه و پرچم‌های ویژگی — تک منبع حقیقت برای Developer Mode
+   اطلاعات نسخه و پرچم‌های ویژگی، تک منبع حقیقت برای Developer Mode
    ================================================================ */
 
 import packageJson from '../../../package.json'
@@ -25,7 +25,7 @@ export interface FeatureFlag {
   experimental: boolean
 }
 
-/** پرچم‌های واقعی سیستم — فقط چیزهایی که در کد وجود دارند */
+/** پرچم‌های واقعی سیستم، فقط چیزهایی که در کد وجود دارند */
 export const FEATURE_FLAGS: FeatureFlag[] = [
   {
     key: 'reading-reader',
@@ -53,7 +53,7 @@ export const FEATURE_FLAGS: FeatureFlag[] = [
   },
   {
     key: 'hoshiyar-ai',
-    label: 'هوش‌یار — موتور هوش مصنوعی با کلید کاربر',
+    label: 'هوش‌یار، موتور هوش مصنوعی با کلید کاربر',
     on: true,
     experimental: false,
   },

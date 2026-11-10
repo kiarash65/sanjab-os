@@ -1,7 +1,7 @@
 'use client'
 
 /* ================================================================
-   Learning Reader — خواننده استاندارد آموزش‌های سان‌جاب‌اواس
+   Learning Reader، خواننده استاندارد آموزش‌های سان‌جاب‌اواس
    ویژگی‌ها:
    - عرض مطالعه و تایپوگرافی از توکن‌های سراسری (CSS Variables)
    - فهرست مطالب با هایلایت بخش فعال (Scroll-Spy)
@@ -78,7 +78,7 @@ export function Callout({
   )
 }
 
-/** بلوک کد استاندارد خواننده — همیشه LTR، با فونت کد قابل‌تنظیم */
+/** بلوک کد استاندارد خواننده، همیشه LTR، با فونت کد قابل‌تنظیم */
 export function ReaderCode({ code, label }: { code: string; label?: string }) {
   return (
     <figure className="my-[var(--fa-paragraph-gap)]">
@@ -97,7 +97,7 @@ export function ReaderCode({ code, label }: { code: string; label?: string }) {
 
 /* ---------------- پوسته ساده مطالعه ---------------- */
 
-/** عرض استاندارد + تایپوگرافی مطالعه — برای درون‌پیچی محتوای درس‌ها */
+/** عرض استاندارد + تایپوگرافی مطالعه، برای درون‌پیچی محتوای درس‌ها */
 export function ReadingShell({
   children,
   className = '',
@@ -112,7 +112,7 @@ export function ReadingShell({
 
 /* ---------------- نوار پیشرفت چسبان برای اسکرول‌های موجود ---------------- */
 
-/** برای mainهایی که خودشان اسکرول دارند — یک خط اضافه می‌کند */
+/** برای mainهایی که خودشان اسکرول دارند، یک خط اضافه می‌کند */
 export function ReadProgress({
   targetRef,
   accent,
@@ -174,13 +174,13 @@ export interface ReaderSection {
 }
 
 interface LearningReaderProps {
-  /** شناسه یکتا برای ذخیره آخرین نقطه مطالعه — مثل linux:boot */
+  /** شناسه یکتا برای ذخیره آخرین نقطه مطالعه، مثل linux:boot */
   readerId: string
   sections: ReaderSection[]
   /** محتوای اختیاری بعد از بخش‌ها (مثلاً جمع‌بندی) */
   footer?: ReactNode
   accent?: string
-  /** عنوان درس — در نوار بالای خواننده نمایش داده می‌شود */
+  /** عنوان درس، در نوار بالای خواننده نمایش داده می‌شود */
   title?: string
 }
 
@@ -509,7 +509,7 @@ export function TypographyPreview() {
     <div className="prose-fa rounded-xl border border-white/10 bg-zinc-950/60 p-4">
       <h3 className="mb-1 text-[1.1em] font-black text-white">این یک پیش‌نمایش زنده است</h3>
       <p>
-        فارسی خوانا، آرام و زیبا — با <strong>عبارت برجسته</strong>، اصطلاح فنی{' '}
+        فارسی خوانا، آرام و زیبا، با <strong>عبارت برجسته</strong>، اصطلاح فنی{' '}
         <span className="ltr-inline">Kernel</span> و کمی عدد ۱۲۳۴۵۶ که کنار{' '}
         <span className="ltr-inline">98.6%</span> می‌نشیند.
       </p>

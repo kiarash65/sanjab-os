@@ -1,5 +1,5 @@
 /**
- * Assessment Engine — موتور آزمون مشترک
+ * Assessment Engine، موتور آزمون مشترک
  *
  * انواع سؤال، تصحیح، بازخورد چندلایه و سیستم راهنما.
  * هر سؤال متادیتای کامل دارد (skill، دشواری، زمان تخمینی، وضعیت اعتبارسنجی)
@@ -57,7 +57,7 @@ export interface Question {
 
 export interface Graded {
   correct: boolean
-  /** درصد تطابق 0..1 — برای ordering و fill جزئی هم محاسبه می‌شود */
+  /** درصد تطابق 0..1، برای ordering و fill جزئی هم محاسبه می‌شود */
   ratio: number
 }
 
@@ -113,7 +113,7 @@ export function gradeAnswer(q: Question, given: unknown): Graded {
 export interface Feedback {
   correct: boolean
   headline: string
-  /** جواب صحیح — برای رشته‌ها/ترتیب‌ها */
+  /** جواب صحیح، برای رشته‌ها/ترتیب‌ها */
   correctText?: string
   explanation: string
   /** دلیل غلط بودن گزینهٔ انتخابی کاربر */
@@ -132,7 +132,7 @@ export function buildFeedback(
     q.type === 'ordering'
       ? (q.answer as number[]).map((i) => q.options?.[i]).join(' ← ')
       : q.type === 'multi-select'
-        ? (q.answer as number[]).map((i) => q.options?.[i]).join(' ، ')
+        ? (q.answer as number[]).map((i) => q.options?.[i]).join('، ')
         : q.type === 'single-choice' || q.type === 'predict-output' || q.type === 'find-bug'
           ? (q.options?.[q.answer as number] ?? '')
           : String(q.answer).split('|')[0]
@@ -163,7 +163,7 @@ export function buildFeedback(
 
 /* ---------------- سیستم راهنما (Hint) ---------------- */
 
-/** راهنمای مرحله‌ای — هر بار فقط یک راهنما، بدون لو دادن جواب نهایی */
+/** راهنمای مرحله‌ای، هر بار فقط یک راهنما، بدون لو دادن جواب نهایی */
 export function nextHint(q: Question, usedCount: number): { text: string; isLast: boolean } | null {
   if (usedCount >= q.hints.length) return null
   return { text: q.hints[usedCount], isLast: usedCount === q.hints.length - 1 }
@@ -173,7 +173,7 @@ export function nextHint(q: Question, usedCount: number): { text: string; isLast
 
 export interface QuizSpec {
   track: TrackId
-  /** مهارت‌های مجاز — خالی یعنی همهٔ مسیر */
+  /** مهارت‌های مجاز، خالی یعنی همهٔ مسیر */
   skillIds?: string[]
   difficulties?: Difficulty[]
   count: number

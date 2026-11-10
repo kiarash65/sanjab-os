@@ -14,7 +14,7 @@ const toFa = (value: number | string): string =>
   String(value).replace(/\d/g, (digit) => FA_DIGITS[Number(digit)] ?? digit)
 
 /* ------------------------------------------------------------------ */
-/* ریاضیات رنگ — تبدیل‌های دستی HEX/RGB/HSL                           */
+/* ریاضیات رنگ، تبدیل‌های دستی HEX/RGB/HSL                           */
 /* ------------------------------------------------------------------ */
 
 interface RGB {
@@ -539,7 +539,7 @@ export default function ColorStudioApp() {
             })}
           </div>
           <p className="mt-2 text-[10px] leading-5 text-zinc-500">
-            AA یعنی نسبت ۴.۵ به بالا، AAA یعنی ۷ به بالا. اگر رد شد، متن روی این رنگ نخوانده می‌شود — به چشم‌ها رحم کن!
+            AA یعنی نسبت ۴.۵ به بالا، AAA یعنی ۷ به بالا. اگر رد شد، متن روی این رنگ نخوانده می‌شود، به چشم‌ها رحم کن!
           </p>
         </div>
 
@@ -592,7 +592,7 @@ export default function ColorStudioApp() {
             <div className="p-3" style={{ backgroundColor: hex, color: onColorText }}>
               <p className="text-sm font-black">آگهی شغلی آزمایشی</p>
               <p className="mt-0.5 text-[11px] opacity-80">
-                استخدام پرتابلِ رنگی — حقوق: به وزنِ کدت! 🐿️
+                استخدام پرتابلِ رنگی، حقوق: به وزنِ کدت! 🐿️
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2 bg-zinc-950/80 p-3">

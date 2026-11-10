@@ -1,5 +1,5 @@
 /**
- * Learning Domain — مدل مشترک یادگیری سنجاب‌اواس
+ * Learning Domain، مدل مشترک یادگیری سنجاب‌اواس
  *
  * لایهٔ مستقل و تایپ‌شده که همهٔ آکادمی‌ها از طریق Adapter به آن وصل می‌شوند.
  * منبع یگانهٔ حقیقت برای «پیشرفت درسی»، «تسلط بر مهارت»، «مرور فاصله‌دار» و
@@ -27,7 +27,7 @@ export const TRACK_TITLES: Record<TrackId, string> = {
   algorithm: 'آکادمی الگوریتم',
 }
 
-/** وضعیت تسلط بر یک مهارت — از شواهد واقعی محاسبه می‌شود، نه دستی */
+/** وضعیت تسلط بر یک مهارت، از شواهد واقعی محاسبه می‌شود، نه دستی */
 export type MasteryState =
   | 'not-started'
   | 'attempted'
@@ -51,9 +51,9 @@ export const MASTERY_ORDER: MasteryState[] = [
   'mastered',
 ]
 
-/** نوع شواهد — هر شواهد وزنی مشخص و بازهٔ زمانی دارد */
+/** نوع شواهد، هر شواهد وزنی مشخص و بازهٔ زمانی دارد */
 export type EvidenceKind =
-  | 'lesson-view' // درس باز شد (فعالیت اولیه — وزن کم)
+  | 'lesson-view' // درس باز شد (فعالیت اولیه، وزن کم)
   | 'lesson-complete' // درس خوانده شد
   | 'exercise-pass' // تمرین عملی پاس شد
   | 'quiz-correct' // پاسخ درست در آزمون
@@ -92,7 +92,7 @@ export const EVIDENCE_LABEL: Record<EvidenceKind, string> = {
 
 export interface SkillEvidence {
   kind: EvidenceKind
-  /** ارجاع — id درس/سؤال/پروژه */
+  /** ارجاع، id درس/سؤال/پروژه */
   ref: string
   at: number
 }
@@ -103,7 +103,7 @@ export interface SkillState {
   lastAt: number
 }
 
-/** رویداد استاندارد یادگیری — گزارش‌گیری و داشبورد از این تغذیه می‌شود */
+/** رویداد استاندارد یادگیری، گزارش‌گیری و داشبورد از این تغذیه می‌شود */
 export type LearningEventType =
   | 'lesson.started'
   | 'lesson.section_completed'
@@ -123,14 +123,14 @@ export interface LearningEvent {
   id: string
   type: LearningEventType
   track: TrackId
-  /** شناسه مرجع — lessonId / projectId / assessmentId */
+  /** شناسه مرجع، lessonId / projectId / assessmentId */
   ref: string
   /** عنوان فارسی کوتاه برای فید */
   label: string
   at: number
 }
 
-/** آیتم مرور فاصله‌دار — زمان‌بند ساده SM-2 گونه (مستندشده در review.ts) */
+/** آیتم مرور فاصله‌دار، زمان‌بند ساده SM-2 گونه (مستندشده در review.ts) */
 export interface ReviewItem {
   id: string
   track: TrackId
@@ -149,7 +149,7 @@ export interface ReviewItem {
 
 export interface LessonRecord {
   done: boolean
-  /** بهترین نمره آزمون درس — [درست, کل] */
+  /** بهترین نمره آزمون درس، [درست, کل] */
   bestScore?: [number, number]
   openedAt: number
   completedAt?: number
@@ -163,14 +163,14 @@ export interface ProjectRecord {
   completedAt?: number
 }
 
-/** پروفایل یادگیری — نسخه‌بندی‌شده و قابل مهاجرت */
+/** پروفایل یادگیری، نسخه‌بندی‌شده و قابل مهاجرت */
 export interface LearningProfile {
   version: 1
-  /** پیشرفت درس‌ها به تفکیک مسیر — مرجع اصلی پیشرفت محتوایی */
+  /** پیشرفت درس‌ها به تفکیک مسیر، مرجع اصلی پیشرفت محتوایی */
   lessons: Partial<Record<TrackId, Record<string, LessonRecord>>>
   /** وضعیت مهارت‌ها با شواهد */
   skills: Record<string, SkillState>
-  /** رویدادها — حداکثر EVENTS_CAP آیتم آخر نگه داشته می‌شود */
+  /** رویدادها، حداکثر EVENTS_CAP آیتم آخر نگه داشته می‌شود */
   events: LearningEvent[]
   /** صف مرور فاصله‌دار */
   review: Record<string, ReviewItem>
@@ -184,7 +184,7 @@ export interface LearningProfile {
   }
   /** مجموع ثانیه مطالعه به تفکیک روز (mirror از sunjob-reading-v1) */
   reading: Record<string, number>
-  /** مهر مهاجرت از کلیدهای قدیمی — تکرارپذیر و ایمن */
+  /** مهر مهاجرت از کلیدهای قدیمی، تکرارپذیر و ایمن */
   migratedAt?: number
 }
 

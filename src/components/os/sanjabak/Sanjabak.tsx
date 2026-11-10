@@ -1,10 +1,10 @@
 'use client'
 
 /**
- * Sanjabak — ماسکوت لایه‌ای سنجاب‌اواس
+ * Sanjabak، ماسکوت لایه‌ای سنجاب‌اواس
  *
  * SanjabakAvatar: رندر SVG لایه‌ای (بدن/چشم/عینک/کلاه/لباس/وسیله/پس‌زمینه)
- * Sanjabak: همدم میزکار — راه می‌رود، نکته می‌دهد و به رویدادهای یادگیری
+ * Sanjabak: همدم میزکار، راه می‌رود، نکته می‌دهد و به رویدادهای یادگیری
  * واکنش ظریف نشان می‌دهد. با funMode و reducedMotion و تنظیم واکنش‌ها
  * کاملاً قابل کنترل است و هیچ‌وقت مزاحم تمرکز نمی‌شود.
  */
@@ -17,12 +17,12 @@ import { useLearning } from '@/lib/learning/store'
 export type SanjabakMood = 'idle' | 'happy' | 'cheer' | 'think'
 
 export const SANJABAK_TIPS = [
-  'درس امروز را با ۱۰ دقیقه شروع کن — پیوستگی مهم‌تر از حجم است!',
+  'درس امروز را با ۱۰ دقیقه شروع کن، پیوستگی مهم‌تر از حجم است!',
   'مرور فاصله‌دار در مرکز یادگیری، دشمن فراموشی است.',
-  'قبل از کدنویسی، شبه‌کد بنویس — در آکادمی الگوریتم امتحانش کن.',
+  'قبل از کدنویسی، شبه‌کد بنویس، در آکادمی الگوریتم امتحانش کن.',
   'آزمون کوچک = تمرین بازیابی حافظه. خودت را بسنج!',
   'یک پروژهٔ کوچک کامل کن تا مهارت واقعی شود.',
-  'ترمینال را باز کن و help بزن — درس‌های مخفی اینجاست.',
+  'ترمینال را باز کن و help بزن، درس‌های مخفی اینجاست.',
 ]
 
 interface AvatarProps {
@@ -31,7 +31,7 @@ interface AvatarProps {
   className?: string
 }
 
-/** رندر خالص سنجابک — در استودیو و میزکار استفاده می‌شود */
+/** رندر خالص سنجابک، در استودیو و میزکار استفاده می‌شود */
 export function SanjabakAvatar({ size = 96, mood = 'idle', className = '' }: AvatarProps) {
   const look = useMascot((s) => s.look)
   const fur = FUR_COLORS[look.fur] ?? FUR_COLORS.classic
@@ -50,7 +50,7 @@ export function SanjabakAvatar({ size = 96, mood = 'idle', className = '' }: Ava
       height={size}
       className={className}
       role="img"
-      aria-label="سنجابک — همراه یادگیری سان‌جاب‌اواس"
+      aria-label="سنجابک، همراه یادگیری سان‌جاب‌اواس"
     >
       {/* پس‌زمینه */}
       {look.bg !== 'none' && (
@@ -67,7 +67,7 @@ export function SanjabakAvatar({ size = 96, mood = 'idle', className = '' }: Ava
         </>
       )}
 
-      {/* دم — امضای سنجاب */}
+      {/* دم، امضای سنجاب */}
       <path
         d="M 30 62 C 12 60, 8 40, 20 30 C 26 25, 34 27, 32 34 C 27 42, 30 52, 36 56 Z"
         fill={fur.tail}
@@ -238,7 +238,7 @@ export function SanjabakAvatar({ size = 96, mood = 'idle', className = '' }: Ava
         </g>
       )}
 
-      {/* حالت فکر — حباب ذهنی کوچک */}
+      {/* حالت فکر، حباب ذهنی کوچک */}
       {mood === 'think' && (
         <g opacity="0.85">
           <circle cx="76" cy="20" r="5.5" fill="#fff" opacity="0.35" />
@@ -268,7 +268,7 @@ export default function Sanjabak() {
   const lastEventId = useRef<string | null>(null)
   const lastEvents = useLearning((s) => s.profile.events)
 
-  /* راه رفتن آرام — بدون setState تو در تو */
+  /* راه رفتن آرام، بدون setState تو در تو */
   useEffect(() => {
     if (!funMode || reducedMotion || !animations) return
     const t = window.setInterval(() => {
@@ -314,14 +314,14 @@ export default function Sanjabak() {
     const isFirst = lastEventId.current === null
     lastEventId.current = last.id
     if (isFirst) return
-    /* با تاخیر صفر — setState در callback، نه هم‌زمان در بدنهٔ effect */
+    /* با تاخیر صفر، setState در callback، نه هم‌زمان در بدنهٔ effect */
     const t = window.setTimeout(() => {
       if (last.type === 'lesson.completed') {
         say('آفرین! یه درس دیگه تموم شد 🎉', 'cheer')
       } else if (last.type === 'project.completed') {
         say('پروژه کامل شد! تو یه چیزی ساختی!', 'cheer')
       } else if (last.type === 'skill.mastery_changed') {
-        say('مهارتت ارتقا گرفت — دمت گرم!', 'cheer')
+        say('مهارتت ارتقا گرفت، دمت گرم!', 'cheer')
       } else if (last.type === 'review.completed') {
         say('مرور باحال! مغزت ممنونت هست.', 'happy')
       }
@@ -337,7 +337,7 @@ export default function Sanjabak() {
       onClick={() => say(SANJABAK_TIPS[Math.floor(Math.random() * SANJABAK_TIPS.length)])}
       className="fixed bottom-11 z-[4] block cursor-pointer transition-[left] duration-100 ease-linear"
       style={{ left: x }}
-      aria-label={`${name} — همراه یادگیری. برای یک نکته کلیک کن`}
+      aria-label={`${name}، همراه یادگیری. برای یک نکته کلیک کن`}
       title={name}
     >
       {bubble && (

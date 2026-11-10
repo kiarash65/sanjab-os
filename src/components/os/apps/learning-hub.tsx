@@ -1,7 +1,7 @@
 'use client'
 
 /* ------------------------------------------------------------------ */
-/* مرکز یادگیری سان‌جاب — Learning Hub                                 */
+/* مرکز یادگیری سان‌جاب؛ Learning Hub                                 */
 /* تب‌ها: نمای کلی · برنامه امروز · مرور فاصله‌دار · مسیرها ·           */
 /*       نقشه مهارت · پروژه‌ها · گزارش هفتگی                           */
 /* همه‌چیز از لایهٔ یادگیری (sanjab-learning-v1) و موتور XP می‌آید.     */
@@ -129,12 +129,12 @@ export default function LearningHubApp() {
         {tab === 'projects' && <ProjectsTab />}
         {tab === 'weekly' && <WeeklyTab />}
 
-        {/* فوتر: موتور XP — نگه‌داشته‌شده و متصل */}
+        {/* فوتر: موتور XP، نگه‌داشته‌شده و متصل */}
         <div className="mt-6 rounded-2xl border border-white/10 bg-zinc-900/40 p-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="flex items-center gap-1.5 text-[11px] font-black text-zinc-300">
               <Trophy size={13} className="text-amber-400" />
-              موتور انگیزش: سطح {fa(levelOf(game.xp))} — {fa(game.xp)} XP · زنجیره {fa(game.streakCount)} روز
+              موتور انگیزش: سطح {fa(levelOf(game.xp))}، {fa(game.xp)} XP · زنجیره {fa(game.streakCount)} روز
             </p>
             <p className="text-[10px] text-zinc-500">
               {fa(game.achievements.length)}/{fa(ACHIEVEMENTS.length)} دستاورد · رویدادهای XP ضدتکرار (Idempotent)
@@ -158,7 +158,7 @@ function Overview({ onGoReview, onGoPlan, dueCount }: { onGoReview: () => void; 
   const profile = useLearning((s) => s.profile)
   const game = useGame()
 
-  /* کارت «ادامه یادگیری» — برجسته‌ترین بخش */
+  /* کارت «ادامه یادگیری»، برجسته‌ترین بخش */
   const ls = profile.lastSession
   const continueTrack = ls?.track
   const continueLesson = ls ? lessonTitle(ls.track, ls.lessonId) : null
@@ -207,7 +207,7 @@ function Overview({ onGoReview, onGoPlan, dueCount }: { onGoReview: () => void; 
             <p className="mt-0.5 text-[11px] leading-5 text-zinc-400">
               {activeSkills > 0
                 ? `${fa(activeSkills)} مهارت فعال داری · ${fa(masteryCounts.mastered)} تسلط کامل · ${dueCount > 0 ? `${fa(dueCount)} مرور سررسید` : 'مرور معوق نداری'}`
-                : 'مسیر یادگیری‌ات را انتخاب کن و اولین درس را باز کن — سنجابک همراهت است.'}
+                : 'مسیر یادگیری‌ات را انتخاب کن و اولین درس را باز کن، سنجابک همراهت است.'}
             </p>
           </div>
         </div>
@@ -222,7 +222,7 @@ function Overview({ onGoReview, onGoPlan, dueCount }: { onGoReview: () => void; 
         >
           <p className="flex items-center gap-1.5 text-[10px] font-black text-teal-300">
             <Play size={12} aria-hidden />
-            ادامهٔ یادگیری — یک کلیک تا جای قبلی
+            ادامهٔ یادگیری، یک کلیک تا جای قبلی
           </p>
           <p className="mt-1.5 text-[13px] font-black text-zinc-100">
             {TRACK_TITLES[continueTrack]} · «{continueLesson}»
@@ -261,7 +261,7 @@ function Overview({ onGoReview, onGoPlan, dueCount }: { onGoReview: () => void; 
           ))}
         </div>
         <p className="mt-2 text-[10px] leading-5 text-zinc-500">
-          تسلط از «شواهد واقعی» محاسبه می‌شود — درس، تمرین عملی، آزمون و مرور فاصله‌دار. تکمیل دوره جداست از تسلط.
+          تسلط از «شواهد واقعی» محاسبه می‌شود، درس، تمرین عملی، آزمون و مرور فاصله‌دار. تکمیل دوره جداست از تسلط.
         </p>
       </div>
 
@@ -282,7 +282,7 @@ function Overview({ onGoReview, onGoPlan, dueCount }: { onGoReview: () => void; 
           ))}
           {profile.events.length === 0 && (
             <p className="py-3 text-center text-[11px] text-zinc-500">
-              هنوز رویدادی ثبت نشده — با باز کردن اولین درس، اینجا زنده می‌شود.
+              هنوز رویدادی ثبت نشده، با باز کردن اولین درس، اینجا زنده می‌شود.
             </p>
           )}
         </div>
@@ -419,7 +419,7 @@ function PlanTab() {
         })}
         {plan.length === 0 && (
           <p className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6 text-center text-[12px] text-zinc-500">
-            فعلاً برنامه‌ای نیست — یک آکادمی را شروع کن تا برنامهٔ هوشمند فعال شود.
+            فعلاً برنامه‌ای نیست، یک آکادمی را شروع کن تا برنامهٔ هوشمند فعال شود.
           </p>
         )}
       </div>
@@ -428,7 +428,7 @@ function PlanTab() {
 }
 
 /* ------------------------------------------------------------------ */
-/* مرور فاصله‌دار — جلسهٔ مرور واقعی                                    */
+/* مرور فاصله‌دار، جلسهٔ مرور واقعی                                    */
 /* ------------------------------------------------------------------ */
 interface DueItemLite {
   id: string
@@ -497,7 +497,7 @@ function ReviewTab({
       setQuestion(null)
       pushToast({
         title: 'جلسهٔ مرور کامل شد 🎉',
-        body: 'مرور فاصله‌دار، دشمن فراموشی است — فردا هم سر بزن.',
+        body: 'مرور فاصله‌دار، دشمن فراموشی است، فردا هم سر بزن.',
       })
     } else {
       setIdx(next)
@@ -533,13 +533,13 @@ function ReviewTab({
             onNext={!isLast ? () => undefined : undefined}
           />
         ) : (
-          /* یادآوری خودارزیابی — برای مفاهیم بدون سؤال بانکی */
+          /* یادآوری خودارزیابی، برای مفاهیم بدون سؤال بانکی */
           <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-4">
             <p className="text-[11px] font-black text-rose-300">یادآوری فعال</p>
             <p className="prose-fa mt-2 text-[14px] font-black leading-8 text-zinc-100">
-              «{item.title}» — بدون نگاه به درس، توضیح بده: این مفهوم چیست و کجا به‌کار می‌آید؟
+              «{item.title}»، بدون نگاه به درس، توضیح بده: این مفهوم چیست و کجا به‌کار می‌آید؟
             </p>
-            <p className="mt-1 text-[11px] text-zinc-500">صادق باش — مغز تو فقط خودش می‌داند! نتیجه در زمان‌بندی مرور اثر می‌گذارد.</p>
+            <p className="mt-1 text-[11px] text-zinc-500">صادق باش، مغز تو فقط خودش می‌داند! نتیجه در زمان‌بندی مرور اثر می‌گذارد.</p>
             <div className="mt-3 grid grid-cols-3 gap-2">
               {[
                 { label: 'بلد بودم ✅', correct: true, conf: 'sure' as const, cls: 'border-emerald-500/40 bg-emerald-500/10 text-emerald-200 hover:bg-emerald-500/20' },
@@ -571,7 +571,7 @@ function ReviewTab({
           صف مرور فاصله‌دار
         </p>
         <p className="mt-1 text-[11px] leading-5 text-zinc-400">
-          مفاهیمی که زمان مرورشان رسیده — زمان‌بند نردبانی (الهام از SM-2): پاسخ درست فاصله را ×ease زیاد می‌کند، فراموشی برمی‌گرداند به ۱ روز.
+          مفاهیمی که زمان مرورشان رسیده، زمان‌بند نردبانی (الهام از SM-2): پاسخ درست فاصله را ×ease زیاد می‌کند، فراموشی برمی‌گرداند به ۱ روز.
         </p>
         {due.length > 0 && (
           <button
@@ -588,7 +588,7 @@ function ReviewTab({
         <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6 text-center">
           <p className="text-[12px] text-zinc-400">صف مرور خالی است 👏</p>
           <p className="mt-1 text-[11px] leading-5 text-zinc-500">
-            مرورها بعد از تکمیل درس و آزمون‌ها ساخته می‌شوند — هر درس تازه، مفاهیمش وارد چرخهٔ مرور می‌شوند.
+            مرورها بعد از تکمیل درس و آزمون‌ها ساخته می‌شوند، هر درس تازه، مفاهیمش وارد چرخهٔ مرور می‌شوند.
           </p>
         </div>
       )}
@@ -833,7 +833,7 @@ function WeeklyTab() {
       <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-4">
         <p className="flex items-center gap-1.5 text-xs font-black text-zinc-200">
           <BarChart3 size={14} className="text-sky-300" />
-          هفتهٔ اخیر — فقط از دادهٔ واقعی
+          هفتهٔ اخیر، فقط از دادهٔ واقعی
         </p>
         <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
           <MiniStat label="درس تکمیل‌شده" value={report.lessonsCompleted} tint="text-teal-300" />
@@ -869,7 +869,7 @@ function WeeklyTab() {
         <p className="mb-2 text-xs font-black text-zinc-200">توصیهٔ هفتهٔ بعد</p>
         {report.skillsImproved.length > 0 && (
           <p className="text-[11px] leading-6 text-zinc-300">
-            📈 این مهارت‌ها ارتقا گرفتند: {report.skillsImproved.map((s) => `«${s}»`).join('، ')} — خوب بود!
+            📈 این مهارت‌ها ارتقا گرفتند: {report.skillsImproved.map((s) => `«${s}»`).join('، ')}، خوب بود!
           </p>
         )}
         {report.needsReview.length > 0 && (
@@ -879,12 +879,12 @@ function WeeklyTab() {
         )}
         {report.assessments < 2 && (
           <p className="mt-1.5 text-[11px] leading-6 text-zinc-400">
-            📝 این هفته کمتر از دو آزمون دادی — آزمون کوتاه، بهترین ابزار تثبیت حافظه است.
+            📝 این هفته کمتر از دو آزمون دادی، آزمون کوتاه، بهترین ابزار تثبیت حافظه است.
           </p>
         )}
         {report.lessonsCompleted === 0 && report.reviewsDone === 0 && (
           <p className="mt-1.5 text-[11px] leading-6 text-zinc-400">
-            🌱 هفتهٔ آرامی بود — برنامهٔ امروز را باز کن و با ۱۰ دقیقه شروع کن.
+            🌱 هفتهٔ آرامی بود، برنامهٔ امروز را باز کن و با ۱۰ دقیقه شروع کن.
           </p>
         )}
       </div>

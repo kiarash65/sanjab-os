@@ -34,7 +34,7 @@ export interface OSSettings {
   fontSize: number
   lineHeight: LineHeightKey
   readingWidth: ReadingWidthKey
-  /** وزن متن مطالعه — داخل بازه مجاز فونت انتخابی clamp می‌شود */
+  /** وزن متن مطالعه، داخل بازه مجاز فونت انتخابی clamp می‌شود */
   bodyWeight: number
   codeFont: CodeFontKey
   /** اندازه فونت کد (px) */
@@ -45,7 +45,7 @@ export interface OSSettings {
   largerControls: boolean
   keyboardNav: boolean
   /* ---- میزکار و رابط ---- */
-  /** مقیاس کلی رابط — ۰٫۹ تا ۱٫۱۵ */
+  /** مقیاس کلی رابط، ۰٫۹ تا ۱٫۱۵ */
   uiScale: number
   density: DensityKey
   animations: boolean
@@ -53,7 +53,7 @@ export interface OSSettings {
   showGuides: boolean
   /** هدف روزانه مطالعه (دقیقه) */
   dailyGoalMin: number
-  /** مربی سنجاب (AI Tutor) — خاموش‌کردن کامل */
+  /** مربی سنجاب (AI Tutor)، خاموش‌کردن کامل */
   coachEnabled: boolean
   /* ---- توسعه‌دهنده ---- */
   devMode: boolean
@@ -312,7 +312,7 @@ export const useOS = create<OSStore>()(
       name: 'sunjob-os-v1',
       version: 2,
       partialize: (s) => ({ settings: s.settings }),
-      /* نسخه ۲: تنظیمات تایپوگرافی/دسترس‌پذیری/یادگیری اضافه شد —
+      /* نسخه ۲: تنظیمات تایپوگرافی/دسترس‌پذیری/یادگیری اضافه شد،
          مقادیر گمشده با پیش‌فرض‌ها پر می‌شوند تا هرگز undefined نماند */
       migrate: (persisted) => {
         const p = (persisted ?? {}) as { settings?: Partial<OSSettings> }

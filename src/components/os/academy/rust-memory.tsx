@@ -1,7 +1,7 @@
 'use client'
 
 /* ================================================================
-   آزمایشگاه حافظه Rust — چهار نمودار تعاملی برای مالکیت، قرض، clone و scope
+   آزمایشگاه حافظه Rust: چهار نمودار تعاملی برای مالکیت، قرض، clone و scope
    این کامپوننت کاملاً مستقل است و هیچ وابستگی‌ای به rust-academy ندارد.
    رنگ‌ها: زمردی = معتبر، رز = خطا/نامعتبر، خاکستری = جابه‌جاشده،
    کهربایی/نارنجی = &mut و هشدار، فیروزه‌ای = &str، بنفش = کپی/مقایسه.
@@ -29,9 +29,9 @@ export type RustMemoryLessonId = 'mem-move' | 'mem-borrow' | 'mem-clone' | 'mem-
 
 export const RUST_MEMORY_LESSONS: RustMemoryLessonId[] = ['mem-move', 'mem-borrow', 'mem-clone', 'mem-scope']
 
-/** برچسب صادقانه — مثل SIM_HINT آکادمی: این‌جا rustc واقعی اجرا نمی‌شود */
+/** برچسب صادقانه، مثل SIM_HINT آکادمی: این‌جا rustc واقعی اجرا نمی‌شود */
 const HONEST_NOTE =
-  'این نمودارها شبیه‌سازی آموزشیِ وضعیت حافظه‌اند — نه اجرای واقعی rustc. متن خطاها عیناً از پیام‌های واقعی کامپایلر Rust نقل شده تا با شکل و زبان آن‌ها آشنا شوی.'
+  'این نمودارها شبیه‌سازی آموزشیِ وضعیت حافظه‌اند، نه اجرای واقعی rustc. متن خطاها عیناً از پیام‌های واقعی کامپایلر Rust نقل شده تا با شکل و زبان آن‌ها آشنا شوی.'
 
 const fa = (n: number) => n.toLocaleString('fa-IR')
 
@@ -53,7 +53,7 @@ const TONE_TEXT: Record<Tone, string> = {
 }
 
 /* ================================================================
-   کمکی‌های متنی — کد و شناسه‌ها انگلیسی و LTR می‌مانند
+   کمکی‌های متنی؛ کد و شناسه‌ها انگلیسی و LTR می‌مانند
    ================================================================ */
 
 function mono(text: string): ReactNode[] {
@@ -68,14 +68,14 @@ function mono(text: string): ReactNode[] {
   )
 }
 
-/** مدت انتقال با احترام به reduced-motion — وقتی کاهش‌یافته، پرش لحظه‌ای */
+/** مدت انتقال با احترام به reduced-motion؛ وقتی کاهش‌یافته، پرش لحظه‌ای */
 function useDur() {
   const reduced = useReducedMotion() ?? false
   return useCallback((d: number) => ({ duration: reduced ? 0 : d }), [reduced])
 }
 
 /* ================================================================
-   قلاب گام‌دهنده — هر گام با setTimeout زمان‌بندی می‌شود تا قانون
+   قلاب گام‌دهنده؛ هر گام با setTimeout زمان‌بندی می‌شود تا قانون
    react-hooks/set-state-in-effect رعایت شود (setState فقط در callback ناهمگام)
    ================================================================ */
 
@@ -86,7 +86,7 @@ function useStepper(total: number) {
   useEffect(() => {
     if (!playing) return
     if (step >= total) {
-      // پایان سناریو — توقف خودکار پخش
+      // پایان سناریو؛ توقف خودکار پخش
       const stop = window.setTimeout(() => setPlaying(false), 350)
       return () => window.clearTimeout(stop)
     }
@@ -157,7 +157,7 @@ function StepControls({ step, total, playing, onToggle, onReset }: { step: numbe
   )
 }
 
-/** خط توضیح هر گام — با تغییر گام، نرم عوض می‌شود */
+/** خط توضیح هر گام؛ با تغییر گام، نرم عوض می‌شود */
 function StepNote({ text }: { text: string }) {
   const dur = useDur()
   return (
@@ -173,7 +173,7 @@ function StepNote({ text }: { text: string }) {
   )
 }
 
-/** کارت خطای رز — نقل قول واقعی rustc + توضیح فارسی */
+/** کارت خطای رز؛ نقل قول واقعی rustc + توضیح فارسی */
 function ErrCard({ title, excerpt, why }: { title: string; excerpt: string; why: string }) {
   return (
     <motion.div initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }} className="space-y-2 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3" role="alert">
@@ -198,7 +198,7 @@ function OkCard({ text }: { text: string }) {
   )
 }
 
-/** پیکان اتصال پشته به heap — در موبایل رو به پایین، در دسکتاپ رو به راست */
+/** پیکان اتصال پشته به heap؛ در موبایل رو به پایین، در دسکتاپ رو به راست */
 function ArrowStrip({ label, tone }: { label: string; tone: Tone }) {
   return (
     <div className="flex flex-col items-center gap-0.5 py-1" aria-hidden>
@@ -305,7 +305,7 @@ function DiagramFrame({ id, title, goal, icon: Icon, children }: { id: string; t
 }
 
 /* ================================================================
-   درس ۱ — جابه‌جایی (Move) در برابر Copy
+   درس ۱: جابه‌جایی (Move) در برابر Copy
    ================================================================ */
 
 const MOVE_STRING_CODE = `fn main() {
@@ -340,7 +340,7 @@ help: consider cloning the value if the performance cost is acceptable
 function MoveLesson() {
   const [mode, setMode] = useState<'string' | 'copy'>('string')
   return (
-    <DiagramFrame id="mem-move" title="جابه‌جایی مالکیت (Move) در برابر Copy" goal="ببین `let s2 = s1;` با String چه می‌کند — و چرا با i32 مشکلی پیش نمی‌آید." icon={Boxes}>
+    <DiagramFrame id="mem-move" title="جابه‌جایی مالکیت (Move) در برابر Copy" goal="ببین `let s2 = s1;` با String چه می‌کند و چرا با i32 مشکلی پیش نمی‌آید." icon={Boxes}>
       {/* key={mode} باعث اجرای تازهٔ سناریو با هر تغییر نوع می‌شود */}
       <MoveScenario key={mode} mode={mode} onModeChange={setMode} />
     </DiagramFrame>
@@ -360,18 +360,18 @@ function MoveScenario({ mode, onModeChange }: { mode: 'string' | 'copy'; onModeC
 
   const notes: Record<'string' | 'copy', string[]> = {
     string: [
-      'هنوز چیزی در حافظه نیست — دکمهٔ «اجرای گام‌به‌گام» را بزن تا انتقال مالکیت را خط‌به‌خط ببینی.',
-      '`s1` ساخته شد: نشانگر، طول و ظرفیت روی پشته‌اند و بافر «سلام» در heap — `s1` مالک داده است.',
-      '`let s2 = s1;` مالکیت را منتقل می‌کند: نشانگر از `s1` به `s2` رسید؛ `s1` بی‌صاحب شد — کپی واقعی‌ای در کار نبود.',
+      'هنوز چیزی در حافظه نیست؛ دکمهٔ «اجرای گام‌به‌گام» را بزن تا انتقال مالکیت را خط‌به‌خط ببینی.',
+      '`s1` ساخته شد: نشانگر، طول و ظرفیت روی پشته‌اند و بافر «سلام» در heap؛ `s1` مالک داده است.',
+      '`let s2 = s1;` مالکیت را منتقل می‌کند: نشانگر از `s1` به `s2` رسید؛ `s1` بی‌صاحب شد؛ کپی واقعی‌ای در کار نبود.',
       'حالا `s1` را چاپ می‌کنیم… کامپایلر دقیقاً روی همین خط می‌ایستد.',
-      'در Rust انتقال، مالکیت را منتقل می‌کند؛ `s1` دیگر معتبر نیست — یا `s2` را بخوان یا از `s1.clone()` استفاده کن.',
+      'در Rust انتقال، مالکیت را منتقل می‌کند؛ `s1` دیگر معتبر نیست؛ یا `s2` را بخوان یا از `s1.clone()` استفاده کن.',
     ],
     copy: [
       'سناریوی موازی با عدد: هنوز چیزی در حافظه نیست.',
-      '`x = 5` مستقیم روی پشته می‌نشیند — برای `i32` هیچ بافری در heap وجود ندارد.',
-      '`let y = x;` کل مقدار ۵ را روی پشته کپی کرد — چون `i32` ویژگی `Copy` دارد، `x` هم معتبر می‌ماند.',
+      '`x = 5` مستقیم روی پشته می‌نشیند؛ برای `i32` هیچ بافری در heap وجود ندارد.',
+      '`let y = x;` کل مقدار ۵ را روی پشته کپی کرد؛ چون `i32` ویژگی `Copy` دارد، `x` هم معتبر می‌ماند.',
       'چاپ هر دو متغیر… این بار کامپایلر اعتراضی ندارد.',
-      'چاپ شد: `5 5` — در `Copy` هیچ مالکیتی منتقل نمی‌شود؛ متغیر قبلی معتبر می‌ماند. تفاوت Move و Copy همین‌جاست.',
+      'چاپ شد: `5 5`. در `Copy` هیچ مالکیتی منتقل نمی‌شود؛ متغیر قبلی معتبر می‌ماند. تفاوت Move و Copy همین‌جاست.',
     ],
   }
 
@@ -392,16 +392,16 @@ function MoveScenario({ mode, onModeChange }: { mode: 'string' | 'copy'; onModeC
           <MemZone label="پشته (Stack)" icon={Cpu}>
             <div className="relative">
               <StackRow
-                name="s1" fields={step >= 1 ? ['ptr', 'len: 8', 'cap: 8'] : ['—']}
+                name="s1" fields={step >= 1 ? ['ptr', 'len: 8', 'cap: 8'] : ['…']}
                 tone={s1Attempt ? 'err' : s1Owner ? 'ok' : 'moved'}
-                note={s1Moved ? 'جابه‌جا شد — moved from' : s1Attempt ? 'استفاده پس از انتقال' : undefined}
+                note={s1Moved ? 'جابه‌جا شد (moved from)' : s1Attempt ? 'استفاده پس از انتقال' : undefined}
               />
               {/* حلقهٔ نشانگر: با انتقال مالکیت، از ردیف s1 به ردیف s2 می‌لغزد */}
               {s1Owner && <motion.span layoutId="ptr-glow" transition={{ layout: { duration: dur(0.5).duration } }} className="absolute inset-0 rounded-lg ring-2 ring-emerald-400/70" />}
             </div>
             {s2Live && (
               <div className="relative">
-                <StackRow name="s2" fields={['ptr', 'len: 8', 'cap: 8']} tone="ok" note={step >= 3 ? 'مالک فعلی — معتبر' : 'معتبر'} />
+                <StackRow name="s2" fields={['ptr', 'len: 8', 'cap: 8']} tone="ok" note={step >= 3 ? 'مالک فعلی؛ معتبر' : 'معتبر'} />
                 <motion.span layoutId="ptr-glow" transition={{ layout: { duration: dur(0.5).duration } }} className="absolute inset-0 rounded-lg ring-2 ring-emerald-400/70" />
               </div>
             )}
@@ -411,7 +411,7 @@ function MoveScenario({ mode, onModeChange }: { mode: 'string' | 'copy'; onModeC
 
           <MemZone label="حافظهٔ پویا (Heap)" icon={HardDrive}>
             {step >= 1 ? (
-              <HeapBox text='"سلام"' bytes={8} caption={s2Live ? 'مالک فعلی: s2 — s1 دیگر به این بافر دسترسی ندارد' : 'مالک: s1'} tone={s1Attempt ? 'err' : 'ok'} />
+              <HeapBox text='"سلام"' bytes={8} caption={s2Live ? 'مالک فعلی: s2؛ s1 دیگر به این بافر دسترسی ندارد' : 'مالک: s1'} tone={s1Attempt ? 'err' : 'ok'} />
             ) : (
               <p className="rounded-lg border border-dashed border-zinc-700/60 p-3 text-center text-[10.5px] text-zinc-500">بافر heap پس از ساخته‌شدن s1 ظاهر می‌شود</p>
             )}
@@ -420,12 +420,12 @@ function MoveScenario({ mode, onModeChange }: { mode: 'string' | 'copy'; onModeC
       ) : (
         <div className="grid gap-2 md:grid-cols-2">
           <MemZone label="پشته (Stack)" icon={Cpu}>
-            <StackRow name="x" fields={copyX ? ['5'] : ['—']} tone={copyX ? 'ok' : 'moved'} />
+            <StackRow name="x" fields={copyX ? ['5'] : ['…']} tone={copyX ? 'ok' : 'moved'} />
             {copyY && <StackRow name="y" fields={['5']} tone="copy" note="کپی مستقل روی پشته" />}
           </MemZone>
           <MemZone label="حافظهٔ پویا (Heap)" icon={HardDrive}>
             <p className="rounded-lg border border-dashed border-purple-500/30 p-3 text-[10.5px] leading-5 text-purple-200/80">
-              هیچ بافری در heap نیست — `i32` از نوع `Copy` است و مقدارش مستقیم روی پشته کپی می‌شود.
+              هیچ بافری در heap نیست؛ `i32` از نوع `Copy` است و مقدارش مستقیم روی پشته کپی می‌شود.
             </p>
           </MemZone>
         </div>
@@ -436,18 +436,18 @@ function MoveScenario({ mode, onModeChange }: { mode: 'string' | 'copy'; onModeC
       <AnimatePresence>
         {mode === 'string' && step >= 4 && (
           <ErrCard
-            key="move-err" title="کامپایلر این کد را نمی‌پذیرد — گزارش واقعی rustc (گزیده)" excerpt={MOVE_ERR_EXCERPT}
-            why="در Rust انتقال، مالکیت را منتقل می‌کند؛ `s1` دیگر معتبر نیست. کامپایلر در زمان ساخت (نه اجرا) جلوی استفاده از مقدار جابه‌جاشده را می‌گیرد — و حتی پیشنهاد `clone()` می‌دهد."
+            key="move-err" title="کامپایلر این کد را نمی‌پذیرد؛ گزارش واقعی rustc (گزیده)" excerpt={MOVE_ERR_EXCERPT}
+            why="در Rust انتقال، مالکیت را منتقل می‌کند؛ `s1` دیگر معتبر نیست. کامپایلر در زمان ساخت (نه اجرا) جلوی استفاده از مقدار جابه‌جاشده را می‌گیرد و حتی پیشنهاد `clone()` می‌دهد."
           />
         )}
-        {mode === 'copy' && step >= 4 && <OkCard key="copy-ok" text="چاپ شد: `5 5` — هر دو متغیر معتبرند چون `i32` ویژگی `Copy` دارد؛ کپی ارزان روی پشته، بدون heap." />}
+        {mode === 'copy' && step >= 4 && <OkCard key="copy-ok" text="چاپ شد: `5 5`. هر دو متغیر معتبرند چون `i32` ویژگی `Copy` دارد؛ کپی ارزان روی پشته، بدون heap." />}
       </AnimatePresence>
     </>
   )
 }
 
 /* ================================================================
-   درس ۲ — قرض گرفتن (Borrow): &s بی‌نهایت، &mut فقط یکی
+   درس ۲: قرض‌گیری (Borrow)؛ &s بی‌نهایت، &mut فقط یکی
    ================================================================ */
 
 interface RefChip {
@@ -461,7 +461,7 @@ type BorrowErr = 'E0502-mut' | 'E0502-imm' | 'E0499' | null
 /** نقل قول‌های واقعی rustc برای هر نقض قاعدهٔ قرض */
 const BORROW_ERRORS: Record<Exclude<BorrowErr, null>, { title: string; excerpt: string; why: string }> = {
   'E0502-mut': {
-    title: 'قرض یکتا ممکن نیست — گزارش واقعی rustc (گزیده)',
+    title: 'قرض یکتا ممکن نیست؛ گزارش واقعی rustc (گزیده)',
     excerpt: `error[E0502]: cannot borrow \`s\` as mutable because it is also borrowed as immutable
  --> src/main.rs:4:14
   |
@@ -469,10 +469,10 @@ const BORROW_ERRORS: Record<Exclude<BorrowErr, null>, { title: string; excerpt: 
   |             -- immutable borrow occurs here
 4 |     let m1 = &mut s;
   |              ^^^^^^ mutable borrow occurs here`,
-    why: 'تا وقتی یک قرض مشترک (`&s`) زنده است، هیچ `&mut s`‌ای مجاز نیست — خواننده‌ای که به داده اعتماد کرده نباید زیر پای‌اش عوض شود.',
+    why: 'تا وقتی یک قرض مشترک (`&s`) زنده است، هیچ `&mut s`‌ای مجاز نیست؛ خواننده‌ای که به داده اعتماد کرده نباید زیر پای‌اش عوض شود.',
   },
   'E0502-imm': {
-    title: 'قرض مشترک روی دادهٔ قرض‌گرفتهٔ یکتا — گزارش واقعی rustc (گزیده)',
+    title: 'قرض مشترک روی دادهٔ قرض‌گرفتهٔ یکتا؛ گزارش واقعی rustc (گزیده)',
     excerpt: `error[E0502]: cannot borrow \`s\` as immutable because it is also borrowed as mutable
  --> src/main.rs:4:14
   |
@@ -483,7 +483,7 @@ const BORROW_ERRORS: Record<Exclude<BorrowErr, null>, { title: string; excerpt: 
     why: 'مالکِ `&mut` انتظار دارد تنها بیننده باشد؛ تا `&mut` زنده است، قرض مشترک جدید ممنوع است.',
   },
   E0499: {
-    title: 'قرض یکتای دوم — گزارش واقعی rustc (گزیده)',
+    title: 'قرض یکتای دوم؛ گزارش واقعی rustc (گزیده)',
     excerpt: `error[E0499]: cannot borrow \`s\` as mutable more than once at a time
  --> src/main.rs:4:14
   |
@@ -491,16 +491,16 @@ const BORROW_ERRORS: Record<Exclude<BorrowErr, null>, { title: string; excerpt: 
   |             ------- first mutable borrow occurs here
 4 |     let m2 = &mut s;
   |              ^^^^^^ second mutable borrow occurs here`,
-    why: 'در هر لحظه فقط یک `&mut` مجاز است — دو نویسندهٔ هم‌زمان یعنی مسابقهٔ داده (data race) که Rust آن را در کامپایل رد می‌کند.',
+    why: 'در هر لحظه فقط یک `&mut` مجاز است؛ دو نویسندهٔ هم‌زمان یعنی مسابقهٔ داده (data race) که Rust آن را در کامپایل رد می‌کند.',
   },
 }
 
 const BORROW_SCRIPT: string[] = [
-  'مالک `s` آماده است — با دکمه‌ها قرض بساز یا سناریوی هدایت‌شده را اجرا کن.',
-  '`r1 = &s` ساخته شد: قرض مشترک، فقط خواندن — هر تعداد که بخواهی مجاز است.',
+  'مالک `s` آماده است؛ با دکمه‌ها قرض بساز یا سناریوی هدایت‌شده را اجرا کن.',
+  '`r1 = &s` ساخته شد: قرض مشترک، فقط خواندن؛ هر تعداد که بخواهی مجاز است.',
   'تلاش برای `&mut s` در حالی که `r1` زنده است… کامپایلر مخالفت می‌کند.',
-  '`r1` با `drop` تمام شد — قرض‌ها پاک شدند و راه برای `&mut` باز شد.',
-  '`m1 = &mut s` با موفقیت ساخته شد — حالا s یک نویسندهٔ یکتا دارد.',
+  '`r1` با `drop` تمام شد؛ قرض‌ها پاک شدند و راه برای `&mut` باز شد.',
+  '`m1 = &mut s` با موفقیت ساخته شد؛ حالا s یک نویسندهٔ یکتا دارد.',
 ]
 
 function BorrowLesson() {
@@ -514,7 +514,7 @@ function BorrowLesson() {
   const [note, setNote] = useState<string | null>(null)
   const [shakeKey, setShakeKey] = useState(0)
 
-  /** اعمال وضعیت سناریوی هدایت‌شده برای گام n — هم از پخش خودکار، هم از کنترل‌ها */
+  /** اعمال وضعیت سناریوی هدایت‌شده برای گام n؛ هم از پخش خودکار، هم از کنترل‌ها */
   const applyScript = useCallback((n: number) => {
     if (n <= 0) {
       setRefs([]); setSeq(0); setErr(null); setNote(null)
@@ -599,7 +599,7 @@ function BorrowLesson() {
   const mutCount = refs.filter((r) => r.kind === 'mut').length
 
   return (
-    <DiagramFrame id="mem-borrow" title="قرض گرفتن (Borrowing)" goal="هر تعداد `&s` یا فقط یک `&mut s` — قاعدهٔ قرض را با دست‌های خودت آزمایش کن." icon={Link2}>
+    <DiagramFrame id="mem-borrow" title="قرض‌گیری (Borrowing)" goal="هر تعداد `&s` یا فقط یک `&mut s`؛ قاعدهٔ قرض را با دست‌های خودت آزمایش کن." icon={Link2}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex flex-wrap gap-2">
           <Button
@@ -622,7 +622,7 @@ function BorrowLesson() {
 
       <p className="flex items-center gap-1.5 text-[10.5px] leading-5 text-zinc-400">
         <HelpCircle className="h-3.5 w-3.5 shrink-0 text-zinc-500" aria-hidden />
-        روی هر چیپ کلیک کن تا `drop` شود (حذف قرض) — قواعد، همان قواعد واقعی کامپایلرند.
+        روی هر چیپ کلیک کن تا `drop` شود (حذف قرض)؛ قواعد، همان قواعد واقعی کامپایلرند.
       </p>
 
       {/* لرزش هنگام نقض قاعده */}
@@ -647,16 +647,16 @@ function BorrowLesson() {
                   </motion.button>
                 ))}
               </AnimatePresence>
-              {refs.length === 0 && <span className="text-[10px] text-zinc-500">هیچ مرجعی وجود ندارد — آزاد برای `&mut`</span>}
+              {refs.length === 0 && <span className="text-[10px] text-zinc-500">هیچ مرجعی وجود ندارد؛ آزاد برای `&mut`</span>}
             </div>
           </MemZone>
 
-          <ArrowStrip label={mutCount > 0 ? '&mut → s' : sharedCount > 0 ? '& → s' : '—'} tone={mutCount > 0 ? 'warn' : sharedCount > 0 ? 'ref' : 'moved'} />
+          <ArrowStrip label={mutCount > 0 ? '&mut → s' : sharedCount > 0 ? '& → s' : '∅'} tone={mutCount > 0 ? 'warn' : sharedCount > 0 ? 'ref' : 'moved'} />
 
-          <MemZone label="خط عمر مرجع‌ها (Lifetime)" icon={Timer}>
+          <MemZone label="طول عمر مرجع‌ها (Lifetime)" icon={Timer}>
             <div className="relative h-4 rounded-md bg-emerald-500/25">
               <span dir="ltr" className="absolute left-1.5 top-1/2 -translate-y-1/2 font-mono text-[9px] font-bold text-emerald-200">s</span>
-              <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[8.5px] font-bold text-emerald-300/80">مالک — تا پایان scope</span>
+              <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[8.5px] font-bold text-emerald-300/80">مالک؛ تا پایان scope</span>
             </div>
             {refs.map((chip, i) => (
               <div key={chip.id} className="relative h-3.5">
@@ -670,15 +670,15 @@ function BorrowLesson() {
               </div>
             ))}
             <p dir="rtl" className="pt-1 text-[9.5px] leading-4 text-zinc-500">
-              عمر هر مرجع زیر عمر مالک است — اگر `s` تمام شود، مرجع‌ها هم تمام شده‌اند.
+              عمر هر مرجع زیر عمر مالک است؛ اگر `s` تمام شود، مرجع‌ها هم تمام شده‌اند.
             </p>
           </MemZone>
         </div>
       </motion.div>
 
       <AnimatePresence>
-        {note === 'mut-ok' && refs.length === 0 && <OkCard key="borrow-ok" text="حالا می‌توانید `&mut` بگیرید — همهٔ قرض‌ها `drop` شده‌اند و `s` آزاد است." />}
-        {mutCount > 0 && !err && <OkCard key="mut-live" text="قرض یکتا فعال است: `&mut s` هم می‌خواند هم می‌نویسد — ولی تا وقتی زنده است هیچ مرجع دیگری مجاز نیست." />}
+        {note === 'mut-ok' && refs.length === 0 && <OkCard key="borrow-ok" text="حالا می‌توانید `&mut` بگیرید؛ همهٔ قرض‌ها `drop` شده‌اند و `s` آزاد است." />}
+        {mutCount > 0 && !err && <OkCard key="mut-live" text="قرض یکتا فعال است: `&mut s` هم می‌خواند هم می‌نویسد؛ ولی تا وقتی زنده است هیچ مرجع دیگری مجاز نیست." />}
       </AnimatePresence>
 
       <StepNote text={BORROW_SCRIPT[Math.min(step, BORROW_SCRIPT.length - 1)]} />
@@ -689,13 +689,13 @@ function BorrowLesson() {
 }
 
 /* ================================================================
-   درس ۳ — String در برابر &str در برابر clone()
+   درس ۳: String در برابر &str در برابر clone()
    ================================================================ */
 
 const CLONE_CODE = `fn main() {
     let s1 = String::from("سلام دنیا");
-    let view: &str = &s1;      // همان بافر — بدون کپی
-    let s2 = s1.clone();       // بافر جدید — کپی واقعی
+    let view: &str = &s1;      // همان بافر، بدون کپی
+    let s2 = s1.clone();       // بافر جدید، کپی واقعی
     println!("{s1} | {view} | {s2}");
 }`
 
@@ -717,7 +717,7 @@ function CloneLesson() {
   }, [setPlaying, setStep])
 
   return (
-    <DiagramFrame id="mem-clone" title="String، &str و clone()" goal="اشاره‌گر چاق فقط نگاه است (O(1))؛ `clone()` بافر جدید می‌سازد (O(n))." icon={Copy}>
+    <DiagramFrame id="mem-clone" title="String، &str و clone()" goal="اشاره‌گر چاق (fat pointer) یعنی اشاره‌گری که افزون بر نشانی، طول داده را هم با خود حمل می‌کند؛ `&str` و برش‌ها (slices) همین‌گونه‌اند. این اشاره‌گر فقط نگاه است (O(1))؛ `clone()` بافر جدید می‌سازد (O(n))." icon={Copy}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex flex-wrap gap-2">
           <Button
@@ -739,9 +739,9 @@ function CloneLesson() {
       <CodeBox code={CLONE_CODE} active={[0, 3, 4, 5][Math.min(step, 3)]} />
 
       <div className="grid gap-2 md:grid-cols-[1fr_auto_1fr] md:items-center">
-        <MemZone label="پشته (Stack) — اشاره‌گرهای چاق" icon={Cpu}>
+        <MemZone label="پشته (Stack)؛ اشاره‌گرهای چاق" icon={Cpu}>
           <StackRow name="s1" fields={['ptr', 'len: 17', 'cap: 17']} tone="ok" note="مالک بافر ۱" />
-          {showRef && <StackRow name="view" fields={['ptr', 'len: 17']} tone="ref" note="&str — بدون cap، مالک جدید نیست" />}
+          {showRef && <StackRow name="view" fields={['ptr', 'len: 17']} tone="ref" note="&str؛ بدون cap، مالک جدید نیست" />}
           {showClone && <StackRow name="s2" fields={['ptr', 'len: 17', 'cap: 17']} tone="copy" note="مالک بافر ۲" />}
         </MemZone>
 
@@ -749,7 +749,7 @@ function CloneLesson() {
 
         <MemZone label="حافظهٔ پویا (Heap)" icon={HardDrive}>
           <div className={showRef && !showClone ? 'rounded-lg ring-2 ring-cyan-400/50' : ''}>
-            <HeapBox text='"سلام دنیا"' bytes={17} caption="بافر ۱ — ۱۷ بایت UTF-8" tone={showRef && !showClone ? 'ref' : 'ok'} />
+            <HeapBox text='"سلام دنیا"' bytes={17} caption="بافر ۱ (۱۷ بایت UTF-8)" tone={showRef && !showClone ? 'ref' : 'ok'} />
           </div>
           {showClone && (
             <>
@@ -764,7 +764,7 @@ function CloneLesson() {
                 ))}
                 <ArrowDown className="h-3.5 w-3.5 text-purple-300/70" />
               </div>
-              <HeapBox text='"سلام دنیا"' bytes={17} caption="بافر ۲ — کپی واقعی در heap؛ پرهزینه ولی امن" tone="copy" />
+              <HeapBox text='"سلام دنیا"' bytes={17} caption="بافر ۲ (کپی واقعی در heap؛ پرهزینه ولی امن)" tone="copy" />
             </>
           )}
         </MemZone>
@@ -776,8 +776,8 @@ function CloneLesson() {
           <Scale className="h-3.5 w-3.5 text-[#f7931e]" aria-hidden /> سنجهٔ هزینه
         </p>
         {[
-          { label: 'اشاره‌گر &str — فقط کپیِ ptr و len روی پشته', gate: 1, bar: 'bg-cyan-400/70', cost: 'O(1)' },
-          { label: 's.clone() — کپی کامل ۱۷ بایت در heap', gate: 2, bar: 'bg-purple-400/70', cost: 'O(n)' },
+          { label: 'اشاره‌گر &str؛ فقط کپیِ ptr و len روی پشته', gate: 1, bar: 'bg-cyan-400/70', cost: 'O(1)' },
+          { label: 's.clone()؛ کپی کامل ۱۷ بایت در heap', gate: 2, bar: 'bg-purple-400/70', cost: 'O(n)' },
         ].map((m) => (
           <div key={m.cost} className="flex items-center gap-2">
             <span className="w-full min-w-0 flex-1 truncate text-[10px] text-zinc-400 sm:w-56">{m.label}</span>
@@ -795,10 +795,10 @@ function CloneLesson() {
       <StepNote
         text={
           [
-            '`s1` مالک بافر «سلام دنیا» است — سه عدد ptr/len/cap روی پشته به آن اشاره می‌کنند.',
-            '`view: &str` فقط یک اشاره‌گر به همان بافر است — «مالک جدید نیست» و هیچ داده‌ای کپی نشد.',
-            '`s1.clone()` بافر دومی در heap ساخت و بایت‌ها را واقعاً کپی کرد — «کپی واقعی در heap، پرهزینه ولی امن»؛ حالا دو مالک مستقل داریم.',
-            'مقایسه با عدد کوچک: `let a = 7; let b = a;` فقط چند بایت روی پشته کپی می‌کند — ارزان و بدون heap؛ به همین دلیل `i32` از نوع `Copy` است.',
+            '`s1` مالک بافر «سلام دنیا» است؛ سه عدد ptr/len/cap روی پشته به آن اشاره می‌کنند.',
+            '`view: &str` فقط یک اشاره‌گر به همان بافر است؛ «مالک جدید نیست» و هیچ داده‌ای کپی نشد.',
+            '`s1.clone()` بافر دومی در heap ساخت و بایت‌ها را واقعاً کپی کرد («کپی واقعی در heap، پرهزینه ولی امن»)؛ حالا دو مالک مستقل داریم.',
+            'مقایسه با عدد کوچک: `let a = 7; let b = a;` فقط چند بایت روی پشته کپی می‌کند (ارزان و بدون heap)؛ به همین دلیل `i32` از نوع `Copy` است.',
           ][Math.min(step, 3)]
         }
       />
@@ -809,10 +809,10 @@ function CloneLesson() {
             <p dir="ltr" className="font-mono text-[11px] leading-6 text-purple-200">
               let a = 7;
               <br />
-              let b = a; <span className="text-purple-300/60">{'// هر دو معتبر — کپی روی پشته'}</span>
+              let b = a; <span className="text-purple-300/60">{'// هر دو معتبر؛ کپی روی پشته'}</span>
             </p>
             <p className="mt-1.5 text-[11px] leading-6 text-purple-100/85">
-              برای `i32`، «اشاره» و «کلون» بی‌معنا هستند: مقدار کوچک است و خودش کپی می‌شود — `a` و `b` هر دو معتبر می‌مانند.
+              برای `i32`، «اشاره» و «کلون» بی‌معنا هستند: مقدار کوچک است و خودش کپی می‌شود؛ `a` و `b` هر دو معتبر می‌مانند.
             </p>
           </motion.div>
         )}
@@ -822,7 +822,7 @@ function CloneLesson() {
 }
 
 /* ================================================================
-   درس ۴ — پایان scope و drop
+   درس ۴: پایان scope و drop
    ================================================================ */
 
 const SCOPE_CODE = `fn main() {
@@ -856,7 +856,7 @@ const DROP_ERR_EXCERPT = `error[E0382]: borrow of moved value: \`s\`
 function ScopeLesson() {
   const [mode, setMode] = useState<'scope' | 'drop'>('scope')
   return (
-    <DiagramFrame id="mem-scope" title="پایان scope و فراخوانی drop()" goal="حافظه دقیقاً در پایان مالکیت آزاد می‌شود — خودکار با پایان scope یا زودهنگام با `drop`." icon={Layers}>
+    <DiagramFrame id="mem-scope" title="پایان scope و فراخوانی drop()" goal="حافظه دقیقاً در پایان مالکیت آزاد می‌شود (خودکار با پایان scope یا زودهنگام با `drop`)." icon={Layers}>
       {/* key={mode} باعث اجرای تازهٔ سناریو با هر تغییر حالت می‌شود */}
       <ScopeScenario key={mode} mode={mode} onModeChange={setMode} />
     </DiagramFrame>
@@ -877,17 +877,17 @@ function ScopeScenario({ mode, onModeChange }: { mode: 'scope' | 'drop'; onModeC
 
   const note = isScope
     ? [
-        'کد دو scope تو در تو دارد — «اجرای گام‌به‌گام» را بزن تا تولد و مرگ هر متغیر را ببینی.',
+        'کد دو scope تو در تو دارد؛ «اجرای گام‌به‌گام» را بزن تا تولد و مرگ هر متغیر را ببینی.',
         '`s` در scope بیرونی ساخته شد و بافر «بیرون» را در heap مالک است.',
-        'scope داخلی باز شد و `t` بافر «درون» را مالک شد — هر فریم، دنیای خودش را دارد.',
-        '`println!("{t}")` داخل scope داخلی کار می‌کند — `t` همین‌جا زنده است.',
-        'پایان scope داخلی: فریم جمع شد و `drop(t)` خودکار اجرا شد — حافظهٔ بافر آزاد شد؛ `s` بیرون هنوز زنده است.',
+        'scope داخلی باز شد و `t` بافر «درون» را مالک شد؛ هر فریم، دنیای خودش را دارد.',
+        '`println!("{t}")` داخل scope داخلی کار می‌کند؛ `t` همین‌جا زنده است.',
+        'پایان scope داخلی: فریم جمع شد و `drop(t)` خودکار اجرا شد؛ حافظهٔ بافر آزاد شد؛ `s` بیرون هنوز زنده است.',
       ][Math.min(step, 4)]
     : [
-        'گاهی می‌خواهی حافظه زودتر آزاد شود — Rust تابع `drop(s)` را برای همین دارد.',
-        '`s` ساخته شد — مالک بافر «زودهنگام».',
-        '`drop(s)` فراخوانی شد: بافر همان لحظه آزاد شد و `s` بی‌صاحب — مثل Move، مالکیت به خودِ drop رفت.',
-        'تلاش برای چاپ `s` بعد از drop… کامپایلر اجازه نمی‌دهد — استفاده پس از آزادسازی از نظر نوع ممنوع است.',
+        'گاهی می‌خواهی حافظه زودتر آزاد شود؛ Rust تابع `drop(s)` را برای همین دارد.',
+        '`s` ساخته شد؛ مالک بافر «زودهنگام».',
+        '`drop(s)` فراخوانی شد: بافر همان لحظه آزاد شد و `s` بی‌صاحب؛ مثل Move، مالکیت به خودِ drop رفت.',
+        'تلاش برای چاپ `s` بعد از drop… کامپایلر اجازه نمی‌دهد؛ استفاده پس از آزادسازی از نظر نوع ممنوع است.',
       ][Math.min(step, 3)]
 
   return (
@@ -906,9 +906,9 @@ function ScopeScenario({ mode, onModeChange }: { mode: 'scope' | 'drop'; onModeC
         <MemZone label="فریم‌های scope" icon={Layers}>
           {/* فریم بیرونی */}
           <div className={`rounded-xl border-2 border-dashed p-2.5 ${sLive ? 'border-emerald-500/40 bg-emerald-500/5' : 'border-zinc-600/50 bg-zinc-900/40'}`}>
-            <p dir="ltr" className="mb-1.5 font-mono text-[9.5px] font-bold text-zinc-400">fn main — scope بیرونی</p>
-            <StackRow name="s" fields={sLive ? ['"بیرون"'] : ['—']} tone={sLive ? 'ok' : 'moved'} note={sDropped ? 'moved — drop(s)' : sLive ? 'مالک بافر A' : undefined} />
-            {/* فریم داخلی — با پایان scope پایین می‌لغزد و محو می‌شود */}
+            <p dir="ltr" className="mb-1.5 font-mono text-[9.5px] font-bold text-zinc-400">fn main (scope بیرونی)</p>
+            <StackRow name="s" fields={sLive ? ['"بیرون"'] : ['∅']} tone={sLive ? 'ok' : 'moved'} note={sDropped ? 'moved؛ drop(s)' : sLive ? 'مالک بافر A' : undefined} />
+            {/* فریم داخلی؛ با پایان scope پایین می‌لغزد و محو می‌شود */}
             <AnimatePresence>
               {isScope && step >= 2 && !framePopped && (
                 <motion.div
@@ -916,26 +916,26 @@ function ScopeScenario({ mode, onModeChange }: { mode: 'scope' | 'drop'; onModeC
                   initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 18 }}
                   className="mt-2 rounded-xl border-2 border-dashed border-cyan-500/40 bg-cyan-500/5 p-2.5"
                 >
-                  <p dir="ltr" className="mb-1.5 font-mono text-[9.5px] font-bold text-cyan-300/80">{'{ … } — scope داخلی'}</p>
+                  <p dir="ltr" className="mb-1.5 font-mono text-[9.5px] font-bold text-cyan-300/80">{'{ … } (scope داخلی)'}</p>
                   <StackRow name="t" fields={['"درون"']} tone="ref" note="مالک بافر B" />
                 </motion.div>
               )}
             </AnimatePresence>
             {framePopped && (
               <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={dur(0.3)} dir="rtl" className="mt-2 rounded-lg border border-rose-500/30 bg-rose-500/10 px-2 py-1.5 text-[10px] font-bold leading-5 text-rose-200">
-                فریم داخلی برداشته شد — `drop(t)` خودکار اجرا شد
+                فریم داخلی برداشته شد؛ `drop(t)` خودکار اجرا شد
               </motion.p>
             )}
           </div>
         </MemZone>
 
-        <ArrowStrip label={tLive ? 't.ptr → بافر B' : sLive ? 's.ptr → بافر A' : '—'} tone={tLive ? 'ref' : sLive ? 'ok' : 'moved'} />
+        <ArrowStrip label={tLive ? 't.ptr → بافر B' : sLive ? 's.ptr → بافر A' : '∅'} tone={tLive ? 'ref' : sLive ? 'ok' : 'moved'} />
 
         <MemZone label="حافظهٔ پویا (Heap)" icon={HardDrive}>
-          <HeapBox text='"بیرون"' bytes={10} caption={sLive ? 'بافر A — مالک: s' : 'بافر A — drop(s) زودهنگام'} tone={sLive ? 'ok' : 'moved'} dropped={sDropped} />
+          <HeapBox text='"بیرون"' bytes={10} caption={sLive ? 'بافر A (مالک: s)' : 'بافر A (drop(s) زودهنگام)'} tone={sLive ? 'ok' : 'moved'} dropped={sDropped} />
           {isScope ? (
             step >= 2 ? (
-              <HeapBox text='"درون"' bytes={8} caption={framePopped ? 'drop() فراخوانی شد — حافظه آزاد شد' : 'بافر B — مالک: t'} tone={framePopped ? 'err' : 'ref'} dropped={framePopped} />
+              <HeapBox text='"درون"' bytes={8} caption={framePopped ? 'drop() فراخوانی شد؛ حافظه آزاد شد' : 'بافر B (مالک: t)'} tone={framePopped ? 'err' : 'ref'} dropped={framePopped} />
             ) : (
               <p className="rounded-lg border border-dashed border-zinc-700/60 p-3 text-center text-[10.5px] text-zinc-500">بافر B با ساخته‌شدن t ظاهر می‌شود</p>
             )
@@ -946,7 +946,7 @@ function ScopeScenario({ mode, onModeChange }: { mode: 'scope' | 'drop'; onModeC
       <StepNote text={note} />
 
       <AnimatePresence>
-        {useAfterDrop && <ErrCard key="drop-err" title="استفاده پس از drop ممنوع است — گزارش واقعی rustc (گزیده)" excerpt={DROP_ERR_EXCERPT} why="`drop` مثل انتقال مالکیت عمل می‌کند — بعد از آن `s` نامعتبر است. کامپایلر حتی یک بار استفادهٔ تصادفی پس از آزادسازی را نمی‌پذیرد." />}
+        {useAfterDrop && <ErrCard key="drop-err" title="استفاده پس از drop ممنوع است؛ گزارش واقعی rustc (گزیده)" excerpt={DROP_ERR_EXCERPT} why="`drop` مثل انتقال مالکیت عمل می‌کند؛ بعد از آن `s` نامعتبر است. کامپایلر حتی یک بار استفادهٔ تصادفی پس از آزادسازی را نمی‌پذیرد." />}
       </AnimatePresence>
 
       {/* کارت مقایسه با سایر زبان‌ها */}
@@ -955,7 +955,7 @@ function ScopeScenario({ mode, onModeChange }: { mode: 'scope' | 'drop'; onModeC
           <Scale className="h-3.5 w-3.5 text-[#f7931e]" aria-hidden /> مقایسه با سایر زبان‌ها
         </p>
         <p className="mt-1.5 text-[11px] leading-6 text-zinc-300">
-          در ++C همین الگو `RAII` است: تخریب‌گر در پایان `scope` اجرا می‌شود. در زبان‌های `GC`‌دار، `garbage collector` بعداً و در زمانی نامعلوم پاک می‌کند. در Rust دقیقاً در پایان مالکیت — نه دیرتر، نه زودتر.
+          در ++C همین الگو `RAII` است: تخریب‌گر در پایان `scope` اجرا می‌شود. در زبان‌های `GC`‌دار، `garbage collector` بعداً و در زمانی نامعلوم پاک می‌کند. در Rust دقیقاً در پایان مالکیت؛ نه دیرتر، نه زودتر.
         </p>
       </motion.div>
     </>
@@ -963,7 +963,7 @@ function ScopeScenario({ mode, onModeChange }: { mode: 'scope' | 'drop'; onModeC
 }
 
 /* ================================================================
-   آزمون خودسنجی — سه پرسش با بازخورد فوری
+   آزمون خودسنجی: سه پرسش با بازخورد فوری
    ================================================================ */
 
 interface Mcq {
@@ -978,19 +978,19 @@ const QUIZ: Mcq[] = [
     q: 'بعد از اجرای `let s1 = String::from("سلام");` و `let s2 = s1;` وضعیت `s1` چیست؟',
     opts: ['کپی شد و همچنان معتبر است', 'به دادهٔ s2 اشاره می‌کند', 'جابه‌جا شده (moved) و دیگر معتبر نیست', 'تبدیل به &str شده است'],
     a: 2,
-    why: 'String از نوع Copy نیست؛ `let s2 = s1` مالکیت را منتقل می‌کند و `s1` از آن پس نامعتبر است — استفادهٔ دوباره خطای E0382 می‌دهد.',
+    why: 'String از نوع Copy نیست؛ `let s2 = s1` مالکیت را منتقل می‌کند و `s1` از آن پس نامعتبر است؛ استفادهٔ دوباره خطای E0382 می‌دهد.',
   },
   {
     q: 'در یک لحظه، چند مرجع `&mut s` می‌توان هم‌زمان داشت؟',
-    opts: ['هر تعداد که بخواهی', 'فقط یکی — و در آن لحظه هیچ مرجع دیگری هم نباشد', 'دو تا، به شرطی که یکی فقط بخواند', 'فقط داخل توابع جداگانه'],
+    opts: ['هر تعداد که بخواهی', 'فقط یکی، و در آن لحظه هیچ مرجع دیگری هم نباشد', 'دو تا، به شرطی که یکی فقط بخواند', 'فقط داخل توابع جداگانه'],
     a: 1,
-    why: 'قاعدهٔ قرض یکتا: حداکثر یک `&mut` در هر لحظه و آن هم فقط وقتی هیچ قرض مشترک زنده‌ای وجود ندارد — این همان چیزی است که data race را در کامپایل رد می‌کند.',
+    why: 'قاعدهٔ قرض یکتا: حداکثر یک `&mut` در هر لحظه و آن هم فقط وقتی هیچ قرض مشترک زنده‌ای وجود ندارد؛ این همان چیزی است که data race را در کامپایل رد می‌کند.',
   },
   {
     q: 'فراخوانی `s.clone()` روی یک String چه می‌کند؟',
-    opts: ['کپی واقعی داده در heap — با هزینه O(n)', 'فقط نشانگر را کپی می‌کند', 'مالکیت را منتقل می‌کند و s نامعتبر می‌شود', 'یک مرجع &str برمی‌گرداند'],
+    opts: ['کپی واقعی داده در heap، با هزینه O(n)', 'فقط نشانگر را کپی می‌کند', 'مالکیت را منتقل می‌کند و s نامعتبر می‌شود', 'یک مرجع &str برمی‌گرداند'],
     a: 0,
-    why: '`clone` بافر تازه‌ای در heap می‌سازد و بایت‌ها را واقعاً کپی می‌کند — پرهزینه ولی امن؛ هر دو متغیر مالک مستقل خود می‌شوند.',
+    why: '`clone` بافر تازه‌ای در heap می‌سازد و بایت‌ها را واقعاً کپی می‌کند (پرهزینه ولی امن)؛ هر دو متغیر مالک مستقل خود می‌شوند.',
   },
 ]
 
@@ -1003,7 +1003,7 @@ function QuizSection() {
   return (
     <section aria-label="آزمون خودسنجی حافظه" className="space-y-3 rounded-2xl border border-white/10 bg-zinc-900/60 p-4">
       <header className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="text-[13px] font-black text-zinc-100">خودسنجی — سه پرسش سریع</h3>
+        <h3 className="text-[13px] font-black text-zinc-100">خودسنجی: سه پرسش سریع</h3>
         <div className="flex items-center gap-2">
           <span className="rounded-full border border-white/10 bg-black/30 px-2.5 py-1 text-[10.5px] font-bold text-zinc-300">
             {fa(answered)} از {fa(QUIZ.length)} پاسخ داده شد
@@ -1063,7 +1063,7 @@ function QuizSection() {
                       correct ? 'border-emerald-500/25 bg-emerald-500/5 text-emerald-100/85' : 'border-amber-500/25 bg-amber-500/5 text-amber-100/85'
                     }`}
                   >
-                    {correct ? 'درست است — ' : 'نه، دقت کن — '}
+                    {correct ? 'درست است؛ ' : 'درست نبود؛ '}
                     {mono(q.why)}
                   </motion.p>
                 )}
@@ -1073,26 +1073,26 @@ function QuizSection() {
         })}
       </div>
 
-      {answered === QUIZ.length && <OkCard text={`نمرهٔ تو: ${fa(score)} از ${fa(QUIZ.length)} — ${score === QUIZ.length ? 'قواعد مالکیت و قرض را خوب فهمیده‌ای.' : 'نمودارها را دوباره گام‌به‌گام اجرا کن؛ خطاهای rustc بهترین معلم‌اند.'}`} />}
+      {answered === QUIZ.length && <OkCard text={`نمرهٔ تو: ${fa(score)} از ${fa(QUIZ.length)}. ${score === QUIZ.length ? 'قواعد مالکیت و قرض را خوب فهمیده‌ای.' : 'نمودارها را دوباره گام‌به‌گام اجرا کن؛ خطاهای rustc بهترین معلم‌اند.'}`} />}
     </section>
   )
 }
 
 /* ================================================================
-   جدول جمع‌بندی — چهار راه انتقال/دسترسی به داده
+   جدول جمع‌بندی: چهار راه انتقال/دسترسی به داده
    ================================================================ */
 
 const SUMMARY: { op: string; moved: string; copied: string; prevValid: string; tones: [Tone, Tone, Tone] }[] = [
-  { op: 'Move (`let s2 = s1`)', moved: 'بله', copied: 'خیر — فقط نشانگر جابه‌جا شد', prevValid: 'خیر — نامعتبر', tones: ['warn', 'moved', 'err'] },
-  { op: 'Copy (`i32` و…)', moved: 'خیر', copied: 'بله — روی پشته، O(1)', prevValid: 'بله', tones: ['moved', 'ok', 'ok'] },
-  { op: 'Clone (`s.clone()`)', moved: 'خیر', copied: 'بله — کپی کامل heap، O(n)', prevValid: 'بله', tones: ['moved', 'copy', 'ok'] },
-  { op: 'Borrow (`&s` / `&mut s`)', moved: 'خیر', copied: 'خیر — فقط دسترسی قرضی', prevValid: 'بله — با قواعد قرض', tones: ['moved', 'moved', 'ok'] },
+  { op: 'Move (`let s2 = s1`)', moved: 'بله', copied: 'خیر؛ فقط نشانگر جابه‌جا شد', prevValid: 'خیر؛ نامعتبر', tones: ['warn', 'moved', 'err'] },
+  { op: 'Copy (`i32` و…)', moved: 'خیر', copied: 'بله؛ روی پشته، O(1)', prevValid: 'بله', tones: ['moved', 'ok', 'ok'] },
+  { op: 'Clone (`s.clone()`)', moved: 'خیر', copied: 'بله؛ کپی کامل heap، O(n)', prevValid: 'بله', tones: ['moved', 'copy', 'ok'] },
+  { op: 'Borrow (`&s` / `&mut s`)', moved: 'خیر', copied: 'خیر؛ فقط دسترسی قرضی', prevValid: 'بله؛ با قواعد قرض', tones: ['moved', 'moved', 'ok'] },
 ]
 
 function SummaryTable() {
   return (
     <section aria-label="جدول جمع‌بندی مالکیت و قرض" className="space-y-2 rounded-2xl border border-white/10 bg-zinc-900/60 p-4">
-      <h3 className="text-[13px] font-black text-zinc-100">جمع‌بندی — Move، Copy، Clone و Borrow در یک نگاه</h3>
+      <h3 className="text-[13px] font-black text-zinc-100">جمع‌بندی: Move، Copy، Clone و Borrow در یک نگاه</h3>
       <div className="os-scroll overflow-x-auto">
         <Table>
           <TableHeader>
@@ -1122,7 +1122,7 @@ function SummaryTable() {
 }
 
 /* ================================================================
-   آزمایشگاه کامل — چهار درس با تب، آزمون و جدول
+   آزمایشگاه کامل: چهار درس با تب، آزمون و جدول
    ================================================================ */
 
 const LESSON_LABELS: Record<RustMemoryLessonId, string> = {
@@ -1145,13 +1145,13 @@ export function RustMemoryLab() {
         </span>
         <div className="min-w-0">
           <h2 className="text-[14px] font-black text-zinc-50">
-            آزمایشگاه حافظه <span className="text-[10px] font-bold text-[#f7931e]">— مالکیت، قرض، clone و scope</span>
+            آزمایشگاه حافظه <span className="text-[10px] font-bold text-[#f7931e]">(مالکیت، قرض، clone و scope)</span>
           </h2>
-          <p className="text-[10.5px] leading-5 text-zinc-400">وضعیت واقعی متغیرها و مرجع‌ها را گام‌به‌گام ببین — همان چیزی که کامپایلر Rust ذهنش را درگیر می‌کند.</p>
+          <p className="text-[10.5px] leading-5 text-zinc-400">وضعیت واقعی متغیرها و مرجع‌ها را گام‌به‌گام ببین؛ همان چیزی که کامپایلر Rust ذهنش را درگیر می‌کند.</p>
         </div>
       </header>
 
-      {/* برچسب صادقانه — سبک SIM_HINT آکادمی */}
+      {/* برچسب صادقانه؛ سبک SIM_HINT آکادمی */}
       <div className="flex gap-2 rounded-xl border border-[#f7931e]/25 bg-[#f7931e]/10 p-3">
         <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#f7931e]" aria-hidden />
         <p className="text-[11.5px] leading-6 text-amber-100/90">{HONEST_NOTE}</p>

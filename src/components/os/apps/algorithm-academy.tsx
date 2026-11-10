@@ -1,7 +1,7 @@
 'use client'
 
 /* ------------------------------------------------------------------ */
-/* آکادمی الگوریتم — تفکر محاسباتی تا تحلیل پیچیدگی                    */
+/* آکادمی الگوریتم: تفکر محاسباتی تا تحلیل پیچیدگی                    */
 /* درس‌ها با LearningReader · Visualizer با Trace واقعی الگوریتم ·      */
 /* Complexity Playground · چالش‌های تعاملی از بانک سؤال                */
 /* ------------------------------------------------------------------ */
@@ -99,7 +99,7 @@ export default function AlgorithmAcademyApp() {
 }
 
 /* ------------------------------------------------------------------ */
-/* خانه — سطوح و درس‌ها                                                */
+/* خانه: سطوح و درس‌ها                                                */
 /* ------------------------------------------------------------------ */
 function Home({
   onOpenLesson,
@@ -128,7 +128,7 @@ function Home({
           آکادمی الگوریتم
         </h1>
         <p className="mt-1 text-[12px] leading-6 text-zinc-400">
-          هدف فقط حفظ کردن الگوریتم‌ها نیست — اینجا یاد می‌گیری مسئله را تحلیل کنی، راه‌حل طراحی کنی و کارایی را بسنجی.
+          هدف فقط حفظ کردن الگوریتم‌ها نیست؛ اینجا یاد می‌گیری مسئله را تحلیل کنی، راه‌حل طراحی کنی و کارایی را بسنجی.
           ۶ سطح، ۳۵ درس، شبیه‌ساز واقعی.
         </p>
       </header>
@@ -209,7 +209,7 @@ function Home({
 }
 
 /* ------------------------------------------------------------------ */
-/* درس — با خواننده استاندارد                                          */
+/* درس: با خواننده استاندارد                                          */
 /* ------------------------------------------------------------------ */
 function LessonView({
   lesson,
@@ -239,9 +239,16 @@ function LessonView({
       title: 'مفهوم',
       content: (
         <>
+          {lesson.prereq && (
+            <p className="mb-3 rounded-lg bg-white/[0.04] px-2.5 py-1.5 text-[11px] leading-5 text-zinc-400">
+              <span className="font-bold text-zinc-200">پیش‌نیاز: </span>
+              {lesson.prereq}
+            </p>
+          )}
           <p>{lesson.intro}</p>
           <p>{lesson.concept}</p>
-          <div className="mt-3 flex flex-wrap gap-1.5">
+          <p className="mt-3 text-[11px] font-black text-teal-300">در پایان این درس می‌توانید:</p>
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
             {lesson.outcomes.map((o) => (
               <span key={o} className="rounded-lg bg-teal-500/15 px-2 py-1 text-[10px] font-bold text-teal-300">
                 🎯 {o}
@@ -299,7 +306,7 @@ function LessonView({
             content: (
               <div className="space-y-3">
                 <p className="text-[12px] leading-6 text-zinc-400">
-                  اول از حافظه جواب بده، بعد توضیح را بخوان — بازیابی، قوی‌ترین ابزار یادگیری است.
+                  اول از حافظه جواب بده، بعد توضیح را بخوان؛ بازیابی، قوی‌ترین ابزار یادگیری است.
                 </p>
                 {questions.map((q) => (
                   <QuestionCard
@@ -366,7 +373,7 @@ function LessonView({
             <div className="mt-6 rounded-2xl border border-white/10 bg-zinc-900/60 p-4">
               {isDone ? (
                 <p className="flex items-center justify-center gap-1.5 text-[12px] font-black text-emerald-300">
-                  ✓ این درس را کامل کرده‌ای — هر وقت خواستی مرورش کن.
+                  ✓ این درس را کامل کرده‌ای؛ هر وقت خواستی مرورش کن.
                 </p>
               ) : (
                 <button
@@ -375,7 +382,7 @@ function LessonView({
                   disabled={!answeredAll}
                   className="w-full rounded-xl bg-emerald-500/80 py-2.5 text-[13px] font-black text-white transition hover:bg-emerald-500 disabled:opacity-40"
                 >
-                  {answeredAll ? '✓ درس را خواندم — ثبت کن' : 'اول آزمون Retrieval را کامل کن'}
+                  {answeredAll ? '✓ درس را خواندم؛ ثبت کن' : 'اول آزمون Retrieval را کامل کن'}
                 </button>
               )}
             </div>
@@ -391,7 +398,7 @@ function Check2() {
 }
 
 /* ------------------------------------------------------------------ */
-/* Visualizer — اجرای گام‌به‌گام با Trace واقعی                         */
+/* Visualizer: اجرای گام‌به‌گام با Trace واقعی                         */
 /* ------------------------------------------------------------------ */
 function Visualizer({ onBack }: { onBack: () => void }) {
   const [algo, setAlgo] = useState<AlgoId>('bubble-sort')
@@ -413,7 +420,7 @@ function Visualizer({ onBack }: { onBack: () => void }) {
     return arr
   }
 
-  /* اجرای اولیه — lazy initializer به‌جای setState در effect */
+  /* اجرای اولیه: lazy initializer به‌جای setState در effect */
   const [steps, setSteps] = useState(() => {
     const result = traceAlgo('bubble-sort', [5, 1, 4, 2, 8])
     return { steps: result.steps, pseudocode: result.pseudocode, ok: result.ok }
@@ -436,7 +443,7 @@ function Visualizer({ onBack }: { onBack: () => void }) {
   useEffect(() => {
     if (!playing || !steps) return
     if (idx >= steps.steps.length - 1) {
-      /* پایان اجرا — با تاخیر صفر تا setState داخل callback باشد */
+      /* پایان اجرا: با تاخیر صفر تا setState داخل callback باشد */
       const done = window.setTimeout(() => {
         setPlaying(false)
         /* پایان اجرای کامل الگوریتم = شواهد تمرین واقعی (یک‌بار در هر الگوریتم) */
@@ -467,7 +474,7 @@ function Visualizer({ onBack }: { onBack: () => void }) {
           <ChevronRight size={13} aria-hidden />
           خانه
         </button>
-        <h1 className="flex-1 text-[15px] font-black text-white">ابزار نمایش الگوریتم — Trace واقعی</h1>
+        <h1 className="flex-1 text-[15px] font-black text-white">ابزار نمایش الگوریتم؛ Trace واقعی</h1>
       </div>
 
       {/* انتخاب الگوریتم */}
@@ -561,7 +568,7 @@ function Visualizer({ onBack }: { onBack: () => void }) {
             })}
           </div>
           {step.arr.length === 0 && (
-            <p className="py-6 text-center text-[12px] text-zinc-500">آرایهٔ خالی — حالت مرزی! الگوریتم باید بدون خطا تمام شود.</p>
+            <p className="py-6 text-center text-[12px] text-zinc-500">آرایهٔ خالی؛ حالت مرزی! الگوریتم باید بدون خطا تمام شود.</p>
           )}
 
           {/* اشاره‌گرها */}
@@ -734,7 +741,7 @@ function Playground({ onBack }: { onBack: () => void }) {
         <Callout kind="tip" title="چرا بعضی الگوریتم‌ها با ورودی بزرگ ناکارآمد می‌شوند؟">
           <p>
             با n=128: خطی فقط ۱۲۸ عملیات می‌خواهد ولی n² یک‌وگیردهزار و 2ⁿ عددی می‌شود که هیچ کامپیوتری تا پایان عمرش نمی‌تواند پردازش کند.
-            رشد «شکل» هزینه است، نه ثانیه — برای همین الگوریتم n² روی داده‌های بزرگ عملاً می‌میرد.
+            رشد «شکل» هزینه است، نه ثانیه؛ برای همین الگوریتم n² روی داده‌های بزرگ عملاً می‌میرد.
           </p>
         </Callout>
       </div>
@@ -826,7 +833,7 @@ function Challenges({ onBack }: { onBack: () => void }) {
           />
         ))}
         {quiz.length === 0 && (
-          <p className="py-6 text-center text-[12px] text-zinc-500">چالشی در بانک نیست — بعداً برگرد.</p>
+          <p className="py-6 text-center text-[12px] text-zinc-500">چالشی در بانک نیست؛ بعداً برگرد.</p>
         )}
       </div>
     </div>

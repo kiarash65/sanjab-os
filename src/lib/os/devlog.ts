@@ -1,5 +1,5 @@
 /* ================================================================
-   لاگ داخلی سیستم — برای Developer Mode
+   لاگ داخلی سیستم، برای Developer Mode
    - حلقه‌ای (ring buffer) با سقف ثابت، هیچ‌وقد رشد نمی‌کند
    - محتوای حساس (کلید، توکن، رمز) پیش از ذخیره پاک می‌شود
    - متن‌ها کوتاه می‌شوند تا حافظه مصرف نشود
@@ -85,7 +85,7 @@ export function installDevLog(): void {
   devLog('info', 'DevLog نصب شد', 'devlog')
 }
 
-/** گزارش فنی کامل برای کپی — بدون هیچ داده خصوصی */
+/** گزارش فنی کامل برای کپی، بدون هیچ داده خصوصی */
 export async function buildTechReport(): Promise<string> {
   const nav = typeof navigator !== 'undefined' ? navigator : null
   const perf = typeof performance !== 'undefined' ? performance : null

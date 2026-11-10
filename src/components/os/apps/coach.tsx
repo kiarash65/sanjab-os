@@ -1,8 +1,8 @@
 'use client'
 
 /* ------------------------------------------------------------------ */
-/* مربی سنجاب (Sanjab Coach) — دستیار یادگیری Context-Aware            */
-/* از زیرساخت هوش‌یار (BYOK + aiComplete) استفاده می‌کند — بدون کلید    */
+/* مربی سنجاب (Sanjab Coach)، دستیار یادگیری Context-Aware            */
+/* از زیرساخت هوش‌یار (BYOK + aiComplete) استفاده می‌کند، بدون کلید    */
 /* یا Provider جدید. ارسال زمینه فقط با رضایت صریح کاربر، سقف مصرف      */
 /* روزانه، امکان خاموش‌کردن کامل از تنظیمات، و حالت Quiz Me آفلاین.     */
 /* ------------------------------------------------------------------ */
@@ -50,7 +50,7 @@ const MODES: { id: Mode; label: string; Icon: typeof Eye; desc: string; system: 
     id: 'socratic',
     label: 'سقراطی',
     Icon: CircleHelp,
-    desc: 'جواب مستقیم نده — با سؤال هدایتم کن.',
+    desc: 'جواب مستقیم نده، با سؤال هدایتم کن.',
     system:
       'تو «مربی سنجاب» با روش سقراطی هستی. هرگز جواب نهایی را مستقیم نگو؛ با سؤال‌های مرحله‌ای کوتاه کاربر را به سمت کشف پاسخ هدایت کن. هر پاسخ حداکثر ۳ جمله و یک سؤال هدایتگر داشته باشد. اگر کاربر بعد از ۳ تلاش ناکام ماند، راهنمایی روشن‌تری بده.',
   },
@@ -82,8 +82,8 @@ const MODES: { id: Mode; label: string; Icon: typeof Eye; desc: string; system: 
     id: 'quiz',
     label: 'Quiz Me',
     Icon: ListChecks,
-    desc: 'آزمون بازیابی حافظه — کاملاً آفلاین از بانک سؤال سنجاب‌اواس.',
-    system: '', /* آفلاین — بدون AI */
+    desc: 'آزمون بازیابی حافظه، کاملاً آفلاین از بانک سؤال سنجاب‌اواس.',
+    system: '', /* آفلاین، بدون AI */
   },
   {
     id: 'reflect',
@@ -116,7 +116,7 @@ export default function CoachApp() {
 
   const configured = typeof window !== 'undefined' && hasAICfg()
 
-  /* سقف مصرف روزانه — فقط شمارندهٔ محلی، بدون محتوای پیام */
+  /* سقف مصرف روزانه، فقط شمارندهٔ محلی، بدون محتوای پیام */
   useEffect(() => {
     try {
       const today = new Date().toDateString()
@@ -155,13 +155,13 @@ export default function CoachApp() {
         if (info) parts.push(`درس فعلی: «${info.title}»`)
       }
     }
-    /* زمینهٔ واقعی و حداقلی — آخرین درس و تعداد مرور سررسید؛ بدون دادهٔ شخصی */
+    /* زمینهٔ واقعی و حداقلی، آخرین درس و تعداد مرور سررسید؛ بدون دادهٔ شخصی */
     if (profile.lastSession) {
       parts.push(`آخرین مطالعه: ${TRACK_TITLES[profile.lastSession.track]} / درس ${profile.lastSession.lessonId}`)
     }
     const skills = Object.values(profile.skills).filter((s) => s.state !== 'not-started').length
     parts.push(`مهارت‌های فعال کاربر: ${skills}`)
-    return parts.length > 0 ? `\n\n[زمینهٔ یادگیری کاربر — با رضایت خودش ارسال شده]:\n${parts.join('\n')}` : null
+    return parts.length > 0 ? `\n\n[زمینهٔ یادگیری کاربر، با رضایت خودش ارسال شده]:\n${parts.join('\n')}` : null
   }
 
   const send = async () => {
@@ -171,7 +171,7 @@ export default function CoachApp() {
       return
     }
     if (usage >= DAILY_CAP) {
-      pushToast({ title: 'سقف مصرف روزانهٔ مربی', body: 'امروز از مربی زیاد استفاده کردی — فردا دوباره فعال می‌شود.' })
+      pushToast({ title: 'سقف مصرف روزانهٔ مربی', body: 'امروز از مربی زیاد استفاده کردی، فردا دوباره فعال می‌شود.' })
       return
     }
     const modeDef = MODES.find((m) => m.id === mode)!
@@ -206,7 +206,7 @@ export default function CoachApp() {
   }
 
   const startQuiz = () => {
-    /* Quiz Me — کاملاً آفلاین از بانک سؤال، بدون AI */
+    /* Quiz Me، کاملاً آفلاین از بانک سؤال، بدون AI */
     const trackKey = (['python', 'linux', 'rust', 'ai', 'powershell', 'algorithm'] as const).includes(
       track as never
     )
@@ -314,7 +314,7 @@ export default function CoachApp() {
         {/* Quiz Me آفلاین */}
         {mode === 'quiz' && (
           <div className="rounded-xl border border-violet-400/30 bg-violet-500/10 p-2.5">
-            <p className="text-[11px] font-black text-violet-200">حالت Quiz Me — سنجش بازیابی حافظه</p>
+            <p className="text-[11px] font-black text-violet-200">حالت Quiz Me، سنجش بازیابی حافظه</p>
             <p className="mt-0.5 text-[10px] leading-5 text-violet-100/80">
               بدون AI و از بانک سؤال واقعی سنجاب‌اواس. مسیر را از زمینهٔ بالا انتخاب کن (یا پیش‌فرض پایتون) و شروع کن.
             </p>

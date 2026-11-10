@@ -1,5 +1,5 @@
 /**
- * Lesson Registry — فهرست درس‌های واقعی هر مسیر + عنوان فارسی
+ * Lesson Registry، فهرست درس‌های واقعی هر مسیر + عنوان فارسی
  * منبع درس‌های پایتون از python-curriculum و الگوریتم از curriculum خودش
  * import می‌شود؛ بقیه نگاشت استاتیک با عنوان‌های رسمی آکادمی‌ها هستند.
  */
@@ -39,7 +39,7 @@ const RUST_TITLES: Record<string, string> = {
 
 const POWERSHELL_TITLES: Record<string, string> = {
   'ps-1': 'پاورشل چیست؟ اشیاء در برابر متن',
-  'ps-2': 'Get-Help و Get-Command — هنوز پیدا کردن',
+  'ps-2': 'Get-Help و Get-Command، هنوز پیدا کردن',
   'ps-3': 'متغیرها و انواع داده',
   'ps-4': 'پوشه‌ها و فایل‌ها؛ دنیای Providerها',
   'ps-5': 'پروسه‌ها و سرویس‌ها',
@@ -62,8 +62,8 @@ const AI_TITLES: Record<string, string> = {
   overfit: 'بیش‌برازش (Overfitting)',
   ethics: 'اخلاق و آینده',
   lab: 'آزمایشگاه شبکه عصبی',
-  tokenizer: 'توکن‌ساز — زبان مدل‌ها (BPE)',
-  attention: 'خودتوجهی — قلب ترنسفورمر',
+  tokenizer: 'توکن‌ساز، زبان مدل‌ها (BPE)',
+  attention: 'خودتوجهی، قلب ترنسفورمر',
   rag: 'بازیابی‌افزوده (RAG)',
   quiz: 'آزمون نهایی',
 }
@@ -105,7 +105,7 @@ export function appOfTrack(track: TrackId): string {
   return TRACK_APP[track]
 }
 
-/** عنوان درس — با fallback خوانا */
+/** عنوان درس، با fallback خوانا */
 export function lessonTitle(track: TrackId, lessonId: string): string {
   const list = TRACK_LESSONS[track]
   const found = list.find((l) => l.id === lessonId)

@@ -1,7 +1,7 @@
 'use client'
 
-/* «نسخه لینوکس واقعی» — راهنمای نصب SanjabOS روی هستهٔ واقعی لینوکس
-   Debian/Ubuntu + Arch + Docker + Kiosk — با اسپانسری سان‌جاب */
+/* «نسخه لینوکس واقعی»، راهنمای نصب SanjabOS روی هستهٔ واقعی لینوکس
+   Debian/Ubuntu + Arch + Docker + Kiosk، با اسپانسری سان‌جاب */
 
 import { useState } from 'react'
 import {
@@ -40,7 +40,7 @@ const METHODS: Method[] = [
     icon: Zap,
     badge: 'پیشنهادی',
     steps: [
-      { title: 'یک فرمان — نصب کاربری (systemd user)', code: QUICK_INSTALL },
+      { title: 'یک فرمان، نصب کاربری (systemd user)', code: QUICK_INSTALL },
       {
         title: 'یا با clone دستی',
         code: `git clone ${REPO}.git\ncd sanjab-os\n./linux-edition/install.sh`,
@@ -58,11 +58,11 @@ const METHODS: Method[] = [
     icon: Package,
     badge: 'پایهٔ اصلی',
     steps: [
-      { title: '۱ — ساخت بستهٔ deb از روی سورس', code: `git clone ${REPO}.git\ncd sanjab-os/linux-edition/packaging\n./build-deb.sh` },
-      { title: '۲ — نصب (بیلد و سرویس خودکار)', code: `sudo apt install ./sanjabos_1.0.0_all.deb` },
-      { title: '۳ — وضعیت سرویس', code: `systemctl status sanjabos\njournalctl -u sanjabos -f` },
+      { title: '۱، ساخت بستهٔ deb از روی سورس', code: `git clone ${REPO}.git\ncd sanjab-os/linux-edition/packaging\n./build-deb.sh` },
+      { title: '۲، نصب (بیلد و سرویس خودکار)', code: `sudo apt install ./sanjabos_1.0.0_all.deb` },
+      { title: '۳، وضعیت سرویس', code: `systemctl status sanjabos\njournalctl -u sanjabos -f` },
     ],
-    note: 'پایهٔ اصلی ما دبین است — این پروژه روی Debian 13 (trixie) توسعه و تست می‌شود. اوبونتو، مین و مبتنی‌ها همین بسته را می‌گیرند.',
+    note: 'پایهٔ اصلی ما دبین است، این پروژه روی Debian 13 (trixie) توسعه و تست می‌شود. اوبونتو، مین و مبتنی‌ها همین بسته را می‌گیرند.',
   },
   {
     id: 'arch',
@@ -70,9 +70,9 @@ const METHODS: Method[] = [
     icon: Binary,
     badge: 'PKGBUILD',
     steps: [
-      { title: '۱ — ساخت و نصب پکیج', code: `git clone ${REPO}.git\ncd sanjab-os/linux-edition/arch\nmakepkg -si` },
-      { title: '۲ — فعال‌سازی سرویس', code: `sudo systemctl enable --now sanjabos` },
-      { title: '۳ — اجرا', code: `sanjabos open` },
+      { title: '۱، ساخت و نصب پکیج', code: `git clone ${REPO}.git\ncd sanjab-os/linux-edition/arch\nmakepkg -si` },
+      { title: '۲، فعال‌سازی سرویس', code: `sudo systemctl enable --now sanjabos` },
+      { title: '۳، اجرا', code: `sanjabos open` },
     ],
     note: 'آرچیوزرها عاشق این‌اند: پکیج بومی، منیجر pacman، آپدیت با همان makepkg. (کاندید AUR!)',
   },
@@ -82,11 +82,11 @@ const METHODS: Method[] = [
     icon: Container,
     badge: 'همه‌جا',
     steps: [
-      { title: '۱ — بیلد و اجرای ایمیج', code: `docker build -t sanjabos -f linux-edition/Dockerfile .\ndocker run -d --name sanjabos -p 4310:4310 --restart unless-stopped sanjabos` },
+      { title: '۱، بیلد و اجرای ایمیج', code: `docker build -t sanjabos -f linux-edition/Dockerfile .\ndocker run -d --name sanjabos -p 4310:4310 --restart unless-stopped sanjabos` },
       { title: 'یا با Compose', code: `docker compose -f linux-edition/docker-compose.yml up -d` },
       { title: 'لاگ‌ها', code: `docker logs -f sanjabos` },
     ],
-    note: 'ایمیج چندمرحله‌ای Bun + خروجی standalone — سبک و سریع. هستهٔ واقعی لینوکسِ میزبان را قرض می‌گیری!',
+    note: 'ایمیج چندمرحله‌ای Bun + خروجی standalone، سبک و سریع. هستهٔ واقعی لینوکسِ میزبان را قرض می‌گیری!',
   },
   {
     id: 'kiosk',
@@ -98,7 +98,7 @@ const METHODS: Method[] = [
       { title: 'اجرای دستی کیوسک', code: `./linux-edition/kiosk.sh` },
       { title: 'autostart بعد از لاگین', code: `./linux-edition/kiosk.sh --install-autostart` },
     ],
-    note: 'بعد از ورود، Chromium فول‌اسکرین باز می‌شود — تجربهٔ یک سیستم‌عامل واقعی با هستهٔ واقعی، بدون دسکتاپ دیگر!',
+    note: 'بعد از ورود، Chromium فول‌اسکرین باز می‌شود، تجربهٔ یک سیستم‌عامل واقعی با هستهٔ واقعی، بدون دسکتاپ دیگر!',
   },
 ]
 
@@ -164,7 +164,7 @@ export default function LinuxEditionApp() {
               نسخهٔ لینوکس واقعی <span className="text-[#f7931e]">سان‌جاب‌او‌اس</span>
             </h2>
             <p className="text-[10px] leading-4 text-zinc-400">
-              همین WebOS — ولی به‌عنوان سرویس بومی systemd روی هستهٔ واقعی لینوکس
+              همین WebOS، ولی به‌عنوان سرویس بومی systemd روی هستهٔ واقعی لینوکس
             </p>
           </div>
           <span className="mr-auto hidden shrink-0 items-center gap-1 rounded-full border border-[#f7931e]/40 bg-[#f7931e]/10 px-2.5 py-1 text-[10px] font-bold text-amber-300 sm:flex">
@@ -176,7 +176,7 @@ export default function LinuxEditionApp() {
           className="mt-2.5 flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-emerald-400/40 bg-emerald-400/10 text-xs font-black text-emerald-300 transition hover:bg-emerald-400/20 active:scale-[0.98]"
         >
           <Zap size={14} aria-hidden />
-          همین الان کرنل واقعی را در همین مرورگر بوت کن — بدون نصب!
+          همین الان کرنل واقعی را در همین مرورگر بوت کن، بدون نصب!
         </button>
       </div>
 
@@ -221,7 +221,7 @@ export default function LinuxEditionApp() {
                   </span>
                   {s.title}
                 </p>
-                <CodeBlock code={s.code} title={`مرحلهٔ ${i + 1} — ${method.label}`} />
+                <CodeBlock code={s.code} title={`مرحلهٔ ${i + 1}، ${method.label}`} />
               </div>
             ))}
           </div>
@@ -236,7 +236,7 @@ export default function LinuxEditionApp() {
           <div className="rounded-2xl border border-white/10 bg-zinc-900/50 p-3">
             <h3 className="mb-2 flex items-center gap-1.5 text-xs font-bold text-zinc-300">
               <Terminal size={13} className="text-[#f7931e]" aria-hidden />
-              بعد از نصب — فرمان <code dir="ltr" className="rounded bg-black/50 px-1.5 py-0.5 font-mono text-[10px] text-amber-300">sanjabos</code>
+              بعد از نصب، فرمان <code dir="ltr" className="rounded bg-black/50 px-1.5 py-0.5 font-mono text-[10px] text-amber-300">sanjabos</code>
             </h3>
             <div className="grid gap-1 sm:grid-cols-2">
               {CLI_ROWS.map(([cmd, desc]) => (
@@ -255,10 +255,10 @@ export default function LinuxEditionApp() {
 
           {/* امضا */}
           <p className="pb-1 text-center text-[10px] leading-5 text-zinc-600">
-            کدهای این بخش در پوشهٔ <code dir="ltr">linux-edition/</code> ریپو هستند —
+            کدهای این بخش در پوشهٔ <code dir="ltr">linux-edition/</code> ریپو هستند،
             {' '}<a href={`${REPO}/tree/main/linux-edition`} target="_blank" rel="noreferrer" className="text-teal-400 underline">مشاهده در گیت‌هاب ↗</a>
             <br />
-            با اسپانسری سان‌جاب — sunjob.ir 🐿️
+            با اسپانسری سان‌جاب، sunjob.ir 🐿️
           </p>
         </div>
       </div>

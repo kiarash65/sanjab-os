@@ -710,7 +710,7 @@ fn main() {
     let c = Circle { r: 2.0 };
     println!("area = {}", c.area());
 }`,
-        tip: 'traitها با genericها ترکیب می‌شوند: `fn print_all(items: &[impl Display])` یعنی هر چیزی که قابل چاپ است.',
+        tip: 'ترِیت‌ها با genericها ترکیب می‌شوند: `fn print_all(items: &[impl Display])` یعنی هر چیزی که قابل چاپ است.',
       },
       {
         id: 'st-collections',
@@ -906,7 +906,7 @@ const QUIZ: QuizQ[] = [
     q: 'حلقهٔ for i in 0..3 چند بار اجرا می‌شود؟',
     o: ['۲ بار', '۳ بار', '۴ بار', 'بی‌نهایت'],
     a: 1,
-    ex: 'بازهٔ 0..3 نیم‌بازه است: ۰ و ۱ و ۲ — بدون خودِ ۳. برای شامل‌شدن انتها از 0..=3 استفاده کن.',
+    ex: 'بازهٔ 0..3 نیم‌بازه است: ۰ و ۱ و ۲، بدون خودِ ۳. برای شامل‌شدن انتها از 0..=3 استفاده کن.',
   },
   {
     id: 'q4',
@@ -918,7 +918,7 @@ const QUIZ: QuizQ[] = [
   {
     id: 'q5',
     q: 'قرض `&T` چه نوع قرضی است و چندتایش ممکن است؟',
-    o: ['نوشتنی — فقط یکی', 'خواندنی — هر تعداد که بخواهی', 'خواندنی — فقط یکی', 'نوشتنی — هر تعداد'],
+    o: ['نوشتنی؛ فقط یکی', 'خواندنی؛ هر تعداد که بخواهی', 'خواندنی؛ فقط یکی', 'نوشتنی؛ هر تعداد'],
     a: 1,
     ex: '&T قرض خواندنی است و هر تعدادش می‌تواند هم‌زمان زنده باشد؛ اما &mut فقط یکی و بدون هیچ قرض خواندنی دیگری.',
   },
@@ -1085,7 +1085,7 @@ const UNSUPPORTED_KW = new Set([
 ])
 
 const SIM_HINT =
-  'این شبیه‌ساز آموزشی زیرمجموعهٔ کوچکی از Rust را اجرا می‌کند — متغیر، تابع، if، حلقه و println! کافی است برای تمرین!'
+  'این شبیه‌ساز آموزشی زیرمجموعهٔ کوچکی از Rust را اجرا می‌کند؛ متغیر، تابع، if، حلقه و println! برای تمرین کافی است. پیام‌های خطا تقریب آموزشی‌اند، نه عین خروجی rustc!'
 
 function unsupported(what: string, line: number): RustError {
   return new RustError('E9999', `unsupported feature: ${what}`, line, SIM_HINT)
@@ -1143,7 +1143,7 @@ function lex(src: string): Tok[] {
         s += src[j]
         j++
       }
-      if (!closed) throw new RustError('E0001', 'unterminated string literal', line, 'رشته بسته نشده — یک علامت " جا افتاده است')
+      if (!closed) throw new RustError('E0001', 'unterminated string literal', line, 'رشته بسته نشده؛ یک علامت " جا افتاده است')
       toks.push({ t: 'str', v: s, line })
       i = j
       continue
@@ -1241,7 +1241,7 @@ class Parser {
   }
 
   private err(msg: string): never {
-    throw new RustError('E0001', msg, this.peek().line, 'خطای نگارشی — آکولاد، پرانتز یا سمی‌کالن‌ها را بشمار')
+    throw new RustError('E0001', msg, this.peek().line, 'خطای نگارشی؛ آکولاد، پرانتز یا سمی‌کالن‌ها را بشمار')
   }
 
   parseProgram(): FnDef[] {
@@ -1253,7 +1253,7 @@ class Parser {
       } else this.err(`expected 'fn' but found '${this.peek().v}'`)
     }
     if (fns.length === 0) {
-      throw new RustError('E0001', 'no function found', 1, 'هیچ تابعی تعریف نشده — برنامه را با fn main() شروع کن')
+      throw new RustError('E0001', 'no function found', 1, 'هیچ تابعی تعریف نشده؛ برنامه را با fn main() شروع کن')
     }
     return fns
   }
@@ -1580,7 +1580,7 @@ class Interp {
   run(): void {
     const main = this.fns.get('main')
     if (!main) {
-      throw new RustError('E0425', 'main function not found', null, 'تابع main پیدا نشد — هر برنامهٔ Rust با fn main() شروع می‌شود')
+      throw new RustError('E0425', 'main function not found', null, 'تابع main پیدا نشد؛ هر برنامهٔ Rust با fn main() شروع می‌شود')
     }
     if (main.params.length !== 0) {
       throw new RustError('E0061', 'main takes no arguments', main.line, 'تابع main نباید پارامتر داشته باشد')
@@ -1618,7 +1618,7 @@ class Interp {
   }
 
   private typeErr(line: number, what: string): RustError {
-    return new RustError('E0308', `mismatched types (operator ${what})`, line, 'نوع داده‌ها هم‌خوان نیست — مثلاً عدد با متن جمع شده است')
+    return new RustError('E0308', `mismatched types (operator ${what})`, line, 'نوع داده‌ها هم‌خوان نیست؛ مثلاً عدد با متن جمع شده است')
   }
 
   private execStmt(st: Stmt, env: Map<string, RValue>[]): void {
@@ -1877,9 +1877,10 @@ function runRust(src: string): RunResult {
 }
 
 /* ================================================================
-   مأموریت‌های کامپایلر — سبک rustlings (MIT) با چک‌گر ساختاری
-   کامپایلر واقعی rustc این‌جا نیست؛ هر مأموریت با اجرای شبیه‌ساز +
-   شرط‌های ساختاری سنجیده می‌شود و خطای واقعی rustc آموزش داده می‌شود.
+   مأموریت‌های کامپایلر: سبک rustlings (MIT) با چک‌گر ساختاری.
+   کامپایلر واقعی rustc این‌جا نیست؛ هر مأموریت با اجرای شبیه‌ساز،
+   شرط‌های ساختاری و خروجی مورد انتظار سنجیده می‌شود و کد خطای
+   واقعی rustc در تحلیل راه‌حل آموزش داده می‌شود.
    ================================================================ */
 
 interface Mission {
@@ -1889,12 +1890,15 @@ interface Mission {
   errFa: string
   broken: string
   goalFa: string
-  hint: string
-  /** خروجی مورد انتظار — هر خط باید در خروجی شبیه‌ساز باشد */
+  /** سرنخ‌های صعودی: اول مفهوم، بعد بخشی از ساختار؛ هرگز کل پاسخ */
+  hints: string[]
+  /** خروجی مورد انتظار: هر خط باید در خروجی شبیه‌ساز باشد */
   expect: string[]
-  /** شرط‌های ساختاری روی کد — جایگزین صادقانه‌ی چک‌گر کامپایلر */
+  /** شرط‌های ساختاری روی کد: جایگزین صادقانهٔ چک‌گر کامپایلر */
   patterns: { re: RegExp; why: string }[]
   solution: string
+  /** تحلیل راه‌حل: چرا این کار می‌کند و در Rust واقعی چه رخ می‌دهد */
+  solutionExplain: string
 }
 
 const MISSIONS: Mission[] = [
@@ -1902,92 +1906,120 @@ const MISSIONS: Mission[] = [
     id: 'm-e0382',
     title: 'قرض بگیر، مالک نباش',
     errCode: 'E0382',
-    errFa: 'borrow of moved value — مقدار جابه‌جا شده دوباره استفاده شده',
+    errFa: 'borrow of moved value: مقدار منتقل‌شده دوباره استفاده شده',
     broken: `fn main() {
   let s = "سلام";
-  let t = s;      // مالکیت به t رفت
-  println!(s);
-  println!(t);
-}`,    goalFa: 'کد را طوری اصلاح کن که s جابه‌جا نشود — از قرض (&) استفاده کن تا هر دو خط چاپ شوند.',
-    hint: 'در Rust واقعی باید به‌جای `let t = s` بنویسی `let t = &s`. شبیه‌ساز هم همین ساختار را می‌پذیرد.',
+  let t = s;               // مالکیت به t رفت
+  println!("{}", s);       // ← خطا: s دیگر مالک نیست
+  println!("{}", t);
+}`,
+    goalFa: 'کد را طوری اصلاح کن که مالکیت جابه‌جا نشود؛ از قرض (&) استفاده کن تا هر دو خط چاپ شوند.',
+    hints: [
+      'انتساب در Rust یعنی دادن مالکیت؛ بعد از `let t = s` هیچ مالکی به نام `s` نمی‌ماند. برای استفادهٔ هم‌زمان از دو نام، کپی نمی‌خواهیم؛ فقط قرض می‌دهیم.',
+      'کل اصلاح یک علامت است: در خط `let t = s`، پیش از `s` همان نمادی را بگذار که در درس قرض‌گیری دیدی؛ با آن، `t` مالک نمی‌شود، فقط نگاه می‌کند.',
+    ],
     expect: ['سلام', 'سلام'],
-    patterns: [{ re: /&s/, why: 'در تخصیص یا چاپ باید ارجاع & بیاید' }],
+    patterns: [{ re: /&s/, why: 'در تخصیص باید ارجاع & بیاید' }],
     solution: `fn main() {
   let s = "سلام";
-  let t = &s;     // فقط قرض — مالکیت نرفت
-  println!(s);
-  println!(t);
-}`,  },
+  let t = &s;              // فقط قرض؛ مالکیت نرفت
+  println!("{}", s);
+  println!("{}", t);
+}`,
+    solutionExplain: 'با `let t = &s` مالکیت جابه‌جا نمی‌شود؛ `t` فقط ارجاعی به دادهٔ `s` است و مالک همان می‌ماند. نکتهٔ صادقانه: در Rust واقعی انتقال مالکیت برای داده‌های حافظهٔ Heap مثل String رخ می‌دهد؛ اینجا برای سازگاری با شبیه‌ساز از رشتهٔ ساده استفاده شده، اما قاعدهٔ قرض‌دادن دقیقاً همان است.',
+  },
   {
     id: 'm-e0384',
     title: 'متغیر تغییرپذیر',
     errCode: 'E0384',
-    errFa: 'cannot assign twice to immutable variable — به متغیر تغییرناپذیر دوباره مقدار ندی',
+    errFa: 'cannot assign twice to immutable variable: به متغیر تغییرناپذیر دوباره مقدار نمی‌توان داد',
     broken: `fn main() {
-  let شمارنده = 5;
-  شمارنده = 10;
-  println!(شمارنده);
-}`,    goalFa: 'کد را درست کن که مقدار دوباره گذاشته شود — Rust باید بداند متغیر mut است.',
-    hint: 'کلمه‌ی کلیدی `mut` را بعد از let بگذار: `let mut شمارنده = 5`',
+  let shomarande = 5;
+  shomarande = 10;
+  println!("{}", shomarande);
+}`,
+    goalFa: 'کد را طوری درست کن که مقدار دوباره گذاشته شود؛ Rust باید بداند متغیر mut است.',
+    hints: [
+      'متغیرهای Rust به‌طور پیش‌فرض غیرقابل‌تغییر (immutable) هستند؛ برای مقدار دادن دوباره، تغییرپذیری را باید در لحظهٔ ساخت اعلام کنی.',
+      'خط ساخت `shomarande` را پیدا کن؛ بین `let` و نام متغیر، کلمهٔ کلیدی سه‌حرفیِ تغییرپذیری را اضافه کن.',
+    ],
     expect: ['10'],
     patterns: [{ re: /let\s+mut/, why: 'باید let mut بنویسی' }],
     solution: `fn main() {
-  let mut شمارنده = 5;
-  شمارنده = 10;
-  println!(شمارنده);
-}`,  },
+  let mut shomarande = 5;
+  shomarande = 10;
+  println!("{}", shomarande);
+}`,
+    solutionExplain: 'با `let mut` به کامپایلر می‌گویی مقدار این متغیر در طول عمرش عوض می‌شود؛ پس انتساب دوم مجاز است و خروجی 10 چاپ می‌شود. کد خطای واقعی rustc برای نسخهٔ بدون mut، E0384 است.',
+  },
   {
     id: 'm-e0308',
     title: 'جمع ناسازگار',
     errCode: 'E0308',
-    errFa: 'mismatched types — نوع‌ها هم‌خوان نیستند',
+    errFa: 'mismatched types: نوع‌ها هم‌خوان نیستند',
     broken: `fn main() {
   let a = 12;
-  let b = "۳۴";
-  println!(a + b);
-}`,    goalFa: 'به‌جای رشتهٔ "۳۴" عدد بگذار تا جمع معنا داشته باشد.',
-    hint: 'b را به عدد تغییر بده: `let b = 34;`',
+  let b = "34";
+  println!("{}", a + b);
+}`,
+    goalFa: 'به‌جای رشته، عدد بگذار تا جمع معنا داشته باشد.',
+    hints: [
+      'عملگر + فقط روی عددها معنا دارد؛ یکی از دو مقدار نوعش اشتباه است.',
+      'مقدار `b` رشته است: `"34"`. در خط ساخت `b`، نقل‌قول‌ها را بردار تا سمت راست تساوی عدد شود، نه رشته.',
+    ],
     expect: ['46'],
     patterns: [{ re: /let\s+b\s*=\s*34\s*;/, why: 'b باید عدد 34 باشد نه رشته' }],
     solution: `fn main() {
   let a = 12;
   let b = 34;
-  println!(a + b);
-}`,  },
+  println!("{}", a + b);
+}`,
+    solutionExplain: 'با `let b = 34` دو عدد جمع می‌شوند و خروجی 46 می‌شود. در Rust واقعی جمعِ عدد با رشته هم رد می‌شود: عملگر + برای این ترکیب نوع تعریف نشده است (خطای E0369)؛ شبیه‌ساز همین‌جا با E0308 پیام می‌دهد.',
+  },
   {
     id: 'm-e0308-fn',
     title: 'خروجی تابع را برگردان',
     errCode: 'E0308',
-    errFa: 'mismatched return type — نوع خروجی تابع غلط است',
-    broken: `fn دوبل(n) {
-  n * 2
+    errFa: 'mismatched types: سمی‌کالن آخرین عبارت را بی‌مقدار کرده',
+    broken: `fn dooble(n) -> i32 {
+  n * 2;
 }
 
 fn main() {
-  println!(دوبل(21));
-}`,    goalFa: 'کد باید ۴۲ چاپ کند — اگر خطا گرفتی، ساختار تابع و برگرداندن مقدار را درست کن.',
-    hint: 'در Rust واقعی آخرین عبارتِ بدون سمی‌کالن، مقدار برگشتی است. شبیه‌ساز همین‌طور است.',
+  println!("{}", dooble(21));
+}`,
+    goalFa: 'این کد در Rust واقعی خطای E0308 می‌گیرد؛ طوری اصلاحش کن که 42 چاپ شود.',
+    hints: [
+      'در Rust، دستور با سمی‌کالن تمام می‌شود و مقدار ندارد؛ عبارتِ بدون سمی‌کالن مقدار دارد و می‌تواند خروجی تابع باشد.',
+      'سمی‌کالن انتهای `n * 2` را بردار تا خودِ عبارت، مقدار بازگشتی تابع شود.',
+    ],
     expect: ['42'],
-    patterns: [{ re: /fn\s+دوبل/, why: 'تابع دوبل باید تعریف شود' }],
-    solution: `fn دوبل(n) {
+    patterns: [{ re: /fn\s+dooble/, why: 'تابع dooble باید تعریف شود' }],
+    solution: `fn dooble(n) -> i32 {
   n * 2
 }
 
 fn main() {
-  println!(دوبل(21));
-}`,  },
+  println!("{}", dooble(21));
+}`,
+    solutionExplain: 'سمی‌کالن، عبارت `n * 2` را به دستور بی‌مقدار تبدیل می‌کند؛ نتیجه unit یعنی () است و با خروجی اعلام‌شدهٔ i32 نمی‌خواند: همان خطای E0308 واقعی rustc. وقتی عبارت را بدون سمی‌کالن بگذاری، خودش مقدار بازگشتی می‌شود و 42 چاپ می‌شود.',
+  },
   {
     id: 'm-e0030',
     title: 'حلقهٔ گیرکرده',
-    errCode: 'PANIC / E0308',
-    errFa: 'حلقهٔ بی‌نهایت — شرط هیچ‌وقت false نمی‌شود',
+    errCode: 'PANIC',
+    errFa: 'حلقهٔ بی‌نهایت؛ شرط هیچ‌وقت false نمی‌شود',
     broken: `fn main() {
   let mut i = 0;
   while i < 5 {
-    println!(i);
+    println!("{}", i);
   }
-}`,    goalFa: 'حلقه را طوری درست کن که ۰ تا ۴ چاپ شود و تمام — نه بی‌نهایت.',
-    hint: 'داخل حلقه i را زیاد کن: `i = i + 1`',
+}`,
+    goalFa: 'حلقه را طوری درست کن که ۰ تا ۴ چاپ شود و تمام؛ نه بی‌نهایت.',
+    hints: [
+      'شرط `i < 5` هر بار با همان `i` اول بررسی می‌شود؛ اگر `i` داخل حلقه بزرگ نشود، شرط هرگز false نمی‌شود.',
+      'بعد از `println!` یک خط اضافه کن که `i` را در هر تکرار یک واحد بزرگ‌تر کند. حواست باشد بعد از چاپ باشد؛ اگر قبلش بگذاری، صفر هرگز چاپ نمی‌شود.',
+    ],
     expect: ['0', '1', '2', '3', '4'],
     patterns: [
       { re: /while/, why: 'همان حلقه while باید بماند' },
@@ -1996,35 +2028,43 @@ fn main() {
     solution: `fn main() {
   let mut i = 0;
   while i < 5 {
-    println!(i);
+    println!("{}", i);
     i = i + 1;
   }
-}`,  },
+}`,
+    solutionExplain: 'با افزایش `i` در پایان هر تکرار، شرط پس از چاپ ۰ تا ۴ false می‌شود و حلقه تمام می‌شود. بدون آن، برنامه برای همیشه می‌چرخید؛ شبیه‌ساز بعد از سقف گام‌ها آن را متوقف می‌کند و در سیستم واقعی CPU را اشغال می‌کرد.',
+  },
   {
     id: 'm-e0369',
-    title: 'جمع بونوس',
-    errCode: 'E0369',
-    errFa: 'cannot add — عملگر برای این نوع‌ها تعریف نشده',
-    broken: `fn میانگین(آ, ب) {
-  (آ + ب) / 2
-}
-
-fn main() {
-  println!(میانگین(10, 21));
-}`,    goalFa: 'خروجی باید ۱۵٫۵ باشد — اول جمع بعد تقسیم روی ۲. اگر شبیه‌ساز اعشار نشاند، گرد کردن را خودت مدیریت کن.',
-    hint: 'ساختار درست است؛ فقط مطمئن شو آرگومان‌ها عدد‌اند و پرانتز جمع درست است. خروجی مورد قبول: 15 یا 15.5',
-    expect: [],
-    patterns: [
-      { re: /fn\s+میانگین/, why: 'تابع میانگین باید باشد' },
-      { re: /آ\s*\+\s*ب/, why: 'دو آرگومان جمع می‌شوند' },
+    title: 'تقسیم بر صفر',
+    errCode: 'PANIC',
+    errFa: 'attempt to divide by zero: در Rust تقسیم بر صفر برنامه را متوقف می‌کند',
+    broken: `fn main() {
+  let total = 10;
+  let count = 0;
+  println!("{}", total / count);
+}`,
+    goalFa: 'با یک شرط جلوی تقسیم بر صفر را بگیر: وقتی count صفر است پیام «count is zero» چاپ شود؛ وگرنه حاصل تقسیم.',
+    hints: [
+      'تقسیم بر صفر در Rust panic می‌زند و برنامه همان‌جا می‌ایستد؛ پیش از تقسیم باید مقدار مقسوم‌علیه را بررسی کنی.',
+      'ساختار: یک `if count == 0` بنویس که در آن حالت پیام چاپ کند و در `else` حاصل `total / count` را.',
     ],
-    solution: `fn میانگین(آ, ب) {
-  (آ + ب) / 2
-}
-
-fn main() {
-  println!(میانگین(10, 21));
-}`,  },
+    expect: ['count is zero'],
+    patterns: [
+      { re: /if\s+count\s*==\s*0/, why: 'شرط بررسی صفر بودن count لازم است' },
+      { re: /else/, why: 'حالت معمول باید در else انجام شود' },
+    ],
+    solution: `fn main() {
+  let total = 10;
+  let count = 0;
+  if count == 0 {
+    println!("count is zero");
+  } else {
+    println!("{}", total / count);
+  }
+}`,
+    solutionExplain: 'با بررسی `count == 0` پیش از تقسیم، مسیر خطرناک اصلاً اجرا نمی‌شود و «count is zero» چاپ می‌شود. در Rust واقعی بدون این شرط، برنامه در زمان اجرا با پیام attempt to divide by zero از کار می‌افتد؛ panic باگ پنهان نمی‌ماند، همان‌جا خودش را نشان می‌دهد.',
+  },
 ]
 
 /* ================================================================
@@ -2082,6 +2122,88 @@ function TipBox({ text }: { text: string }) {
   )
 }
 
+/* بخش‌های اختیاری درس (LessonExtra): فقط وقتی داده باشند رندر می‌شوند */
+function PrereqBox({ text }: { text: string }) {
+  return (
+    <div className="flex gap-2 rounded-xl border border-white/10 bg-white/[0.03] p-3">
+      <BookOpen className="mt-0.5 h-4 w-4 shrink-0 text-zinc-400" aria-hidden />
+      <div className="min-w-0">
+        <p className="text-[10px] font-black text-zinc-500">پیش‌نیاز</p>
+        <p className="text-[12px] leading-6 text-zinc-300">{rich(text)}</p>
+      </div>
+    </div>
+  )
+}
+
+function GoalBox({ items }: { items: string[] }) {
+  return (
+    <div className="rounded-xl border border-[#f7931e]/25 bg-[#f7931e]/[0.06] p-3">
+      <p className="flex items-center gap-1.5 text-[10px] font-black text-[#f7931e]">
+        <GraduationCap className="h-3.5 w-3.5" aria-hidden /> هدف درس
+      </p>
+      <ul className="mt-1.5 space-y-1">
+        {items.map((g, i) => (
+          <li key={i} className="flex gap-1.5 text-[12px] leading-6 text-zinc-300">
+            <Check className="mt-1 h-3 w-3 shrink-0 text-[#f7931e]" aria-hidden />
+            <span className="min-w-0">{rich(g)}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+function WhyBox({ text }: { text: string }) {
+  return (
+    <div className="flex gap-2 rounded-xl border border-white/10 bg-white/[0.03] p-3">
+      <Zap className="mt-0.5 h-4 w-4 shrink-0 text-[#f7931e]" aria-hidden />
+      <div className="min-w-0">
+        <p className="text-[10px] font-black text-zinc-500">چرا این مفهوم لازم است؟</p>
+        <p className="text-[12px] leading-6 text-zinc-300">{rich(text)}</p>
+      </div>
+    </div>
+  )
+}
+
+function AnalogyBox({ text }: { text: string }) {
+  return (
+    <div className="flex gap-2 rounded-xl border border-cyan-500/25 bg-cyan-500/[0.07] p-3">
+      <Layers className="mt-0.5 h-4 w-4 shrink-0 text-cyan-300" aria-hidden />
+      <div className="min-w-0">
+        <p className="text-[10px] font-black text-cyan-300/80">مرز تشبیه</p>
+        <p className="text-[12px] leading-6 text-zinc-300">{rich(text)}</p>
+      </div>
+    </div>
+  )
+}
+
+function SelfCheckBox({ points, questions }: { points: string[]; questions: string[] }) {
+  return (
+    <div className="space-y-2.5 rounded-xl border border-emerald-500/25 bg-emerald-500/[0.06] p-3">
+      <p className="flex items-center gap-1.5 text-[10px] font-black text-emerald-300">
+        <CheckCircle2 className="h-3.5 w-3.5" aria-hidden /> خودارزیابی
+      </p>
+      <ul className="space-y-1">
+        {points.map((p, i) => (
+          <li key={i} className="flex gap-1.5 text-[12px] leading-6 text-zinc-300">
+            <Check className="mt-1 h-3 w-3 shrink-0 text-emerald-400" aria-hidden />
+            <span className="min-w-0">{rich(p)}</span>
+          </li>
+        ))}
+      </ul>
+      <div className="space-y-1 border-t border-emerald-500/20 pt-2.5">
+        <p className="text-[10px] font-black text-zinc-500">پرسش‌های سنجش فهم</p>
+        {questions.map((q, i) => (
+          <p key={i} className="text-[12px] leading-6 text-zinc-300">
+            <span className="font-black text-emerald-300">{fa(i + 1)}. </span>
+            {rich(q)}
+          </p>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function ErrBox({ title, code, why }: { title: string; code: string; why: string }) {
   return (
     <div className="space-y-2 rounded-xl border border-red-500/25 bg-red-500/10 p-3">
@@ -2132,7 +2254,8 @@ export default function RustAcademyApp() {
   const [missionCode, setMissionCode] = useState(MISSIONS[0].broken)
   const [missionMsg, setMissionMsg] = useState<string[]>([])
   const [missionOk, setMissionOk] = useState(false)
-  const [showHint, setShowHint] = useState(false)
+  const [hintCount, setHintCount] = useState(0)
+  const [showSolution, setShowSolution] = useState(false)
   const [missionsDone, setMissionsDone] = useState<string[]>([])
 
   /* ---------- ذخیره‌سازی ---------- */
@@ -2253,13 +2376,14 @@ export default function RustAcademyApp() {
     setMissionCode(m.broken)
     setMissionMsg([])
     setMissionOk(false)
-    setShowHint(false)
+    setHintCount(0)
+    setShowSolution(false)
   }
 
   const checkMission = () => {
     const m = activeMission
     const msgs: string[] = []
-    // ۱) اجرای شبیه‌ساز — کد باید واقعاً اجرا شود
+    // ۱) اجرای شبیه‌ساز: کد باید واقعاً اجرا شود
     const res = runRust(missionCode)
     if (!res.ok) {
       setMissionMsg([
@@ -2269,7 +2393,7 @@ export default function RustAcademyApp() {
       setMissionOk(false)
       return
     }
-    // ۲) شرط‌های ساختاری — جایگزین صادقانه‌ی چک‌گر کامپایلر واقعی
+    // ۲) شرط‌های ساختاری: جایگزین صادقانهٔ چک‌گر کامپایلر واقعی
     for (const p of m.patterns) {
       if (!p.re.test(missionCode)) {
         msgs.push(`شرط برآورده نشد: ${p.why}`)
@@ -2278,7 +2402,7 @@ export default function RustAcademyApp() {
     // ۳) خروجی مورد انتظار
     for (const exp of m.expect) {
       if (!res.out.some((l) => l.trim().includes(exp))) {
-        msgs.push(`خروجی «${exp}» پیدا نشد — خروجی فعلی: ${res.out.join(' | ') || '(خالی)'}`)
+        msgs.push(`خروجی «${exp}» پیدا نشد؛ خروجی فعلی: ${res.out.join(' | ') || '(خالی)'}`)
       }
     }
     setMissionMsg(msgs)
@@ -2290,7 +2414,7 @@ export default function RustAcademyApp() {
       }
       pushToast({
         title: 'مأموریت انجام شد!',
-        body: `«${m.title}» حل شد — در Rust واقعی هم کامپایلر همین را می‌خواست`,
+        body: `«${m.title}» حل شد؛ در Rust واقعی هم کامپایلر همین را می‌خواست`,
         icon: ShieldCheck,
       })
     }
@@ -2320,9 +2444,9 @@ export default function RustAcademyApp() {
         </span>
         <div className="min-w-0 flex-1">
           <h1 className="truncate text-sm font-black text-zinc-50">
-            آکادمی Rust <span className="text-[10px] font-bold text-[#f7931e]">— دورهٔ تعاملی فارسی</span>
+            آکادمی Rust <span className="text-[10px] font-bold text-[#f7931e]">· دورهٔ تعاملی فارسی</span>
           </h1>
-          <p className="hidden text-[10.5px] text-zinc-400 sm:block">سرعت C و ++C، امنیت حافظه بدون GC — با شبیه‌ساز داخلی Rust</p>
+          <p className="hidden text-[10.5px] text-zinc-400 sm:block">برنامه‌نویسی سیستمی سریع و امن؛ با شبیه‌ساز داخلی Rust</p>
         </div>
         <div className="flex w-24 shrink-0 items-center gap-2 sm:w-32">
           <Progress value={pct} className="h-1.5 flex-1" aria-label="پیشرفت کل دوره" />
@@ -2413,10 +2537,10 @@ export default function RustAcademyApp() {
               {view === 'memory' && (
                 <div className="space-y-3">
                   <div className="rounded-2xl border border-[#f7931e]/20 bg-[#f7931e]/[0.05] p-4">
-                    <h2 className="text-sm font-black text-zinc-100">آزمایشگاه حافظه — مالکیت را ببینید</h2>
+                    <h2 className="text-sm font-black text-zinc-100">آزمایشگاه حافظه: مالکیت را ببین</h2>
                     <p className="mt-1 text-[11.5px] leading-6 text-zinc-400">
-                      چهار دیاگرام تعاملی: انتقال (Move)، قرض‌گیری (Borrow)، کپی (Clone) و آزادسازی (Drop). مالکیت، مهم‌ترین مفهوم راست است —
-                      اینجا آن را گام‌به‌گام با انیمیشن تجربه کنید و خطاهای واقعی کامپایلر (E0382، E0502، E0499) را در عمل ببینید.
+                      چهار دیاگرام تعاملی: انتقال مالکیت (Move)، قرض‌گیری (Borrow)، کپی (Clone) و آزادسازی (Drop). مالکیت مهم‌ترین مفهوم راست است؛
+                      اینجا آن را گام‌به‌گام با انیمیشن تجربه کن و متن خطاهای واقعی کامپایلر (E0382، E0502، E0499) را کنار هر نمودار ببین.
                     </p>
                   </div>
                   <RustMemoryLab />
@@ -2430,12 +2554,12 @@ export default function RustAcademyApp() {
                     <Cog className="absolute -bottom-8 -left-8 h-36 w-36 text-[#f7931e]/10" aria-hidden />
                     <div className="relative space-y-2.5">
                       <p className="text-[10px] font-bold tracking-wide text-[#f7931e]">زبان سیستمیِ محبوب دنیا</p>
-                      <h2 className="text-xl font-black text-zinc-50 sm:text-2xl">Rust را با آتش یاد بگیر</h2>
+                      <h2 className="text-xl font-black text-zinc-50 sm:text-2xl">زبان Rust را با آتش یاد بگیر</h2>
                       <p className="max-w-xl text-[12px] leading-6 text-zinc-300">
-                        {fa(total)} درس کوتاه فارسی، شبیه‌ساز Rust داخلی، زمین بازی و آزمون — از متغیر تا مالکیت و همزمانی.
+                        {fa(total)} درس کوتاه فارسی، شبیه‌ساز Rust داخلی، زمین بازی و آزمون؛ از برنامه‌نویسی سیستمی تا مالکیت و همزمانی.
                       </p>
                       <div className="flex flex-wrap gap-1.5">
-                        {['هستهٔ لینوکس ۶.۷+', 'فایرفاکس', 'ویندوز', 'بدون GC'].map((t) => (
+                        {['هستهٔ لینوکس ۶٫۱+', 'فایرفاکس', 'ویندوز', 'بدون GC'].map((t) => (
                           <Badge key={t} variant="outline" className="border-white/15 bg-black/30 text-[10px] font-normal text-zinc-300">
                             {t}
                           </Badge>
@@ -2466,10 +2590,10 @@ export default function RustAcademyApp() {
                     <h3 className="text-[13px] font-bold text-zinc-100">چرا Rust؟</h3>
                     <ul className="mt-2.5 space-y-2.5">
                       {[
-                        { i: Zap, t: 'سرعت هم‌تراز C و ++C — بدون زباله‌روب و با صفر هزینهٔ زمان اجرا.' },
+                        { i: Zap, t: 'سرعت هم‌تراز C و ++C، بدون زباله‌روب و با صفر هزینهٔ زمان اجرا.' },
                         { i: ShieldCheck, t: 'امنیت حافظه در زمان کامپایل: نه data race، نه dangling pointer، نه double-free.' },
-                        { i: Flame, t: 'از نسخهٔ ۶.۷ بخشی از هستهٔ لینوکس است و در فایرفاکس و ویندوز نفس می‌کشد.' },
-                        { i: BookOpen, t: 'پیام‌های کامپایلر مثل یک معلم خصوصی‌اند — بهترین تجربهٔ یادگیری بین زبان‌ها.' },
+                        { i: Flame, t: 'از نسخهٔ ۶٫۱ بخشی از هستهٔ لینوکس است؛ اجزای فایرفاکس و ویندوز هم به آن مهاجرت کرده‌اند.' },
+                        { i: BookOpen, t: 'پیام‌های کامپایلر مثل یک معلم خصوصی‌اند؛ بهترین تجربهٔ یادگیری بین زبان‌ها.' },
                       ].map((r) => (
                         <li key={r.t} className="flex items-start gap-2 text-[12px] leading-6 text-zinc-300">
                           <r.i className="mt-1 h-3.5 w-3.5 shrink-0 text-[#f7931e]" aria-hidden />
@@ -2515,7 +2639,7 @@ export default function RustAcademyApp() {
                       <div className="flex items-center gap-2 text-[13px] font-bold text-zinc-100">
                         <FlaskConical className="h-4 w-4 text-[#f7931e]" aria-hidden /> زمین بازی
                       </div>
-                      <p className="mt-1.5 text-[11px] leading-5 text-zinc-400">کد Rust را همین‌جا بنویس و با شبیه‌ساز داخلی اجرا کن — {fa(EXAMPLES.length)} نمونهٔ آماده هم دارد.</p>
+                      <p className="mt-1.5 text-[11px] leading-5 text-zinc-400">کد Rust را همین‌جا بنویس و با شبیه‌ساز داخلی اجرا کن؛ {fa(EXAMPLES.length)} نمونهٔ آماده هم دارد.</p>
                     </button>
                     <button
                       onClick={() => setView('quiz')}
@@ -2540,6 +2664,8 @@ export default function RustAcademyApp() {
                     </Badge>
                     <h2 className="min-w-0 flex-1 truncate text-sm font-bold text-zinc-100">{lesson.title}</h2>
                   </div>
+                  {lesson.prereq && <PrereqBox text={lesson.prereq} />}
+                  {lesson.goal && <GoalBox items={lesson.goal} />}
                   <div className="space-y-2.5 rounded-2xl border border-white/10 bg-zinc-900/60 p-4">
                     {lesson.paragraphs.map((p, i) => (
                       <p key={i} className="text-zinc-300">
@@ -2547,10 +2673,13 @@ export default function RustAcademyApp() {
                       </p>
                     ))}
                   </div>
+                  {lesson.whyMatters && <WhyBox text={lesson.whyMatters} />}
                   {lesson.terminal && <CodeBlock code={lesson.terminal} tone="term" />}
                   <CodeBlock code={lesson.code} />
                   {lesson.tip && <TipBox text={lesson.tip} />}
                   {lesson.errTitle && lesson.errCode && lesson.errWhy && <ErrBox title={lesson.errTitle} code={lesson.errCode} why={lesson.errWhy} />}
+                  {lesson.analogyLimit && <AnalogyBox text={lesson.analogyLimit} />}
+                  {lesson.selfCheck && <SelfCheckBox points={lesson.selfCheck.points} questions={lesson.selfCheck.questions} />}
                   <div className="flex flex-wrap items-center gap-2">
                     <Button size="sm" variant="outline" onClick={() => tryIt(lesson.code)} className="gap-1.5">
                       <FlaskConical className="h-3.5 w-3.5" aria-hidden /> امتحانش کن
@@ -2614,6 +2743,10 @@ export default function RustAcademyApp() {
                   <p className="text-[10.5px] text-zinc-500">
                     مدت اجرا: {fa(Math.round(runMs))} میلی‌ثانیه · {fa(out.length)} خط خروجی
                   </p>
+                  <p className="flex items-start gap-1.5 rounded-xl border border-[#f7931e]/25 bg-[#f7931e]/[0.06] p-2.5 text-[10.5px] leading-5 text-amber-100/85">
+                    <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#f7931e]" aria-hidden />
+                    شبیه‌ساز آموزشی: این‌جا rustc واقعی اجرا نمی‌شود؛ زیرمجموعهٔ کوچکی از Rust شبیه‌سازی شده و پیام‌های خطا تقریب آموزشی‌اند و ممکن است با پیام واقعی کامپایلر فرق داشته باشند.
+                  </p>
                   {runErr && (
                     <div className="rounded-xl border border-red-500/30 bg-red-950/40 p-3">
                       <p dir="ltr" className="text-left font-mono text-[11.5px] text-red-300">
@@ -2633,7 +2766,7 @@ export default function RustAcademyApp() {
                       out.length ? 'text-emerald-300' : 'text-zinc-600'
                     }`}
                   >
-                    <code>{out.length ? out.join('\n') : '— output appears here —'}</code>
+                    <code>{out.length ? out.join('\n') : 'خروجی این‌جا ظاهر می‌شود'}</code>
                   </pre>
                 </>
               )}
@@ -2650,9 +2783,10 @@ export default function RustAcademyApp() {
                     </Badge>
                   </div>
                   <p className="rounded-xl border border-white/10 bg-zinc-900/60 p-3 text-[11px] leading-6 text-zinc-400">
-                    سبک تمرین rustlings: یک کد خراب می‌گیری، خطای کامپایلر را می‌بینی و باید درستش کنی.
-                    نکته‌ی صادقانه: کامپایلر واقعی rustc در مرورگر وجود ندارد؛ این‌جا خطای شبیه‌سازی‌شده + شرط‌های
-                    ساختاری + اجرای شبیه‌ساز سنجیده می‌شوند، ولی هر خطای واقعی rustc (کد E مربوط) آموزش داده می‌شود.
+                    سبک تمرین rustlings: یک کد خراب می‌گیری، خطا را می‌بینی و باید درستش کنی. نکتهٔ صادقانه:
+                    کامپایلر واقعی rustc در مرورگر وجود ندارد؛ بررسی این‌جا با اجرای شبیه‌ساز، شرط‌های ساختاری
+                    و خروجی مورد انتظار انجام می‌شود. پیام‌های خطا تقریب آموزشی‌اند، نه عین خروجی rustc؛
+                    کد خطای واقعی هر مأموریت در تحلیل راه‌حل آمده است.
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {MISSIONS.map((m) => (
@@ -2701,10 +2835,35 @@ export default function RustAcademyApp() {
                     <Button size="sm" onClick={checkMission} className="gap-1.5">
                       <ShieldCheck className="h-3.5 w-3.5" aria-hidden /> بررسی مأموریت
                     </Button>
-                    <Button size="sm" variant="outline" onClick={() => setShowHint((s) => !s)} className="gap-1.5">
-                      <Lightbulb className="h-3.5 w-3.5" aria-hidden /> {showHint ? 'بستن راهنما' : 'راهنما'}
+                    {hintCount < activeMission.hints.length && (
+                      <Button size="sm" variant="outline" onClick={() => setHintCount((c) => c + 1)} className="gap-1.5">
+                        <Lightbulb className="h-3.5 w-3.5" aria-hidden /> سرنخ بعدی ({fa(hintCount + 1)} از {fa(activeMission.hints.length)})
+                      </Button>
+                    )}
+                    <Button size="sm" variant="outline" onClick={() => setShowSolution((s) => !s)} className="gap-1.5">
+                      <CheckCircle2 className="h-3.5 w-3.5" aria-hidden /> {showSolution ? 'بستن راه‌حل' : 'دیدن راه‌حل'}
                     </Button>
-                    {missionOk && (
+                    <Button size="sm" variant="outline" onClick={() => openMission(activeMission)} className="gap-1.5">
+                      <RotateCcw className="h-3.5 w-3.5" aria-hidden /> بازنشانی
+                    </Button>
+                  </div>
+
+                  {hintCount > 0 && (
+                    <div className="space-y-1.5">
+                      {activeMission.hints.slice(0, hintCount).map((h, i) => (
+                        <p key={i} className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-[11.5px] leading-6 text-amber-100">
+                          <span className="font-black">سرنخ {fa(i + 1)}: </span>
+                          {rich(h)}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+
+                  {showSolution && (
+                    <div className="space-y-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3">
+                      <p className="text-[12px] font-black text-emerald-300">راه‌حل و تحلیل</p>
+                      <CodeBlock code={activeMission.solution} />
+                      <p className="text-[11.5px] leading-6 text-emerald-100/90">{rich(activeMission.solutionExplain)}</p>
                       <Button
                         size="sm"
                         variant="outline"
@@ -2714,18 +2873,9 @@ export default function RustAcademyApp() {
                         }}
                         className="gap-1.5"
                       >
-                        <CheckCircle2 className="h-3.5 w-3.5" aria-hidden /> دیدن راه‌حل
+                        <Play className="h-3.5 w-3.5" aria-hidden /> بارگذاری در ویرایشگر
                       </Button>
-                    )}
-                    <Button size="sm" variant="outline" onClick={() => openMission(activeMission)} className="gap-1.5">
-                      <RotateCcw className="h-3.5 w-3.5" aria-hidden /> بازنشانی
-                    </Button>
-                  </div>
-
-                  {showHint && (
-                    <p className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-[11.5px] leading-6 text-amber-100">
-                      {rich(activeMission.hint)}
-                    </p>
+                    </div>
                   )}
 
                   {missionMsg.length > 0 && !missionOk && (
@@ -2741,7 +2891,7 @@ export default function RustAcademyApp() {
                   {missionOk && (
                     <div className="rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-3">
                       <p className="text-[12px] font-black text-emerald-300">
-                        مأموریت حل شد! +۲۵ XP — رویداد در مرکز پیشرفت ثبت شد
+                        مأموریت حل شد! +۲۵ XP؛ رویداد در مرکز پیشرفت ثبت شد
                       </p>
                     </div>
                   )}
@@ -2765,7 +2915,7 @@ export default function RustAcademyApp() {
                     >
                       {score >= 6 && <Trophy className="mx-auto h-8 w-8 text-amber-300" aria-hidden />}
                       <p className={`mt-1 text-base font-black ${score >= 6 ? 'text-emerald-300' : 'text-[#f7931e]'}`}>
-                        {fa(score)} از {fa(QUIZ.length)} — {score >= 6 ? 'آفرین، قبول شدی!' : 'نزدیک بودی؛ یک دور دیگر مرور کن'}
+                        {fa(score)} از {fa(QUIZ.length)}؛ {score >= 6 ? 'آفرین، قبول شدی!' : 'نزدیک بودی؛ یک دور دیگر مرور کن'}
                       </p>
                     </motion.div>
                   )}
@@ -2824,7 +2974,7 @@ export default function RustAcademyApp() {
       </div>
 
       <footer className="shrink-0 border-t border-white/10 bg-black/20 px-4 py-1.5 text-center text-[10px] text-zinc-500">
-        آکادمی Rust — با اسپانسری سان‌جاب
+        آکادمی Rust؛ حمایت سان‌جاب
       </footer>
     </div>
   )

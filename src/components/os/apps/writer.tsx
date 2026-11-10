@@ -1,8 +1,8 @@
 'use client'
 
 /* ------------------------------------------------------------------ */
-/* «نویسا» — واژه‌پرداز سان‌جاب‌او‌اس                                    */
-/* ویرایشگر غنی راست‌به‌چپ با خروجی Word (.doc / .docx) و PDF — آفلاین  */
+/* «نویسا»، واژه‌پرداز سان‌جاب‌او‌اس                                    */
+/* ویرایشگر غنی راست‌به‌چپ با خروجی Word (.doc / .docx) و PDF، آفلاین  */
 /* ------------------------------------------------------------------ */
 
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -61,7 +61,7 @@ const STAMP_TEXT = 'با اسپانسری سان‌جاب | sunjob.ir'
 
 const WELCOME_HTML = `
 <h1>سند اول من</h1>
-<p>این سند نمونه در <b>نویسا</b> — واژه‌پرداز رسمی <b>سان‌جاب‌او‌اس</b> — است. مثل ورد می‌نویسی، قالب‌بندی می‌کنی و آخرش خروجی Word یا PDF می‌گیری؛ همه‌چیز آفلاین و داخل مرورگر خودت.</p>
+<p>این سند نمونه در <b>نویسا</b>، واژه‌پرداز رسمی <b>سان‌جاب‌او‌اس</b>، است. مثل ورد می‌نویسی، قالب‌بندی می‌کنی و آخرش خروجی Word یا PDF می‌گیری؛ همه‌چیز آفلاین و داخل مرورگر خودت.</p>
 <p>چند نکتهٔ سریع برای شروع:</p>
 <ul>
   <li>نوار ابزار بالا، متن را درشت، کج، زیرخط‌دار و رنگی می‌کند.</li>
@@ -71,7 +71,7 @@ const WELCOME_HTML = `
 </ul>
 `.trim()
 
-/** استایل سرصفحه‌ها و فهرست‌ها — چون پیش‌فرض‌های Tailwind آن‌ها را صفر می‌کند */
+/** استایل سرصفحه‌ها و فهرست‌ها، چون پیش‌فرض‌های Tailwind آن‌ها را صفر می‌کند */
 const DOC_STYLES = [
   '[&_h1]:mb-4 [&_h1]:mt-1 [&_h1]:text-2xl [&_h1]:font-extrabold',
   '[&_h2]:mb-3 [&_h2]:mt-3 [&_h2]:text-xl [&_h2]:font-bold',
@@ -89,7 +89,7 @@ const faNum = (n: number): string => n.toLocaleString('fa-IR')
 const safeName = (raw: string): string =>
   raw.trim().replace(/[\\/:*?"<>|]+/g, '_') || DEFAULT_NAME
 
-/** محتوای آغازین سند — پیش‌نویس ذخیره‌شدهٔ خودکار یا سند خوش‌آمد */
+/** محتوای آغازین سند، پیش‌نویس ذخیره‌شدهٔ خودکار یا سند خوش‌آمد */
 function initialDocHtml(): string {
   if (typeof window === 'undefined') return WELCOME_HTML
   try {
@@ -101,7 +101,7 @@ function initialDocHtml(): string {
   return WELCOME_HTML
 }
 
-/** شمارش واژه/نویسه از روی HTML — فقط برای مقدار اولیه (بدون دست‌زدن به DOM) */
+/** شمارش واژه/نویسه از روی HTML، فقط برای مقدار اولیه (بدون دست‌زدن به DOM) */
 function textStats(html: string): { words: number; chars: number } {
   if (typeof window === 'undefined' || typeof DOMParser === 'undefined') {
     return { words: 0, chars: 0 }
@@ -239,7 +239,7 @@ function collectRuns(node: Node, ctx: RunCtx): TextRun[] {
   return runs
 }
 
-/** تراز پاراگراف — پیش‌فرض سند راست‌به‌چپ یعنی راست‌چین */
+/** تراز پاراگراف، پیش‌فرض سند راست‌به‌چپ یعنی راست‌چین */
 function paraAlign(el: HTMLElement): (typeof AlignmentType)[keyof typeof AlignmentType] {
   const a = (el.style.textAlign || el.getAttribute('align') || '').toLowerCase()
   if (a === 'center') return AlignmentType.CENTER
@@ -572,7 +572,7 @@ export default function WriterApp() {
         )
       }
       const doc = new Document({
-        creator: 'نویسا — سان‌جاب‌او‌اس',
+        creator: 'نویسا، سان‌جاب‌او‌اس',
         title: fileName,
         numbering: {
           config: [
@@ -614,7 +614,7 @@ export default function WriterApp() {
         useCORS: true,
       })
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
-      const pageW = 210 // میلی‌متر — A4
+      const pageW = 210 // میلی‌متر؛ A4
       const pageH = 297
       const imgH = (canvas.height * pageW) / canvas.width // ارتفاع کل سند بر حسب میلی‌متر
       const data = canvas.toDataURL('image/jpeg', 0.95)
@@ -801,7 +801,7 @@ export default function WriterApp() {
             className={`os-scroll min-h-[420px] overflow-y-auto rounded-xl px-6 py-6 text-[15px] outline-none ${DOC_STYLES}`}
             style={{ fontFamily: 'var(--font-vazir), sans-serif' }}
           />
-          {/* مهر اسپانسر — بیرون از contentEditable ولی داخل ناحیهٔ خروجی PDF */}
+          {/* مهر اسپانسر، بیرون از contentEditable ولی داخل ناحیهٔ خروجی PDF */}
           {stamp && (
             <div className="select-none pb-5 pt-1 text-center text-[11px] text-zinc-400">
               {STAMP_TEXT}

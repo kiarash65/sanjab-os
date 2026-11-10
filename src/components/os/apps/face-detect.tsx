@@ -1,6 +1,6 @@
 'use client'
 
-/* «تشخیص چهره» — تشخیص جنسیت و سن با دوربین + face-api.js
+/* «تشخیص چهره»، تشخیص جنسیت و سن با دوربین + face-api.js
    کتابخانه: face-api.js (justadudewhohacks) مبتنی بر TensorFlow.js
    مدل‌ها از CDN jsDelivr بارگذاری می‌شوند. */
 
@@ -78,7 +78,7 @@ export default function FaceDetectApp() {
       script.async = true
       script.onload = () => resolve()
       script.onerror = () =>
-        reject(new Error('بارگذاری کتابخانه face-api ناموفق بود — اینترنت چک کن'))
+        reject(new Error('بارگذاری کتابخانه face-api ناموفق بود، اینترنت چک کن'))
       document.head.appendChild(script)
     })
   }, [])
@@ -176,7 +176,7 @@ export default function FaceDetectApp() {
             age,
             expression: EXP_FA[bestExp] || bestExp,
           })
-          // فقط قاب — برچسب‌ها با HTML روی ویدیو می‌نشینند تا متن فارسی برعکس/بریده نشود
+          // فقط قاب، برچسب‌ها با HTML روی ویدیو می‌نشینند تا متن فارسی برعکس/بریده نشود
           ctx.lineWidth = 3
           ctx.strokeStyle = r.gender === 'male' ? '#38bdf8' : '#f472b6'
           ctx.strokeRect(box.x, box.y, box.width, box.height)
@@ -229,15 +229,15 @@ export default function FaceDetectApp() {
       pushToast({
         icon: '🎥',
         title: 'دوربین روشن شد',
-        body: 'حالا صورتت را جلوی دوربین بگیر — سان‌جاب حدس می‌زنه!',
+        body: 'حالا صورتت را جلوی دوربین بگیر، سان‌جاب حدس می‌زنه!',
       })
       detectLoop()
     } catch (err) {
       const msg =
         err instanceof DOMException && err.name === 'NotAllowedError'
-          ? 'دسترسی به دوربین داده نشد — اجازه بده!'
+          ? 'دسترسی به دوربین داده نشد، اجازه بده!'
           : err instanceof DOMException && err.name === 'NotFoundError'
-            ? 'دوربینی پیدا نشد — شاید روی دسکتاپ بدون وب‌کم هستی'
+            ? 'دوربینی پیدا نشد، شاید روی دسکتاپ بدون وب‌کم هستی'
             : 'خطا در باز کردن دوربین'
       setError(msg)
       pushToast({ icon: '⚠️', title: 'دوربین کار نکرد', body: msg })
@@ -297,7 +297,7 @@ export default function FaceDetectApp() {
             className="absolute inset-0 h-full w-full"
             style={{ transform: 'scaleX(-1)' }}
           />
-          {/* برچسب‌های HTML — چون canvas آینه‌ای است، متن را اینجا فارسی می‌کشیم */}
+          {/* برچسب‌های HTML، چون canvas آینه‌ای است، متن را اینجا فارسی می‌کشیم */}
           {detections.map((d, i) => {
             const vw = videoRef.current?.videoWidth || 640
             const vh = videoRef.current?.videoHeight || 480
@@ -330,7 +330,7 @@ export default function FaceDetectApp() {
                     <Loader2 className="size-7 animate-spin text-[#f7931e]" />
                     <p className="text-xs text-zinc-300">{loadLabel[loadState]}</p>
                     <p className="text-[10px] text-zinc-500">
-                      اولین بار کمی طول می‌کشه — بعداً سریع می‌شه
+                      اولین بار کمی طول می‌کشه، بعداً سریع می‌شه
                     </p>
                   </>
                 ) : loadState === 'error' ? (
@@ -399,7 +399,7 @@ export default function FaceDetectApp() {
         )}
         <span className="mr-auto flex items-center gap-1 text-[9px] text-zinc-600">
           <Sparkles size={9} />
-          face-api.js · TensorFlow.js · حریم خصوصی ۱۰۰٪ — هیچ تصویری ارسال نمی‌شود
+          face-api.js · TensorFlow.js · حریم خصوصی ۱۰۰٪، هیچ تصویری ارسال نمی‌شود
         </span>
       </div>
     </div>

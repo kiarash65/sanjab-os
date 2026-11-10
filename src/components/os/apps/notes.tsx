@@ -100,7 +100,7 @@ const loadNotes = (): Note[] => {
   } catch {
     /* اگه داده خراب بود، از نو شروع می‌کنیم */
   }
-  return [makeNote('به دفترچه خوش اومدی 👋', WELCOME_BODY)]
+  return [makeNote('به دفترچه خوش آمدی 👋', WELCOME_BODY)]
 }
 
 const loadMode = (): 'text' | 'ink' => {

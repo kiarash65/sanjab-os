@@ -32,7 +32,7 @@ const clampInt = (raw: string, lo: number, hi: number): number => {
 const RING_CIRCUMFERENCE = 2 * Math.PI * 70
 const TIMER_PRESETS: readonly number[] = [1, 3, 5, 10]
 
-// بوق پایان تایمر: چون بدون کلیک کاربر اجرا می‌شه ممکنه اجازه نگیره — بی‌صدا رد می‌شیم
+// بوق پایان تایمر: چون بدون کلیک کاربر اجرا می‌شه ممکنه اجازه نگیره، بی‌صدا رد می‌شیم
 const playFinishBeeps = (): void => {
   try {
     const Ctor: typeof AudioContext | undefined =

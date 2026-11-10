@@ -195,7 +195,7 @@ export default function WhackamoleGame() {
           show={phase === 'over'}
           emoji="⏰"
           title="تموم شد!"
-          subtitle={`امتیاز: ${score} — ${rankText}`}
+          subtitle={`امتیاز: ${score}، ${rankText}`}
           onAction={startRound}
         />
       </div>

@@ -1,5 +1,5 @@
 /**
- * Learning Store — منبع یگانهٔ حقیقت پیشرفت یادگیری
+ * Learning Store، منبع یگانهٔ حقیقت پیشرفت یادگیری
  *
  * Zustand + persist روی کلید sanjab-learning-v1.
  * آکادمی‌ها از طریق Adapterهای همین فایل (noteLessonOpened, noteLessonCompleted,
@@ -372,7 +372,7 @@ export const useLearning = create<LearningStore>()(
     {
       name: LEARNING_KEY,
       version: 1,
-      /* ذخیرهٔ کامل پروفایل — حجم رویدادها با EVENTS_CAP محدود شده */
+      /* ذخیرهٔ کامل پروفایل، حجم رویدادها با EVENTS_CAP محدود شده */
     }
   )
 )
@@ -430,7 +430,7 @@ function enqueueWeakSkills(
 }
 
 /* ------------------------------------------------------------------ */
-/* مهاجرت از کلیدهای قدیمی — idempotent، بدون حذف دادهٔ کاربر          */
+/* مهاجرت از کلیدهای قدیمی، idempotent، بدون حذف دادهٔ کاربر          */
 /* ------------------------------------------------------------------ */
 function migrateFromLegacy(p: LearningProfile): LearningProfile {
   if (typeof window === 'undefined') return { ...p, migratedAt: Date.now() }

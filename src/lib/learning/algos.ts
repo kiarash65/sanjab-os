@@ -1,5 +1,5 @@
 /**
- * Algorithm Execution Traces — رد اجرای واقعی الگوریتم‌ها
+ * Algorithm Execution Traces، رد اجرای واقعی الگوریتم‌ها
  *
  * هر trace از اجرای واقعی الگوریتم روی آرایه تولید می‌شود (نه انیمیشن دستی).
  * هر Step وضعیت کامل را دارد: آرایه، اشاره‌گرها، مقایسه/جابه‌جایی جاری،
@@ -20,7 +20,7 @@ export interface AlgoStep {
   sorted: number[]
   /** اشاره‌گرهای نامی (lo، hi، mid، i، j، key …) */
   pointers: Record<string, number>
-  /** پشتهٔ فراخوانی — برای Merge/Quick */
+  /** پشتهٔ فراخوانی، برای Merge/Quick */
   callStack?: string[]
   /** شمارهٔ خط شبه‌کد در حال اجرا (0-based) */
   pseudoLine: number
@@ -93,7 +93,7 @@ export function linearSearchTrace(input: number[], target: number): TraceResult 
         sorted: [i],
         pointers: { i, target },
         pseudoLine: 2,
-        note: `🎯 پیدا شد! هدف در ایندکس ${i} است — با ${comparisons} مقایسه`,
+        note: `🎯 پیدا شد! هدف در ایندکس ${i} است، با ${comparisons} مقایسه`,
         stats: baseStats(),
       })
       return { steps, pseudocode: LINEAR_PSEUDO, final: [i], ok: true }
@@ -104,7 +104,7 @@ export function linearSearchTrace(input: number[], target: number): TraceResult 
     sorted: [],
     pointers: { target },
     pseudoLine: 3,
-    note: `هدف ${target} در آرایه نیست — بعد از ${comparisons} مقایسه -1 برمی‌گردد`,
+    note: `هدف ${target} در آرایه نیست، بعد از ${comparisons} مقایسه -1 برمی‌گردد`,
     stats: baseStats(),
   })
   return { steps, pseudocode: LINEAR_PSEUDO, final: [-1], ok: false }
@@ -133,7 +133,7 @@ export function binarySearchTrace(input: number[], target: number): TraceResult 
     sorted: [],
     pointers: { lo, hi },
     pseudoLine: 0,
-    note: `آرایه ابتدا باید مرتب باشد — lo=0 و hi=${hi}`,
+    note: `آرایه ابتدا باید مرتب باشد، lo=0 و hi=${hi}`,
     stats: base(),
   })
   while (lo <= hi) {
@@ -154,7 +154,7 @@ export function binarySearchTrace(input: number[], target: number): TraceResult 
         sorted: [mid],
         pointers: { mid, lo, hi },
         pseudoLine: 3,
-        note: `🎯 پیدا شد! ${target} در ایندکس ${mid} — فقط ${comparisons} مقایسه`,
+        note: `🎯 پیدا شد! ${target} در ایندکس ${mid}، فقط ${comparisons} مقایسه`,
         stats: base(),
       })
       return { steps, pseudocode: BINARY_PSEUDO, final: [mid], ok: true }
@@ -185,7 +185,7 @@ export function binarySearchTrace(input: number[], target: number): TraceResult 
     sorted: [],
     pointers: {},
     pseudoLine: 6,
-    note: `بازه خالی شد — هدف ${target} وجود ندارد (−1)`,
+    note: `بازه خالی شد، هدف ${target} وجود ندارد (−1)`,
     stats: base(),
   })
   return { steps, pseudocode: BINARY_PSEUDO, final: [-1], ok: false }
@@ -246,7 +246,7 @@ export function bubbleSortTrace(input: number[]): TraceResult {
       sorted: [...sortedIdx],
       pointers: { i },
       pseudoLine: 0,
-      note: `پایان گذر ${i + 1} — A[${n - 1 - i}] = ${arr[n - 1 - i]} در جای نهایی خود است`,
+      note: `پایان گذر ${i + 1}؛ A[${n - 1 - i}] = ${arr[n - 1 - i]} در جای نهایی خود است`,
       stats: { comparisons, swaps },
     })
   }
@@ -332,7 +332,7 @@ export function selectionSortTrace(input: number[]): TraceResult {
     sorted: [...Array(n).keys()],
     pointers: {},
     pseudoLine: 0,
-    note: `مرتب شد! ✓ همیشه n(n−1)/2 = ${comparisons} مقایسه — جابه‌جایی‌ها فقط ${swaps} بار`,
+    note: `مرتب شد! ✓ همیشه n(n−1)/2 = ${comparisons} مقایسه، جابه‌جایی‌ها فقط ${swaps} بار`,
     stats: { comparisons, swaps },
   })
   return { steps, pseudocode: SELECTION_PSEUDO, final: arr, ok: true }
@@ -360,7 +360,7 @@ export function insertionSortTrace(input: number[]): TraceResult {
     sorted: [0],
     pointers: {},
     pseudoLine: 0,
-    note: 'درجی: بخش چپ همیشه مرتب است — عنصر بعدی در جای درستش «درج» می‌شود',
+    note: 'درجی: بخش چپ همیشه مرتب است، عنصر بعدی در جای درستش «درج» می‌شود',
     stats: { comparisons, swaps },
   })
   for (let i = 1; i < n; i++) {
@@ -371,7 +371,7 @@ export function insertionSortTrace(input: number[]): TraceResult {
       sorted: [...Array(i).keys()],
       pointers: { i, key },
       pseudoLine: 1,
-      note: `key = A[${i}] = ${key} — باید در بخش مرتبِ چپ جا باز کنیم`,
+      note: `key = A[${i}] = ${key}، باید در بخش مرتبِ چپ جا باز کنیم`,
       stats: { comparisons, swaps },
     })
     while (j >= 0 && arr[j] > key) {
@@ -405,7 +405,7 @@ export function insertionSortTrace(input: number[]): TraceResult {
     sorted: [...Array(n).keys()],
     pointers: {},
     pseudoLine: 0,
-    note: `مرتب شد! ✓ ${comparisons} مقایسه، ${swaps} شیفت — روی آرایهٔ تقریباً مرتب فوق‌العاده سریع است`,
+    note: `مرتب شد! ✓ ${comparisons} مقایسه، ${swaps} شیفت؛ روی آرایهٔ تقریباً مرتب تقریباً خطی پیش می‌رود`,
     stats: { comparisons, swaps },
   })
   return { steps, pseudocode: INSERTION_PSEUDO, final: arr, ok: true }
@@ -453,7 +453,7 @@ export function mergeSortTrace(input: number[]): TraceResult {
     const mid = Math.floor((lo + hi) / 2)
     stack.push({ label: `mergeSort[${lo}..${hi})`, range: [lo, hi] })
     note(
-      `تجزیهٔ بازهٔ [${lo}..${hi}) به [${lo}..${mid}) و [${mid}..${hi}) — عمق پشته: ${stack.length}`,
+      `تجزیهٔ بازهٔ [${lo}..${hi}) به [${lo}..${mid}) و [${mid}..${hi})، عمق پشته: ${stack.length}`,
       1
     )
     work(lo, mid)
@@ -470,7 +470,7 @@ export function mergeSortTrace(input: number[]): TraceResult {
         merged.push(arr[j++])
       }
       note(
-        `ادغام: مقایسهٔ ${arr[Math.min(i, arr.length - 1)]} و … — تا اینجا: [${merged.join(', ')}]`,
+        `ادغام: مقایسهٔ ${arr[Math.min(i, arr.length - 1)]} و …، تا اینجا: [${merged.join(', ')}]`,
         4,
         { pointers: { i, j } }
       )
@@ -491,7 +491,7 @@ export function mergeSortTrace(input: number[]): TraceResult {
 
   work(0, n)
   note(
-    `مرتب شد! ✓ ${comparisons} مقایسه — تضمینی O(n log n) حتی در بدترین حالت`,
+    `مرتب شد! ✓ ${comparisons} مقایسه، تضمینی O(n log n) حتی در بدترین حالت`,
     0,
     { sorted: [...Array(n).keys()] }
   )
@@ -533,7 +533,7 @@ export function quickSortTrace(input: number[]): TraceResult {
     if (lo >= hi) return
     stack.push(`quickSort[${lo}..${hi}]`)
     const pivot = arr[hi]
-    note(`pivot = A[${hi}] = ${pivot} — بازهٔ [${lo}..${hi}]`, 1, { pointers: { lo, hi, pivot: hi } })
+    note(`pivot = A[${hi}] = ${pivot}، بازهٔ [${lo}..${hi}]`, 1, { pointers: { lo, hi, pivot: hi } })
     let i = lo
     for (let j = lo; j < hi; j++) {
       comparisons++
@@ -557,7 +557,7 @@ export function quickSortTrace(input: number[]): TraceResult {
     ;[arr[i], arr[hi]] = [arr[hi], arr[i]]
     swaps++
     note(
-      `pivot در جای نهایی ${i} نشست — چپ همه کوچک‌تر و راست همه بزرگ‌ترند`,
+      `pivot در جای نهایی ${i} نشست، چپ همه کوچک‌تر و راست همه بزرگ‌ترند`,
       2,
       { pointers: { i }, sorted: [i] }
     )
@@ -568,7 +568,7 @@ export function quickSortTrace(input: number[]): TraceResult {
 
   work(0, n - 1)
   note(
-    `مرتب شد! ✓ ${comparisons} مقایسه، ${swaps} جابه‌جایی — میانگین O(n log n)`,
+    `مرتب شد! ✓ ${comparisons} مقایسه، ${swaps} جابه‌جایی، میانگین O(n log n)`,
     0,
     { sorted: [...Array(n).keys()] }
   )
@@ -599,7 +599,7 @@ export function traceAlgo(
   }
 }
 
-/** شمارش عملیات برای Complexity Playground — مدل محاسباتی واقعی، نه رند */
+/** شمارش عملیات برای Complexity Playground، مدل محاسباتی واقعی، نه رند */
 export function complexityModel(n: number): { id: string; label: string; ops: number }[] {
   const safe = Math.max(1, Math.min(n, 512))
   return [
@@ -612,7 +612,7 @@ export function complexityModel(n: number): { id: string; label: string; ops: nu
   ]
 }
 
-/** نگاشت trace به مسیر یادگیری — برای شواهد */
+/** نگاشت trace به مسیر یادگیری، برای شواهد */
 export const ALGO_SKILL: Record<AlgoId, { track: TrackId; lessonId: string; skill: string }> = {
   'linear-search': { track: 'algorithm', lessonId: 'al-linear-search', skill: 'al-searching' },
   'binary-search': { track: 'algorithm', lessonId: 'al-binary-search', skill: 'al-searching' },

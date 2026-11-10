@@ -1,5 +1,5 @@
 /* ------------------------------------------------------------------ */
-/* موتور خودکار مشتق‌گیری اسکالر — برگرفته از ایده micrograd (MIT)      */
+/* موتور خودکار مشتق‌گیری اسکالر، برگرفته از ایده micrograd (MIT)      */
 /* پیاده‌سازی اصلی سان‌جاب‌اواس برای آموزش پس‌انتشار در آکادمی AI        */
 /* ------------------------------------------------------------------ */
 
@@ -107,7 +107,7 @@ export class Value {
     return out
   }
 
-  /** پس‌انتشار — مرتب‌سازی توپولوژیک و اعمال زنجیره قانون */
+  /** پس‌انتشار، مرتب‌سازی توپولوژیک و اعمال زنجیره قانون */
   backward(): void {
     const topo: Value[] = []
     const visited = new Set<Value>()
@@ -244,7 +244,7 @@ export interface TrainStepResult {
   epoch: number
 }
 
-/** یک گام آموزش (minibatch کامل — دیتاست کوچک است) */
+/** یک گام آموزش (minibatch کامل، دیتاست کوچک است) */
 export function trainStep(net: MLP, data: Point[], opts: TrainOptions, epoch: number): TrainStepResult {
   net.zeroGrad()
   let totalLoss = new Value(0)
@@ -258,7 +258,7 @@ export function trainStep(net: MLP, data: Point[], opts: TrainOptions, epoch: nu
     if (opts.loss === 'mse') {
       diff = out.sub(target).pow(2)
     } else {
-      // BCE روی خروجی sigmoid — برای پایداری از margin-softplus استفاده می‌کنیم
+      // BCE روی خروجی sigmoid، برای پایداری از margin-softplus استفاده می‌کنیم
       // loss = log(1 + exp(-target*out))
       diff = out.mul(-target).exp().add(1).log()
     }
@@ -273,7 +273,7 @@ export function trainStep(net: MLP, data: Point[], opts: TrainOptions, epoch: nu
   return { loss: loss.data, accuracy: correct / n, epoch }
 }
 
-/** خروجی شبکه برای یک نقطه — در [-1, 1] با tanh */
+/** خروجی شبکه برای یک نقطه، در [-1, 1] با tanh */
 export function predict(net: MLP, x: number, y: number): number {
   return net.forward([new Value(x), new Value(y)])[0].data
 }

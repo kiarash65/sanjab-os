@@ -1,8 +1,8 @@
 'use client'
 
-/* «ماشین زمان چهره» — جوان‌کن و پیرکن زنده با دوربین
+/* «ماشین زمان چهره»، جوان‌کن و پیرکن زنده با دوربین
    فیلترهای بوم نقاشی + چین‌وچروک مبتنی بر ۶۸ نقطهٔ لندمارک چهره
-   همه‌چیز محلی است — هیچ تصویری جایی نمی‌رود. جادوی بوم‌نقاشی است، نه علم! */
+   همه‌چیز محلی است، هیچ تصویری جایی نمی‌رود. جادوی بوم‌نقاشی است، نه علم! */
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
@@ -90,7 +90,7 @@ export default function AgeMachineApp() {
           s.src = FACEAPI_CDN
           s.async = true
           s.onload = () => resolve()
-          s.onerror = () => reject(new Error('بارگذاری کتابخانه ناموفق بود — اینترنت را چک کن'))
+          s.onerror = () => reject(new Error('بارگذاری کتابخانه ناموفق بود، اینترنت را چک کن'))
           document.head.appendChild(s)
         })
       }
@@ -139,7 +139,7 @@ export default function AgeMachineApp() {
       ctx.save()
       ctx.lineCap = 'round'
 
-      // چین‌های پیشانی — سه کمان لایه‌لایه
+      // چین‌های پیشانی، سه کمان لایه‌لایه
       const browL = p(17)
       const browR = p(26)
       const cx = (browL.x + browR.x) / 2
@@ -224,7 +224,7 @@ export default function AgeMachineApp() {
         ctx.stroke()
       }
 
-      // موی جوگندمی — رگه‌های سفید بالای قاب
+      // موی جوگندمی، رگه‌های سفید بالای قاب
       if (k > 0.45) {
         const topY = boxTop - 2
         const hw = face.box.w * 0.6
@@ -375,7 +375,7 @@ export default function AgeMachineApp() {
     } catch (err) {
       const msg =
         err instanceof DOMException && err.name === 'NotAllowedError'
-          ? 'دسترسی به دوربین داده نشد — اجازه بده!'
+          ? 'دسترسی به دوربین داده نشد، اجازه بده!'
           : 'دوربینی پیدا نشد یا خطایی پیش آمد'
       setLibErr(msg)
       setLibState('error')
@@ -409,7 +409,7 @@ export default function AgeMachineApp() {
     )
     ctx.fillStyle = '#71717a'
     ctx.font = '12px Vazirmatn, sans-serif'
-    ctx.fillText('ماشین زمان چهرهٔ سان‌جاب‌اواس — با اسپانسری سان‌جاب', w - 12, h + 44)
+    ctx.fillText('ماشین زمان چهرهٔ سان‌جاب‌اواس، با اسپانسری سان‌جاب', w - 12, h + 44)
     const a = document.createElement('a')
     a.href = out.toDataURL('image/png')
     a.download = 'sanjab-age-machine.png'
@@ -429,7 +429,7 @@ export default function AgeMachineApp() {
         </span>
         <div className="min-w-0">
           <h2 className="text-xs font-black text-zinc-100">ماشین زمان چهره</h2>
-          <p className="text-[10px] text-zinc-500">جوان‌کن و پیرکن زنده — جادوی بوم‌نقاشی</p>
+          <p className="text-[10px] text-zinc-500">جوان‌کن و پیرکن زنده، جادوی بوم‌نقاشی</p>
         </div>
         {shownAge !== null && (
           <span className="pengo-fadein mr-auto rounded-full bg-white/10 px-2.5 py-1 text-[11px] font-black text-zinc-100">
@@ -466,7 +466,7 @@ export default function AgeMachineApp() {
                   <>
                     <Hourglass className="size-7 text-zinc-500" />
                     <p className="max-w-[250px] text-xs leading-5 text-zinc-400">
-                      دوربین را روشن کن و ببین ۳۰ سال بعد خودت چه شکلی می‌شود — یا دوباره بچرخ به بچگی!
+                      دوربین را روشن کن و ببین ۳۰ سال بعد خودت چه شکلی می‌شود، یا دوباره بچرخ به بچگی!
                     </p>
                   </>
                 )}
@@ -599,7 +599,7 @@ export default function AgeMachineApp() {
         <div className="flex items-center justify-between gap-2 text-[9.5px] text-zinc-600">
           <span className="flex items-center gap-1">
             <Sparkles size={9} />
-            همه‌چیز محلی است — هیچ تصویری ارسال نمی‌شود
+            همه‌چیز محلی است، هیچ تصویری ارسال نمی‌شود
           </span>
           <button
             onClick={() => {

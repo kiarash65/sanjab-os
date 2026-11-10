@@ -129,7 +129,7 @@ export default function WeatherApp() {
             <span className="text-sm font-bold text-[var(--pengo-accent)]">{condition.name}</span>
           </div>
           <p className="mt-1.5 text-xs leading-5 text-zinc-400">{condition.advice}</p>
-          <p className="mt-1 text-[11px] text-zinc-500">پنگوئن‌آباد — اکنون</p>
+          <p className="mt-1 text-[11px] text-zinc-500">پنگوئن‌آباد، اکنون</p>
         </div>
       </div>
 
@@ -171,7 +171,7 @@ export default function WeatherApp() {
       </div>
 
       <p className="px-4 py-4 text-center text-[11px] text-zinc-500">
-        دقت پیش‌بینی: حدود ۴۲٪ — بیشتر از این ادعا نداریم
+        دقت پیش‌بینی: حدود ۴۲٪، بیشتر از این ادعا نداریم
       </p>
     </div>
   )

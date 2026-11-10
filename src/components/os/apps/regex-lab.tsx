@@ -52,7 +52,7 @@ interface Challenge {
 const DEFAULT_TEXT = `کاربر ali@gmail.com دیروز ثبت‌نام کرد.
 شماره‌اش 09121234567 است و کدپستی‌اش 1234567890.
 قرار ما ۱۴۰۲/۰۸/۱۵ است یا 2024-11-06؟
-قیمت دوره: 25000 تومان — فقط 20% تخفیف!
+قیمت دوره: 25000 تومان، فقط 20% تخفیف!
 رنگ لوگو #f7931e و #8B5CF6 است.`
 
 const FLAG_DEFS: Array<{ key: keyof FlagState; label: string; color: string }> = [
@@ -266,7 +266,7 @@ export default function RegexLabApp() {
             <label htmlFor="re-pattern" className="text-xs font-bold text-zinc-300">
               الگو (Pattern)
             </label>
-            <span className="text-[10px] text-zinc-500">بین دو اسلش — مثل فیلم‌های اکشن!</span>
+            <span className="text-[10px] text-zinc-500">بین دو اسلش، مثل فیلم‌های اکشن!</span>
           </div>
           <div dir="ltr" className="flex items-center gap-1.5">
             <span className="font-mono text-sm text-zinc-500">/</span>
@@ -472,7 +472,7 @@ export default function RegexLabApp() {
             onClick={() => setCheatOpen((o) => !o)}
             className="flex w-full items-center gap-1.5 px-3 py-2.5 text-xs font-bold text-zinc-200"
           >
-            <span className="flex-1 text-start">📋 برگه تقلب — پرکاربردترین نمادها</span>
+            <span className="flex-1 text-start">📋 برگه تقلب، پرکاربردترین نمادها</span>
             <ChevronDown
               className={`size-4 text-zinc-400 transition-transform ${cheatOpen ? 'rotate-180' : ''}`}
             />
@@ -513,7 +513,7 @@ export default function RegexLabApp() {
         </div>
 
         <p className="pb-1 text-center text-[10px] text-zinc-600">
-          Regex مثل دوچرخه‌سواری است — اول افتادی، بعد پرواز می‌کنی! 🚴
+          Regex مثل دوچرخه‌سواری است، اول افتادی، بعد پرواز می‌کنی! 🚴
         </p>
       </div>
     </div>

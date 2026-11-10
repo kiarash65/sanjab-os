@@ -42,7 +42,7 @@ function winnerOf(cells: readonly Cell[]): { winner: Mark | null; line: readonly
   return { winner: null, line: null }
 }
 
-// مینیمکس کامل — پنگوئنِ بی‌رحم
+// مینیمکس کامل، پنگوئنِ بی‌رحم
 function minimax(cells: Cell[], current: Mark, me: Mark, depth: number): number {
   const res = winnerOf(cells)
   if (res.winner !== null) return res.winner === me ? 10 - depth : depth - 10

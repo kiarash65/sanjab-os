@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 /* ------------------------------------------------------------------ */
-/* گارد مشترک API سان‌جاب‌اواس — محدودسازی نرخ، اندازه و ورودی‌ها       */
+/* گارد مشترک API سان‌جاب‌اواس، محدودسازی نرخ، اندازه و ورودی‌ها       */
 /* ------------------------------------------------------------------ */
 
 /**
@@ -40,12 +40,12 @@ export function rateLimit(
 
 export function tooMany(retryAfter: number) {
   return NextResponse.json(
-    { error: 'درخواست‌ها زیاد است — چند لحظه صبر کن' },
+    { error: 'درخواست‌ها زیاد است، چند لحظه صبر کن' },
     { status: 429, headers: { 'Retry-After': String(retryAfter) } }
   )
 }
 
-/** حداکثر حجم بدنه مجاز (بایت) — درخواست‌های بزرگ‌تر رد می‌شوند */
+/** حداکثر حجم بدنه مجاز (بایت)، درخواست‌های بزرگ‌تر رد می‌شوند */
 export async function readJsonLimited(
   req: NextRequest,
   maxBytes: number
@@ -74,7 +74,7 @@ export async function readJsonLimited(
   }
 }
 
-/** فهرست رسمی بازی‌ها — امتیاز فقط برای این‌ها و در بازه معتبر پذیرفته می‌شود */
+/** فهرست رسمی بازی‌ها، امتیاز فقط برای این‌ها و در بازه معتبر پذیرفته می‌شود */
 export const GAME_REGISTRY: Record<string, { min: number; max: number }> = {
   snake: { min: 0, max: 5000 },
   g2048: { min: 0, max: 200000 },

@@ -1,6 +1,6 @@
 /* ------------------------------------------------------------------ */
-/* اجراکننده پایتون واقعی (CPython/Pyodide) — رابط تمیز روی Worker     */
-/* نسخه پین‌شده v0.26.4 — بارگیری فقط با اقدام صریح کاربر              */
+/* اجراکننده پایتون واقعی (CPython/Pyodide)، رابط تمیز روی Worker     */
+/* نسخه پین‌شده v0.26.4، بارگیری فقط با اقدام صریح کاربر              */
 /* ------------------------------------------------------------------ */
 
 export type PyOutKind = 'stdout' | 'stderr' | 'status' | 'ready' | 'fatal'
@@ -82,7 +82,7 @@ export class PyodideRunner {
       const id = ++this.runId
       this.resolveRun = resolve
       this.timeout = setTimeout(() => {
-        this.onOut('stderr', `✗ اجرا بیش از ${Math.round(timeoutMs / 1000)} ثانیه طول کشید — متوقف شد (ورکر ری‌استارت می‌شود)`)
+        this.onOut('stderr', `✗ اجرا بیش از ${Math.round(timeoutMs / 1000)} ثانیه طول کشید، متوقف شد (ورکر ری‌استارت می‌شود)`)
         this.terminate()
         resolve({ ok: false, ms: timeoutMs })
       }, timeoutMs)

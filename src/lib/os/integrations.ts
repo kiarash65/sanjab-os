@@ -1,5 +1,5 @@
 /* ------------------------------------------------------------------ */
-/* یکپارچه‌سازی‌های کاربر — کلیدهای هوش مصنوعی و توکن گیت‌هاب          */
+/* یکپارچه‌سازی‌های کاربر، کلیدهای هوش مصنوعی و توکن گیت‌هاب          */
 /* همه‌چیز فقط در localStorage مرورگر خود کاربر ذخیره می‌شود           */
 /* و درخواست‌ها مستقیم از مرورگر به سرویس مقصد فرستاده می‌شوند.        */
 /* ------------------------------------------------------------------ */
@@ -24,7 +24,7 @@ export interface AIPreset {
   note: string
 }
 
-/** سرویس‌های آماده — همه با OpenAI API سازگارند جز Claude */
+/** سرویس‌های آماده، همه با OpenAI API سازگارند جز Claude */
 export const AI_PRESETS: AIPreset[] = [
   {
     id: 'openai',
@@ -72,7 +72,7 @@ export const AI_PRESETS: AIPreset[] = [
     kind: 'openai',
     baseUrl: 'https://open.bigmodel.cn/api/paas/v4',
     model: 'glm-4-flash',
-    note: 'کلید از open.bigmodel.cn — مدل‌های چینی قوی و اقتصادی',
+    note: 'کلید از open.bigmodel.cn، مدل‌های چینی قوی و اقتصادی',
   },
 ]
 
@@ -132,7 +132,7 @@ function aiHttpError(status: number, bodyText: string): string {
 }
 
 /**
- * گفتگو با هر سرویس سازگار با OpenAI یا Anthropic — مستقیم از مرورگر.
+ * گفتگو با هر سرویس سازگار با OpenAI یا Anthropic، مستقیم از مرورگر.
  * اگر رد شد، Error با پیام فارسی پرتاب می‌شود.
  */
 export async function aiComplete(
@@ -203,7 +203,7 @@ export async function aiComplete(
     if (err instanceof DOMException && err.name === 'AbortError') throw err
     if (err instanceof TypeError) {
       throw new Error(
-        'اتصال برقرار نشد — اینترنت/CORS؟ بعضی سرویس‌ها از مرورگر مستقیم قبول نمی‌کنند. OpenRouter و Groq و OpenAI معمولاً کار می‌کنند.'
+        'اتصال برقرار نشد، اینترنت/CORS؟ بعضی سرویس‌ها از مرورگر مستقیم قبول نمی‌کنند. OpenRouter و Groq و OpenAI معمولاً کار می‌کنند.'
       )
     }
     throw err instanceof Error ? err : new Error('خطای ناشناخته')
@@ -215,7 +215,7 @@ export async function aiComplete(
 const GH_STORAGE = 'pengo-gh-token-v1'
 const GH_SESSION_STORAGE = 'pengo-gh-token-session'
 
-/** نمایش ماسک‌شده‌ی توکن — فقط ۴ کاراکتر آخر */
+/** نمایش ماسک‌شده‌ی توکن، فقط ۴ کاراکتر آخر */
 export function maskToken(token: string): string {
   const t = token.trim()
   if (!t) return ''
@@ -224,9 +224,9 @@ export function maskToken(token: string): string {
 }
 
 /**
- * توکن گیت‌هاب — دو حالت:
- *  - sessionOnly=true → فقط sessionStorage (با بستن تب پاک می‌شود — کم‌ریسک‌تر)
- *  - پیش‌فرض localStorage (ماندگار) — توجه: هیچ‌کدام در برابر XSS هم‌مبدا محافظت قوی نیستند
+ * توکن گیت‌هاب، دو حالت:
+ *  - sessionOnly=true → فقط sessionStorage (با بستن تب پاک می‌شود، کم‌ریسک‌تر)
+ *  - پیش‌فرض localStorage (ماندگار)، توجه: هیچ‌کدام در برابر XSS هم‌مبدا محافظت قوی نیستند
  */
 export function saveGhToken(token: string, sessionOnly = false): void {
   try {
@@ -276,14 +276,14 @@ export function clearGhToken(): void {
 function ghError(status: number): string {
   if (status === 401) return 'توکن نامعتبر است یا منقضی شده (۴۰۱)'
   if (status === 403)
-    return 'دسترسی رد شد — یا محدودیت نرخ API (۶۰ درخواست در ساعت بدون توکن) یا توکن اجازه لازم را ندارد (۴۰۳)'
-  if (status === 404) return 'پیدا نشد — ریپو خصوصی است؟ بدون توکن فقط عمومی‌ها دیده می‌شوند (۴۰۴)'
+    return 'دسترسی رد شد، یا محدودیت نرخ API (۶۰ درخواست در ساعت بدون توکن) یا توکن اجازه لازم را ندارد (۴۰۳)'
+  if (status === 404) return 'پیدا نشد، ریپو خصوصی است؟ بدون توکن فقط عمومی‌ها دیده می‌شوند (۴۰۴)'
   if (status === 422) return 'درخواست نامعتبر است (۴۲۲)'
   if (status >= 500) return 'گیت‌هاب حسابی شلوغ است، بعداً امتحان کن (۵xx)'
   return `خطای گیت‌هاب (${status})`
 }
 
-/** GET از REST API گیت‌هاب — با یا بدون توکن */
+/** GET از REST API گیت‌هاب، با یا بدون توکن */
 export async function ghApi<T = unknown>(
   path: string,
   token: string,
@@ -299,7 +299,7 @@ export async function ghApi<T = unknown>(
   try {
     res = await fetch(`https://api.github.com${path}`, { ...init, headers })
   } catch {
-    throw new Error('اتصال به گیت‌هاب برقرار نشد — اینترنت چک کن')
+    throw new Error('اتصال به گیت‌هاب برقرار نشد، اینترنت چک کن')
   }
   if (!res.ok) throw new Error(ghError(res.status))
   return (await res.json()) as T
