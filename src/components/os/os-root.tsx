@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { AnimatePresence } from 'framer-motion'
 import {
   Battery,
   Bell,
@@ -137,7 +138,7 @@ function ContextMenu({
     <>
       <div className="fixed inset-0 z-[9100]" onClick={onClose} onContextMenu={(e) => { e.preventDefault(); onClose() }} aria-hidden />
       <div
-        className="pengo-pop fixed z-[9200] w-56 overflow-hidden rounded-xl border border-white/15 bg-zinc-900/95 py-1.5 shadow-2xl backdrop-blur-xl"
+        className="pengo-pop fixed z-[9200] w-56 origin-top-right overflow-hidden rounded-xl border border-white/15 bg-zinc-900/95 py-1.5 shadow-2xl shadow-black/50 backdrop-blur-xl"
         style={{ left: Math.max(4, x), top: Math.max(4, y) }}
         role="menu"
       >
@@ -148,7 +149,7 @@ function ContextMenu({
               it.action()
               onClose()
             }}
-            className="block w-full px-3.5 py-2 text-right text-xs font-medium text-zinc-200 transition hover:bg-white/10"
+            className="block w-full px-3.5 py-2 text-right text-xs font-medium text-zinc-200 transition-all hover:bg-white/10 hover:pr-5"
             role="menuitem"
           >
             {it.label}
@@ -275,6 +276,8 @@ export default function OSRoot() {
     >
       <style>{`:root{--pengo-accent:${settings.accent}}`}</style>
       <div className="absolute inset-0 bg-black/10" aria-hidden />
+      {/* لکه‌های نور محیطی، زنده و هماهنگ با اکسنت */}
+      <div className="os-ambient" aria-hidden />
       <DesktopIcons />
       <Sanjabak />
       {/* واترمارک اسپانسری، لوگوی رسمی سان‌جاب */}
@@ -294,16 +297,20 @@ export default function OSRoot() {
           با اسپانسری سان‌جاب
         </span>
       </a>
-      {windows.map((w) => {
-        const app = getApp(w.appId)
-        if (!app) return null
-        const Comp = app.component
-        return (
-          <WindowFrame key={w.id} win={w}>
-            <Comp />
-          </WindowFrame>
-        )
-      })}
+      <AnimatePresence>
+        {windows
+          .filter((w) => !w.minimized)
+          .map((w) => {
+            const app = getApp(w.appId)
+            if (!app) return null
+            const Comp = app.component
+            return (
+              <WindowFrame key={w.id} win={w}>
+                <Comp />
+              </WindowFrame>
+            )
+          })}
+      </AnimatePresence>
       <Taskbar />
       <StartMenu />
       <Toasts />

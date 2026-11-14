@@ -122,7 +122,18 @@
   html {
     font-family: var(--fa-font-body);
     font-size: 16px;
+    /* رندر تمیزتر متن فارسی: هموارسازی، کرنینگ و جلوگیری از فونت ساختگی */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-synthesis: none;
+    font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
   }
+}
+
+/* اعداد جدولی؛ ساعت، تایمر و آمار بدون لرزش ارقام */
+.fa-tabular {
+  font-variant-numeric: tabular-nums;
 }
 
 /* ================================================================
@@ -516,7 +527,10 @@ body {
 @keyframes pengo-pop {
   from {
     opacity: 0;
-    transform: scale(0.96) translateY(8px);
+    transform: scale(0.94) translateY(10px);
+  }
+  60% {
+    opacity: 1;
   }
   to {
     opacity: 1;
@@ -524,13 +538,141 @@ body {
   }
 }
 .pengo-pop {
-  animation: pengo-pop 0.18s ease-out;
+  animation: pengo-pop 0.24s cubic-bezier(0.34, 1.45, 0.64, 1);
+}
+
+/* ورود پلکانی آیکن‌ها، میزکار و منوی شروع */
+@keyframes icon-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.icon-enter {
+  opacity: 0;
+  animation: icon-enter 0.38s cubic-bezier(0.34, 1.3, 0.64, 1) forwards;
+}
+
+/* لکه‌های نور محیطی میزکار، هماهنگ با رنگ اکسنت کاربر */
+.os-ambient {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.os-ambient::before,
+.os-ambient::after {
+  content: '';
+  position: absolute;
+  width: 55vmax;
+  height: 55vmax;
+  border-radius: 9999px;
+  filter: blur(70px);
+  opacity: 0.13;
+  will-change: transform;
+}
+.os-ambient::before {
+  background: radial-gradient(
+    closest-side,
+    var(--pengo-accent, #f7931e),
+    transparent 72%
+  );
+  top: -18vmax;
+  left: -14vmax;
+  animation: ambient-a 26s ease-in-out infinite alternate;
+}
+.os-ambient::after {
+  background: radial-gradient(
+    closest-side,
+    #8b5cf6,
+    transparent 72%
+  );
+  bottom: -20vmax;
+  right: -16vmax;
+  animation: ambient-b 32s ease-in-out infinite alternate;
+}
+@keyframes ambient-a {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(7vw, 5vh, 0) scale(1.15);
+  }
+  100% {
+    transform: translate3d(14vw, -4vh, 0) scale(0.95);
+  }
+}
+@keyframes ambient-b {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-9vw, -7vh, 0) scale(1.12);
+  }
+  100% {
+    transform: translate3d(-16vw, 5vh, 0) scale(1.2);
+  }
+}
+
+/* درخشش گذرنده روی نوارهای اسپانسری */
+@keyframes sheen-move {
+  0% {
+    transform: translateX(-140%);
+  }
+  55%,
+  100% {
+    transform: translateX(260%);
+  }
+}
+.sheen {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.sheen::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 36%;
+  background: linear-gradient(
+    100deg,
+    transparent,
+    rgba(255, 255, 255, 0.28),
+    transparent
+  );
+  animation: sheen-move 4.2s ease-in-out infinite;
+}
+
+/* هالهٔ ملایم دکمهٔ شروع با رنگ اکسنت */
+.start-glow {
+  transition: filter 0.25s ease, background-color 0.15s ease, transform 0.1s ease;
+}
+.start-glow:hover {
+  filter: drop-shadow(0 0 9px var(--pengo-accent, #f7931e));
+}
+
+/* احترام به تنظیم کاهش حرکت سیستم‌عامل کاربر */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 @keyframes toast-in {
   from {
     opacity: 0;
-    transform: translateY(12px) scale(0.97);
+    transform: translateY(14px) scale(0.95);
   }
   to {
     opacity: 1;
@@ -538,7 +680,7 @@ body {
   }
 }
 .toast-in {
-  animation: toast-in 0.22s ease-out;
+  animation: toast-in 0.28s cubic-bezier(0.34, 1.4, 0.64, 1);
 }
 
 @keyframes pengo-blink {

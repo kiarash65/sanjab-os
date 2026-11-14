@@ -177,6 +177,8 @@ export const ACCENTS: Accent[] = [
   { key: 'rose', value: '#e11d48', name: 'قرمز سان‌جاب' },
   { key: 'green', value: '#22c55e', name: 'سبز پنگوئنی' },
   { key: 'amber', value: '#f59e0b', name: 'زرد عسلی' },
+  { key: 'gold', value: '#fbbf24', name: 'طلایی درخشان' },
+  { key: 'cyan', value: '#22d3ee', name: 'آسمانی روشن' },
   { key: 'pink', value: '#ec4899', name: 'صورتی بامزه' },
   { key: 'lime', value: '#84cc16', name: 'لیمویی' },
 ]

@@ -27,7 +27,7 @@ function TaskbarClock() {
   })
   return (
     <div className="mr-1 text-right leading-tight" dir="ltr">
-      <div className="text-xs font-black text-zinc-100" dir="rtl">
+      <div className="fa-tabular text-xs font-black text-zinc-100" dir="rtl">
         {time}
       </div>
       <div className="text-[10px] text-zinc-400" dir="rtl">
@@ -50,12 +50,12 @@ export default function Taskbar() {
   return (
     <footer
       data-tour="taskbar"
-      className="os-taskbar fixed inset-x-0 bottom-0 z-[8000] flex h-12 items-center gap-1 border-t border-white/10 bg-black/70 px-2 backdrop-blur-md"
+      className="os-taskbar fixed inset-x-0 bottom-0 z-[8000] flex h-12 items-center gap-1 border-t border-white/10 bg-black/70 px-2 shadow-[0_-10px_30px_rgba(0,0,0,0.35)] backdrop-blur-md"
     >
       <button
         data-tour="start"
         onClick={() => toggleStart()}
-        className="flex h-9 shrink-0 items-center gap-1.5 rounded-lg px-2.5 text-sm font-black transition hover:bg-white/10 active:scale-95"
+        className="start-glow flex h-9 shrink-0 items-center gap-1.5 rounded-lg px-2.5 text-sm font-black transition hover:bg-white/10 active:scale-95"
         style={{ color: accent }}
         aria-label="منوی شروع"
       >
@@ -93,7 +93,7 @@ export default function Taskbar() {
             <button
               key={win.id}
               onClick={() => toggleWindow(win.id)}
-              className={`flex h-9 shrink-0 items-center gap-1.5 rounded-lg px-2.5 text-xs transition active:scale-95 ${
+              className={`relative flex h-9 shrink-0 items-center gap-1.5 rounded-lg px-2.5 text-xs transition-all hover:-translate-y-px active:scale-95 ${
                 isFocused
                   ? 'bg-white/15 font-bold text-white'
                   : win.minimized
@@ -107,8 +107,12 @@ export default function Taskbar() {
                 {win.title}
               </span>
               <span
-                className="h-1 w-1 rounded-full"
-                style={{ background: isFocused ? accent : 'transparent' }}
+                className="absolute inset-x-2.5 bottom-0 h-[3px] rounded-full transition-all duration-300"
+                style={{
+                  background: isFocused ? accent : 'transparent',
+                  transform: `scaleX(${isFocused ? 1 : 0.4})`,
+                  opacity: win.minimized ? 0.35 : 1,
+                }}
                 aria-hidden
               />
             </button>

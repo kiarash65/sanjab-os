@@ -14,7 +14,7 @@ function ToastCard({ t }: { t: OSToast }) {
   }, [t.id, dismiss])
   const Icon: LucideIcon | string | undefined = t.icon ?? Bell
   return (
-    <div className="toast-in pointer-events-auto flex items-start gap-2.5 rounded-xl border border-white/15 bg-zinc-900/95 p-3 shadow-2xl shadow-black/50 backdrop-blur">
+    <div className="toast-in pointer-events-auto flex items-start gap-2.5 rounded-xl border border-white/15 bg-zinc-900/95 p-3 shadow-2xl shadow-black/50 backdrop-blur transition-transform hover:-translate-y-0.5">
       <span
         className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-white/10 bg-white/5"
         aria-hidden
@@ -33,7 +33,7 @@ function ToastCard({ t }: { t: OSToast }) {
       </div>
       <button
         onClick={() => dismiss(t.id)}
-        className="text-zinc-500 transition hover:text-zinc-200"
+        className="shrink-0 self-center rounded-md p-1 text-zinc-500 transition-all hover:rotate-90 hover:bg-white/10 hover:text-zinc-100"
         aria-label="بستن اعلان"
       >
         <X size={14} />

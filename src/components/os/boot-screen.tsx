@@ -155,8 +155,8 @@ export default function BootScreen({ onDone }: { onDone: () => void }) {
           </div>
         </div>
         <div
-          className="os-scroll h-64 w-full max-w-xl overflow-hidden text-[11px] leading-6 sm:text-xs"
-          dir="rtl"
+          className="os-scroll h-64 w-full max-w-xl overflow-hidden text-left text-[11px] leading-6 sm:text-xs"
+          dir="ltr"
         >
           {LINES.slice(0, n).map((l, i) => (
             <div key={i} className="pengo-fadein text-zinc-300">

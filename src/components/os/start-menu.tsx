@@ -45,7 +45,7 @@ function StartMenuInner() {
         aria-hidden
       />
       <div
-        className="pengo-pop fixed bottom-14 right-2 z-[8500] flex max-h-[min(74vh,580px)] w-[min(94vw,580px)] flex-col overflow-hidden rounded-2xl border border-white/15 bg-zinc-900/95 shadow-2xl shadow-black/60 backdrop-blur-xl sm:right-3"
+        className="pengo-pop fixed bottom-14 right-2 z-[8500] flex max-h-[min(74vh,580px)] w-[min(94vw,580px)] origin-bottom-right flex-col overflow-hidden rounded-2xl border border-white/15 bg-zinc-900/95 shadow-2xl shadow-black/60 backdrop-blur-xl sm:right-3"
         role="menu"
         aria-label="منوی شروع"
       >
@@ -60,42 +60,58 @@ function StartMenuInner() {
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="جستجو بین اپ‌ها و بازی‌ها…"
-              className="h-9 bg-zinc-800/70 pr-9 text-sm"
+              className="h-9 bg-zinc-800/70 pr-9 text-sm focus-visible:ring-[#f7931e]/60"
               aria-label="جستجوی برنامه‌ها"
             />
           </div>
         </div>
         <div className="os-scroll flex-1 space-y-4 overflow-y-auto p-3">
-          {groups.map((g) =>
-            g.items.length > 0 ? (
-              <section key={g.label}>
-                <h3 className="mb-2 text-xs font-bold text-zinc-500">
-                  {g.label}
-                </h3>
-                <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-5">
-                  {g.items.map((a) => (
-                    <button
-                      key={a.id}
-                      onClick={() => launch(a.id)}
-                      className="flex flex-col items-center gap-1.5 rounded-xl p-2 transition hover:bg-white/10 active:scale-95"
-                    >
-                      <span
-                        className={`grid h-11 w-11 place-items-center rounded-xl border border-white/15 bg-gradient-to-br shadow-lg shadow-black/30 ${
-                          a.tint ?? 'from-zinc-700 to-zinc-800'
-                        }`}
-                        aria-hidden
-                      >
-                        <a.icon size={22} strokeWidth={2} className="text-white drop-shadow" />
-                      </span>
-                      <span className="text-center text-[11px] font-medium leading-tight text-zinc-200">
-                        {a.name}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </section>
-            ) : null
-          )}
+          {(() => {
+            let stagger = 0
+            return groups.map((g) =>
+              g.items.length > 0 ? (
+                <section key={g.label}>
+                  <h3 className="mb-2 flex items-center gap-1.5 text-xs font-bold text-zinc-500">
+                    <span
+                      className="h-1.5 w-1.5 rounded-full"
+                      style={{ background: 'var(--pengo-accent, #f7931e)' }}
+                      aria-hidden
+                    />
+                    {g.label}
+                  </h3>
+                  <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-5">
+                    {g.items.map((a) => {
+                      const delay = Math.min(stagger++ * 26, 520)
+                      return (
+                        <button
+                          key={a.id}
+                          onClick={() => launch(a.id)}
+                          className="icon-enter group/item flex flex-col items-center gap-1.5 rounded-xl p-2 transition-colors hover:bg-white/10 active:bg-white/15"
+                          style={{ animationDelay: `${delay}ms` }}
+                        >
+                          <span
+                            className={`grid h-11 w-11 place-items-center rounded-xl border border-white/20 bg-gradient-to-br shadow-[inset_0_1px_0_rgba(255,255,255,0.35),inset_0_-7px_12px_rgba(0,0,0,0.15),0_8px_14px_-6px_rgba(0,0,0,0.5)] transition-all duration-200 ease-out group-hover/item:-translate-y-1 group-hover/item:scale-105 ${
+                              a.tint ?? 'from-zinc-700 to-zinc-800'
+                            }`}
+                            aria-hidden
+                          >
+                            <a.icon
+                              size={22}
+                              strokeWidth={2}
+                              className="text-white drop-shadow transition-transform duration-200 group-hover/item:scale-110"
+                            />
+                          </span>
+                          <span className="text-center text-[11px] font-medium leading-tight text-zinc-200">
+                            {a.name}
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </section>
+              ) : null
+            )
+          })()}
           {filtered.length === 0 && (
             <div className="grid place-items-center gap-2 py-10 text-center">
               <Search size={36} className="text-zinc-600" aria-hidden />
@@ -132,7 +148,7 @@ function StartMenuInner() {
                 toggleStart(false)
                 useOS.getState().lockScreen()
               }}
-              className="grid h-9 w-9 place-items-center rounded-lg text-zinc-300 transition hover:bg-white/10 hover:text-teal-300"
+              className="grid h-9 w-9 place-items-center rounded-lg text-zinc-300 transition-all hover:-translate-y-0.5 hover:bg-white/10 hover:text-teal-300"
               title="قفل صفحه"
               aria-label="قفل صفحه"
             >
@@ -140,7 +156,7 @@ function StartMenuInner() {
             </button>
             <button
               onClick={restartOS}
-              className="grid h-9 w-9 place-items-center rounded-lg text-zinc-300 transition hover:bg-white/10 hover:text-amber-300"
+              className="grid h-9 w-9 place-items-center rounded-lg text-zinc-300 transition-all hover:-translate-y-0.5 hover:bg-white/10 hover:text-amber-300"
               title="شروع دوباره سیستم"
               aria-label="شروع دوباره سیستم"
             >
@@ -148,7 +164,7 @@ function StartMenuInner() {
             </button>
             <button
               onClick={shutdownOS}
-              className="grid h-9 w-9 place-items-center rounded-lg text-zinc-300 transition hover:bg-red-500/20 hover:text-red-400"
+              className="grid h-9 w-9 place-items-center rounded-lg text-zinc-300 transition-all hover:-translate-y-0.5 hover:bg-red-500/20 hover:text-red-400"
               title="خاموش کردن سیستم"
               aria-label="خاموش کردن سیستم"
             >
@@ -160,8 +176,9 @@ function StartMenuInner() {
           href={BRAND.sponsorUrl}
           target="_blank"
           rel="noreferrer"
-          className="flex h-9 shrink-0 items-center justify-center gap-1.5 border-t border-white/10 bg-gradient-to-l from-[#f7931e]/20 via-[#8b5cf6]/15 to-[#0ea5a0]/15 text-[11px] font-black text-amber-200 transition hover:from-[#f7931e]/35 hover:via-[#8b5cf6]/25 hover:to-[#0ea5a0]/25"
+          className="relative flex h-9 shrink-0 items-center justify-center gap-1.5 overflow-hidden border-t border-white/10 bg-gradient-to-l from-[#f7931e]/20 via-[#8b5cf6]/15 to-[#0ea5a0]/15 text-[11px] font-black text-amber-200 transition hover:from-[#f7931e]/35 hover:via-[#8b5cf6]/25 hover:to-[#0ea5a0]/25"
         >
+          <span className="sheen" aria-hidden />
           <img
             src="/brand/sunjob-logo.webp"
             alt="لوگوی سان‌جاب"

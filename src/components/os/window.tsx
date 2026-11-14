@@ -1,11 +1,8 @@
 'use client'
 
-import {
-  useRef,
-  type CSSProperties,
-  type PointerEvent as ReactPointerEvent,
-  type ReactNode,
-} from 'react'
+import { useRef, type CSSProperties, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
+import { motion } from 'framer-motion'
+import { Minus, Plus, X } from 'lucide-react'
 import { useOS, type OSWindow } from '@/lib/os/store'
 import { getApp } from '@/lib/os/apps'
 
@@ -101,14 +98,19 @@ export default function WindowFrame({
         zIndex: win.z,
       }
 
-  if (win.minimized) return null
+  /* پنجره‌های کوچک‌شده در os-root فیلتر می‌شوند؛ اینجا نباید null برگردانیم
+     وگرنه انیمیشن خروج AnimatePresence قطع می‌شود */
 
   return (
-    <section
-      className={`pengo-pop absolute flex flex-col select-none overflow-hidden rounded-xl border text-zinc-100 ${
+    <motion.section
+      initial={{ opacity: 0, scale: 0.93, y: 16 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.92, y: 26, transition: { duration: 0.16, ease: 'easeIn' } }}
+      transition={{ type: 'spring', stiffness: 360, damping: 30 }}
+      className={`absolute flex flex-col select-none overflow-hidden rounded-xl border text-zinc-100 ${
         focused
-          ? 'border-white/25 shadow-2xl shadow-black/60'
-          : 'border-white/10 shadow-lg shadow-black/30'
+          ? 'border-white/25 shadow-2xl shadow-black/60 ring-1 ring-white/10'
+          : 'border-white/10 shadow-xl shadow-black/40'
       }`}
       style={style}
       onPointerDown={() => focusWindow(win.id)}
@@ -116,7 +118,7 @@ export default function WindowFrame({
       aria-label={win.title}
     >
       <div
-        className={`os-titlebar pengo-noselect flex h-10 shrink-0 cursor-grab items-center gap-2 px-3 backdrop-blur active:cursor-grabbing ${
+        className={`os-titlebar pengo-noselect relative flex h-10 shrink-0 cursor-grab items-center gap-2 px-3 backdrop-blur active:cursor-grabbing ${
           focused && tint
             ? `bg-gradient-to-l ${tint}`
             : 'bg-zinc-900/95'
@@ -134,35 +136,58 @@ export default function WindowFrame({
         onPointerCancel={endDrag}
         onDoubleClick={() => toggleMaximize(win.id)}
       >
-        <div className="flex items-center gap-1.5" data-nodrag>
+        {/* برق سطح شیشه‌ای نوار عنوان */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/10 to-transparent"
+        />
+        <div className="relative flex items-center gap-1.5" data-nodrag>
           <button
             aria-label="بستن پنجره"
             onClick={() => closeWindow(win.id)}
-            className="h-3.5 w-3.5 rounded-full bg-red-500 transition hover:brightness-125"
-          />
+            className="group/close grid h-3.5 w-3.5 place-items-center rounded-full bg-red-500 transition hover:brightness-110 active:scale-90"
+          >
+            <X
+              className="h-2 w-2 text-black/60 opacity-0 transition-opacity group-hover/close:opacity-100"
+              strokeWidth={4}
+              aria-hidden
+            />
+          </button>
           <button
             aria-label="بزرگ کردن یا برگرداندن پنجره"
             onClick={() => toggleMaximize(win.id)}
-            className="h-3.5 w-3.5 rounded-full bg-amber-400 transition hover:brightness-125"
-          />
+            className="group/max grid h-3.5 w-3.5 place-items-center rounded-full bg-amber-400 transition hover:brightness-110 active:scale-90"
+          >
+            <Plus
+              className="h-2 w-2 text-black/55 opacity-0 transition-opacity group-hover/max:opacity-100"
+              strokeWidth={4}
+              aria-hidden
+            />
+          </button>
           <button
             aria-label="کوچک کردن پنجره"
             onClick={() => minimizeWindow(win.id)}
-            className="h-3.5 w-3.5 rounded-full bg-emerald-500 transition hover:brightness-125"
-          />
+            className="group/min grid h-3.5 w-3.5 place-items-center rounded-full bg-emerald-500 transition hover:brightness-110 active:scale-90"
+          >
+            <Minus
+              className="h-2 w-2 text-black/55 opacity-0 transition-opacity group-hover/min:opacity-100"
+              strokeWidth={4}
+              aria-hidden
+            />
+          </button>
         </div>
         {app && (
           <span
-            className="grid h-5 w-5 shrink-0 place-items-center rounded-md bg-black/25"
+            className="relative grid h-5 w-5 shrink-0 place-items-center rounded-md bg-black/25 ring-1 ring-white/10"
             aria-hidden
           >
             <app.icon size={12} strokeWidth={2.2} className="text-white" />
           </span>
         )}
-        <div className="pointer-events-none min-w-0 flex-1 px-1 text-center text-xs font-bold text-white drop-shadow-sm sm:text-[13px]">
+        <div className="pointer-events-none relative min-w-0 flex-1 px-1 text-center text-xs font-bold text-white drop-shadow-sm sm:text-[13px]">
           <span className="block truncate">{win.title}</span>
         </div>
-        <div className="w-14 shrink-0" aria-hidden />
+        <div className="relative w-14 shrink-0" aria-hidden />
       </div>
       <div className="relative min-h-0 flex-1 bg-zinc-950/95">{children}</div>
       {!win.maximized && (
@@ -180,6 +205,6 @@ export default function WindowFrame({
           aria-hidden
         />
       )}
-    </section>
+    </motion.section>
   )
 }
