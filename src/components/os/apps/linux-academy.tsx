@@ -187,10 +187,7 @@ function CountUp({ to, suffix = '' }: { to: number; suffix?: string }) {
   const [v, setV] = useState(0)
   const reduceMotion = useReducedMotion()
   useEffect(() => {
-    if (reduceMotion) {
-      setV(to)
-      return
-    }
+    if (reduceMotion) return
     const start = performance.now()
     const dur = 900
     let raf = 0
@@ -204,7 +201,7 @@ function CountUp({ to, suffix = '' }: { to: number; suffix?: string }) {
   }, [to, reduceMotion])
   return (
     <span dir="ltr" className="tabular-nums">
-      {fa(v)}
+      {fa(reduceMotion ? to : v)}
       {suffix}
     </span>
   )
