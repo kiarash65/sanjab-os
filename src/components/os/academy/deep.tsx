@@ -379,6 +379,7 @@ function SchedulerAnim() {
    ================================================================ */
 
 function PageTableAnim() {
+  const reduceMotion = useReducedMotion() ?? false
   const [step, bump] = useStepper(3, 1200)
   const pairs = [
     { va: '0x1000', pa: 'RAM 0x7f20' },
@@ -404,8 +405,8 @@ function PageTableAnim() {
         </div>
         <div className="flex flex-col items-center">
           <motion.div
-            animate={{ boxShadow: ['0 0 0px #8b5cf6', '0 0 14px #8b5cf6', '0 0 0px #8b5cf6'] }}
-            transition={{ repeat: Infinity, duration: 1.6 }}
+            animate={{ boxShadow: reduceMotion ? '0 0 0px #8b5cf6' : ['0 0 0px #8b5cf6', '0 0 14px #8b5cf6', '0 0 0px #8b5cf6'] }}
+            transition={reduceMotion ? { duration: 0 } : { repeat: Infinity, duration: 1.6 }}
             className="rounded-xl border border-violet-500/60 bg-violet-500/15 p-2 text-center"
           >
             <p className="text-[9.5px] font-black text-violet-300">جدول صفحه‌ها</p>
@@ -650,6 +651,7 @@ function SshAnim() {
    ================================================================ */
 
 function CronAnim() {
+  const reduceMotion = useReducedMotion() ?? false
   const [tick, bump] = useStepper(4, 1200)
   const jobs = [
     { expr: '0 9 * * *', what: 'گزارش صبح' },
@@ -663,8 +665,8 @@ function CronAnim() {
       <div className="flex items-center gap-3">
         <div className="relative grid size-16 shrink-0 place-items-center rounded-full border-2 border-white/10">
           <motion.span
-            animate={{ rotate: 360 }}
-            transition={{ repeat: Infinity, duration: tick === 0 ? 1.1 : 3, ease: 'linear' }}
+            animate={{ rotate: reduceMotion ? 0 : 360 }}
+            transition={reduceMotion ? { duration: 0 } : { repeat: Infinity, duration: tick === 0 ? 1.1 : 3, ease: 'linear' }}
             className="absolute h-6 w-0.5 origin-bottom rounded-full bg-[#f7931e]"
             style={{ bottom: '50%' }}
             aria-hidden
