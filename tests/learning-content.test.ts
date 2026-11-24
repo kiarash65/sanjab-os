@@ -26,8 +26,13 @@ const checks: Check[] = [
         assert(from >= 0 && to > from, 'بازهٔ کد پیدا نشد: ' + start)
         return source.slice(from, to)
       }
-      const mapKeys = (name: string, next: string): string[] =>
-        Array.from(between(registry, 'const ' + name + ':', 'const ' + next + ':').matchAll(/^\s*'([^']+)'\s*:/gm), (m) => m[1]!)
+      const mapKeys = (name: string, next: string): string[] => {
+        const end = next === 'PY_TITLES' ? 'const PY_TITLES' : 'const ' + next + ':'
+        return Array.from(
+          between(registry, 'const ' + name + ':', end).matchAll(/^\s*(?:'([^']+)'|([A-Za-z_$][\w$-]*))\s*:/gm),
+          (m) => (m[1] ?? m[2])!,
+        )
+      }
       const ids = (source: string, expression: RegExp): string[] =>
         Array.from(source.matchAll(expression), (m) => m[1]!)
       const sameSet = (label: string, actual: string[], expected: string[]) => {
