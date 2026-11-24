@@ -73,7 +73,7 @@ function usePyProgress() {
 
 /* ------------------------- بلوک کد ------------------------------- */
 
-function CodeBlock({ code, caption }: { code: string; caption?: string }) {
+function CodeBlock({ code, caption, language = 'python' }: { code: string; caption?: string; language?: 'python' | 'text' }) {
   const [copied, setCopied] = useState(false)
   const copy = useCallback(() => {
     navigator.clipboard?.writeText(code).then(
@@ -87,8 +87,8 @@ function CodeBlock({ code, caption }: { code: string; caption?: string }) {
   return (
     <div className="overflow-hidden rounded-xl border border-white/10 bg-zinc-950/80">
       <div className="flex items-center justify-between border-b border-white/5 px-3 py-1.5">
-        <span className="font-mono text-[10px] text-zinc-500" dir="ltr">
-          python
+        <span className="font-mono text-[10px] text-zinc-500" dir={language === "python" ? "ltr" : "rtl"}>
+          {caption ?? (language === "python" ? "python" : "شبه‌کد فارسی")}
         </span>
         <div className="flex items-center gap-2">
           {caption && <span className="text-[10px] text-zinc-400">{caption}</span>}
@@ -97,7 +97,7 @@ function CodeBlock({ code, caption }: { code: string; caption?: string }) {
           </Button>
         </div>
       </div>
-      <pre className="os-scroll overflow-x-auto p-3 font-mono text-[11.5px] leading-6 text-emerald-100/90" dir="ltr" style={{ fontSize: 'var(--fa-code-size)', lineHeight: 'var(--fa-code-line-height)' }}>
+      <pre className={`os-scroll overflow-x-auto p-3 text-[11.5px] leading-6 text-emerald-100/90 ${language === "python" ? "font-mono text-left" : "font-sans text-right"}`} dir={language === "python" ? "ltr" : "rtl"} style={{ fontSize: 'var(--fa-code-size)', lineHeight: 'var(--fa-code-line-height)' }}>
         {code}
       </pre>
     </div>
@@ -687,7 +687,13 @@ export default function PythonAcademyApp() {
               </p>
             </Card>
 
-            {/* مقدمه */}
+            {/* مسئلهٔ شروع و مقدمه */}
+            {lesson.problem && (
+              <Card className="border-sky-500/20 bg-sky-500/[0.035] p-3.5">
+                <div className="mb-1 text-xs font-black text-sky-300">مسئلهٔ شروع</div>
+                <p className="text-[11.5px] leading-6 text-zinc-300">{lesson.problem}</p>
+              </Card>
+            )}
             <div className="space-y-2">
               <p className="text-[12.5px] leading-7 text-zinc-300">{lesson.intro}</p>
               {lesson.whyMatters && (
@@ -723,7 +729,7 @@ export default function PythonAcademyApp() {
                   <Terminal size={13} style={{ color: SUNJOB_PALETTE.orange }} />
                   مثال {fa(i + 1)}؛ {ex.title}
                 </div>
-                <CodeBlock code={ex.code} />
+                <CodeBlock code={ex.code} language={ex.language} />
                 <p className="text-[11px] leading-5 text-zinc-400">{ex.explain}</p>
               </div>
             ))}
@@ -784,6 +790,19 @@ export default function PythonAcademyApp() {
               <div className="mb-1 text-xs font-black text-emerald-300">خلاصهٔ درس</div>
               <p className="text-zinc-300">{lesson.summary}</p>
             </Card>
+
+            {lesson.selfCheck && (
+              <Card className="border-sky-500/20 bg-sky-500/[0.035] p-3.5">
+                <div className="mb-2 text-xs font-black text-sky-300">خودارزیابی؛ بدون نگاه‌کردن به متن جواب بده</div>
+                <ul className="mb-2 space-y-1">
+                  {lesson.selfCheck.points.map((point, i) => <li key={i} className="text-[11px] leading-5 text-zinc-300">• {point}</li>)}
+                </ul>
+                <div className="mb-2 space-y-1">
+                  {lesson.selfCheck.questions.map((question, i) => <p key={i} className="text-[11px] leading-5 text-zinc-400">{fa(i + 1)}. {question}</p>)}
+                </div>
+                <p className="rounded-lg border border-white/5 bg-black/20 p-2 text-[11px] leading-5 text-zinc-300"><b className="text-sky-300">کار مستقل: </b>{lesson.selfCheck.task}</p>
+              </Card>
+            )}
 
             {/* کوئیز */}
             <QuizBlock

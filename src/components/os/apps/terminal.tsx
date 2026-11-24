@@ -74,12 +74,12 @@ const MAN: Record<string, { u: string; d: string }> = {
   history: { u: 'history', d: 'لیست دستورهایی که زده‌ای. با فلش بالا هم قابل مرور است.' },
   man: { u: 'man دستور', d: 'دفترچه راهنمای هر دستور. هر وقت گم شدی اینجایی.' },
   neofetch: { u: 'neofetch', d: 'مشخصات سیستم + هنر ASCII پنگوئن. سنت همه لینوکسی‌ها!' },
-  learn: { u: 'learn [start|status|reset]', d: 'آموزش تعاملی ترمینال با ۱۴ ماموریت و امتیاز. همین را امتحان کن!' },
+  learn: { u: 'learn [start|list|status|reset]', d: 'آموزش تعاملی ترمینال با ۲۸ مأموریت در ۵ فصل و امتیاز. برای شروع: learn start' },
   ask: { u: 'ask سوال', d: 'از دستیار هوشمند بپرس. به فارسی جواب می‌دهد و دستور پیشنهاد می‌کند.' },
   open: { u: 'open نام‌اپ', d: 'برنامه‌ای را از دل ترمینال باز می‌کند. مثلاً: open snake' },
   wallpaper: { u: 'wallpaper [کلید]', d: 'کاغذدیواری عوض می‌کند. بدون پارامتر، لیست می‌دهد.' },
-  ps: { u: 'ps', d: 'پنجره‌های باز = پروسه‌های در حال اجرا. مثل htop ولی بامزه‌تر.' },
-  kill: { u: 'kill شمارهٔ PID', d: 'یک فرایند را می‌بندد. اول با ps شماره‌اش را پیدا کن.' },
+  ps: { u: 'ps', d: 'فهرست آموزشیِ پنجره‌های باز SanjabOS را نشان می‌دهد؛ جدول پردازه‌های سیستم‌عامل میزبان نیست.' },
+  kill: { u: 'kill شمارهٔ PID', d: 'پنجرهٔ متناظر را در محیط شبیه‌سازی‌شده می‌بندد؛ پردازه‌ای از ویندوز یا سیستم میزبان را متوقف نمی‌کند.' },
   sudo: { u: 'sudo دستور', d: 'اجرا با دسترسی مدیر. (superuser do) با پنگوئن‌ها مهربان باش.' },
   apt: { u: 'apt install بسته', d: 'نصب بسته (خیالی). خب یه چیزی که نباشه!' },
   /* ---------- نسخه ۴.۰: متن و فیلتر ---------- */
@@ -129,7 +129,7 @@ const MAN: Record<string, { u: string; d: string }> = {
   ufw: { u: 'ufw status | ufw enable', d: 'فایروال سادهٔ اوبونتو (Uncomplicated Firewall).' },
   mount: { u: 'mount', d: 'سیستم‌فایل‌های متصل و نقاط اتصال را نشان می‌دهد.' },
   lsblk: { u: 'lsblk', d: 'درخت دیسک‌ها و پارتیشن‌ها.' },
-  lscpu: { u: 'lscpu', d: 'مشخصات پردازنده، تعداد هسته‌ها را واقعی از دستگاهت می‌خواند!' },
+  lscpu: { u: 'lscpu', d: 'تعداد پردازنده‌های منطقیِ گزارش‌شده به مرورگر را نشان می‌دهد؛ مدل و معماری واقعی CPU از این محیط قابل‌خواندن نیست.' },
   lsusb: { u: 'lsusb', d: 'دستگاه‌های USB متصل (خیالی و بامزه).' },
   lspci: { u: 'lspci', d: 'دستگاه‌های روی گذرگاه PCI (کارت گرافیک و…).' },
   vmstat: { u: 'vmstat', d: 'خلاصهٔ حافظه، swap و CPU.' },
@@ -137,7 +137,7 @@ const MAN: Record<string, { u: string; d: string }> = {
   unzip: { u: 'unzip بسته.zip', d: 'باز کردن بستهٔ زیپ (خیالی).' },
   sha256sum: { u: 'sha256sum فایل', d: 'اثر انگشت رمزنگاری فایل، برای چک سلامت دانلودها.' },
   base64: { u: 'base64 متن | base64 -d متن', d: 'کدگذاری و کدگشایی base64، واقعی کار می‌کند!' },
-  killall: { u: 'killall نام‌پروسه', d: 'همهٔ پروسه‌های با آن نام را می‌بندد (پنجره‌های واقعی!).' },
+  killall: { u: 'killall نام‌پروسه', d: 'پنجره‌های هم‌نام را در محیط مجازی می‌بندد؛ به پردازه‌های سیستم میزبان دسترسی ندارد.' },
   pgrep: { u: 'pgrep نام', d: 'شمارهٔ پروسه‌های حاوی آن نام.' },
   pacman: { u: 'pacman -S بسته', d: 'مدیر بستهٔ آرچ. اینجا مهمان هستیم، apt صاحبخانه است!' },
   dnf: { u: 'dnf install بسته', d: 'مدیر بستهٔ فدورا/Red Hat.' },
@@ -1269,8 +1269,8 @@ export default function TerminalApp() {
         push(
           'out',
           args.includes('-a')
-            ? 'Linux sanjob-os 6.12.4-sanjob-cute #1 SMP PREEMPT x86_64 GNU/Linux-ولی-بامزه'
-            : 'PenguinOS'
+            ? 'SanjabOS 4.0 web-terminal #1 (educational shell simulation)'
+            : 'SanjabOS'
         )
         break
       case 'uptime': {
@@ -2024,10 +2024,10 @@ export default function TerminalApp() {
         push('out', '└─sda3    8:3    1  483G  /')
         break
       case 'lscpu':
-        push('out', 'Architecture:        x86_64')
-        push('out', `CPU(s):              ${navigator.hardwareConcurrency || 8}  ← واقعی از دستگاهت!`)
-        push('out', 'Model name:          بسته به دستگاه تو')
-        push('out', 'Virtualization:      داخل مرورگر، پس همیشه بله!')
+        push('out', 'Architecture:        در محیط مرورگر قابل‌تشخیص نیست')
+        push('out', `Logical CPUs:        ${navigator.hardwareConcurrency || 'نامشخص'}  (گزارش مرورگر؛ ممکن است گرد شده باشد)`)
+        push('out', 'Model name:          مرورگر این اطلاعات را در اختیار این اپ نمی‌گذارد')
+        push('out', 'Source:              Browser capability API؛ نه خروجی lscpu واقعی')
         break
       case 'lsusb':
         push('out', 'Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub')

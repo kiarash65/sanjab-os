@@ -46,6 +46,9 @@ jobs:
       - name: Lint
         run: bun run lint
 
+      - name: Content and API regression tests
+        run: bun test
+
       - name: Build (standalone + copy static/public)
         run: bun run build
 

@@ -45,25 +45,68 @@ export function tooMany(retryAfter: number) {
   )
 }
 
-/** حداکثر حجم بدنه مجاز (بایت)، درخواست‌های بزرگ‌تر رد می‌شوند */
+/** اندازهٔ واقعی متن UTF-8 بر حسب بایت، نه تعداد واحدهای UTF-16 جاوااسکریپت */
+export function utf8ByteLength(value: string): number {
+  return new TextEncoder().encode(value).byteLength
+}
+
+/** حداکثر حجم بدنه مجاز (بایت)، حتی اگر Content-Length ارسال نشده یا نادرست باشد */
 export async function readJsonLimited(
   req: NextRequest,
   maxBytes: number
 ): Promise<{ ok: true; data: unknown } | { ok: false; resp: NextResponse }> {
-  const len = Number(req.headers.get('content-length') ?? '0')
-  if (Number.isFinite(len) && len > maxBytes) {
-    return {
-      ok: false,
-      resp: NextResponse.json({ error: 'بدنه درخواست بزرگ‌تر از حد مجاز است' }, { status: 413 }),
+  const tooLarge = () =>
+    NextResponse.json({ error: 'بدنه درخواست بزرگ‌تر از حد مجاز است' }, { status: 413 })
+
+  const declaredLength = Number(req.headers.get('content-length') ?? '0')
+  if (Number.isFinite(declaredLength) && declaredLength > maxBytes) {
+    return { ok: false, resp: tooLarge() }
+  }
+
+  const chunks: Uint8Array[] = []
+  let totalBytes = 0
+  const reader = req.body?.getReader()
+
+  if (reader) {
+    try {
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        if (!value) continue
+        totalBytes += value.byteLength
+        if (totalBytes > maxBytes) {
+          await reader.cancel().catch(() => undefined)
+          return { ok: false, resp: tooLarge() }
+        }
+        chunks.push(value)
+      }
+    } catch {
+      return {
+        ok: false,
+        resp: NextResponse.json({ error: 'خواندن بدنهٔ درخواست ناموفق بود' }, { status: 400 }),
+      }
+    } finally {
+      reader.releaseLock()
     }
   }
-  const text = await req.text()
-  if (text.length > maxBytes) {
+
+  const bytes = new Uint8Array(totalBytes)
+  let offset = 0
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset)
+    offset += chunk.byteLength
+  }
+
+  let text: string
+  try {
+    text = new TextDecoder('utf-8', { fatal: true }).decode(bytes)
+  } catch {
     return {
       ok: false,
-      resp: NextResponse.json({ error: 'بدنه درخواست بزرگ‌تر از حد مجاز است' }, { status: 413 }),
+      resp: NextResponse.json({ error: 'بدنهٔ درخواست باید UTF-8 معتبر باشد' }, { status: 400 }),
     }
   }
+
   try {
     return { ok: true, data: JSON.parse(text) }
   } catch {
