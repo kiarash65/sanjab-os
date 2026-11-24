@@ -183,7 +183,7 @@ function useStepper(length: number, ms: number) {
   useEffect(() => {
     if (reduceMotion || length <= 1) return
 
-    let timer: ReturnType<typeof window.setInterval> | undefined
+    let timer: number | undefined
     const stop = () => {
       if (timer !== undefined) {
         window.clearInterval(timer)
