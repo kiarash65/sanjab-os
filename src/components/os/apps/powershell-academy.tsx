@@ -2820,6 +2820,7 @@ function CertView({ progress }: { progress: PsProgress }) {
 type ViewId = 'home' | 'play' | 'quiz' | 'cert' | string
 
 export default function PowerShellAcademyApp() {
+  const reduceMotion = useReducedMotion()
   const [progress, setProgress] = useState<PsProgress>(EMPTY_PROGRESS)
   const [view, setView] = useState<ViewId>('home')
   const pushToast = useOS((s) => s.pushToast)
@@ -2982,7 +2983,7 @@ export default function PowerShellAcademyApp() {
         <main ref={scrollRef} className="os-scroll relative min-w-0 flex-1 overflow-y-auto p-4 pb-16 pt-10 md:pb-4 md:pt-4">
           <ReadProgress targetRef={scrollRef} accent={SUNJOB_PALETTE.orange} />
           <AnimatePresence mode="wait">
-            <motion.div key={view} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.16 }} className="reading-shell prose-fa mx-auto">
+            <motion.div key={view} initial={reduceMotion ? false : { opacity: 0, y: 10 }} animate={reduceMotion ? undefined : { opacity: 1, y: 0 }} exit={reduceMotion ? undefined : { opacity: 0, y: -8 }} transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 320, damping: 32 }} className="reading-shell prose-fa mx-auto">
               {/* ---------------- خانه ---------------- */}
               {view === 'home' && (
                 <div className="space-y-4">
@@ -2991,7 +2992,7 @@ export default function PowerShellAcademyApp() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent" aria-hidden />
                     <div className="absolute bottom-3 left-4 right-4">
                       <p className="text-sm font-black text-white sm:text-base">کاربر ویندوزی! پاورشل قدرت واقعی سیستم‌ات در دست توست.</p>
-                      <p className="mt-0.5 text-[11px] leading-4 text-zinc-300">{`${fa(LESSONS.length)} درس در ${fa(STAGES.length)} مرحله، زمین بازی با شبیه‌ساز آموزشی صادق، ${fa(MISSIONS.length)} مأموریت عملی، آزمون و گواهی؛ همه‌چیز آفلاین و بدون خطر.`}</p>
+                      <p className="mt-0.5 text-[11px] leading-4 text-zinc-300">{`${fa(LESSONS.length)} درس در ${fa(STAGES.length)} مرحله، زمین بازی با شبیه‌ساز آموزشی صادق، ${fa(MISSIONS.length)} مأموریت عملی، آزمون و گواهی؛ تمرین‌ها در محیط شبیه‌ساز آموزشی اجرا می‌شوند و به PowerShell میزبان دسترسی ندارند.`}</p>
                     </div>
                   </div>
 

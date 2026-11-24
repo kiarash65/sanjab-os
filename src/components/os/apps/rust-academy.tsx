@@ -5,7 +5,7 @@
 import dynamic from 'next/dynamic'
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import {
   AlertTriangle,
   BookOpen,
@@ -2235,6 +2235,7 @@ function SideItem({ icon: Icon, label, active, onClick }: { icon: LucideIcon; la
 }
 
 export default function RustAcademyApp() {
+  const reduceMotion = useReducedMotion()
   const pushToast = useOS((s) => s.pushToast)
   const mainRef = useRef<HTMLElement>(null)
   const [view, setView] = useState<View>('home')
@@ -2414,7 +2415,7 @@ export default function RustAcademyApp() {
       }
       pushToast({
         title: 'مأموریت انجام شد!',
-        body: `«${m.title}» حل شد؛ در Rust واقعی هم کامپایلر همین را می‌خواست`,
+        body: `«${m.title}» در بررسی این تمرین آموزشی پذیرفته شد؛ این شبیه‌ساز جایگزین rustc نیست.`, 
         icon: ShieldCheck,
       })
     }
@@ -2527,10 +2528,10 @@ export default function RustAcademyApp() {
           <AnimatePresence mode="wait">
             <motion.div
               key={`${view}:${view === 'track' ? lessonId : ''}`}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.16 }}
+              initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+              animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+              exit={reduceMotion ? undefined : { opacity: 0, y: -8 }}
+              transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 320, damping: 32 }}
               className="reading-shell prose-fa mx-auto space-y-3"
             >
               {/* --------- آزمایشگاه حافظه (مالکیت بصری) --------- */}
@@ -2540,7 +2541,7 @@ export default function RustAcademyApp() {
                     <h2 className="text-sm font-black text-zinc-100">آزمایشگاه حافظه: مالکیت را ببین</h2>
                     <p className="mt-1 text-[11.5px] leading-6 text-zinc-400">
                       چهار دیاگرام تعاملی: انتقال مالکیت (Move)، قرض‌گیری (Borrow)، کپی (Clone) و آزادسازی (Drop). مالکیت مهم‌ترین مفهوم راست است؛
-                      اینجا آن را گام‌به‌گام با انیمیشن تجربه کن و متن خطاهای واقعی کامپایلر (E0382، E0502، E0499) را کنار هر نمودار ببین.
+                      اینجا آن را گام‌به‌گام با انیمیشن تجربه کن و نمونه‌هایی از diagnosticهای رایج rustc (E0382، E0502، E0499) را کنار هر نمودار ببین؛ این متن‌ها خروجی کامپایل زنده نیستند.
                     </p>
                   </div>
                   <RustMemoryLab />

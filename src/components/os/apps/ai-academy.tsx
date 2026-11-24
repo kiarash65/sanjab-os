@@ -12,7 +12,7 @@
 import dynamic from 'next/dynamic'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode, RefObject } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import {
   Activity,
   AlertTriangle,
@@ -2619,6 +2619,7 @@ function QuizSection({ best, onSave }: { best: number; onSave: (score: number) =
    ================================================================ */
 
 export default function AIAcademyApp() {
+  const reduceMotion = useReducedMotion()
   const [progress, setProgress] = useState<AIProgress>(EMPTY_PROGRESS)
   const [view, setView] = useState<ViewId>('home')
   const pushToast = useOS((s) => s.pushToast)
@@ -2776,7 +2777,7 @@ export default function AIAcademyApp() {
           >
             {SECTIONS.map(sidebarItem)}
             <p className="mt-3 rounded-xl border border-white/10 bg-white/[0.03] p-2.5 text-center text-[9.5px] leading-4 text-zinc-500">
-              هر بخش یک آزمایش تعاملی دارد؛ دست بزن تا یاد بگیری.
+              هر بخش با توضیح، مثال یا آزمایش تعاملی کمک می‌کند مفهوم را بهتر بفهمی.
               <br />
               با اسپانسری سان‌جاب
             </p>
@@ -2788,10 +2789,10 @@ export default function AIAcademyApp() {
             <AnimatePresence mode="wait">
               <motion.div
                 key={view}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.16 }}
+                initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+                animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+                exit={reduceMotion ? undefined : { opacity: 0, y: -8 }}
+                transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 320, damping: 32 }}
                 className="reading-shell prose-fa mx-auto"
               >
                 {view === 'home' && renderSection('home', <HomeSection onNavigate={setView} />)}

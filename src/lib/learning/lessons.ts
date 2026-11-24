@@ -13,7 +13,8 @@ export interface LessonInfo {
 }
 
 const RUST_TITLES: Record<string, string> = {
-  'rust-what': 'راست چیست؟',
+  'rust-0-systems': 'برنامه‌نویسی سیستمی چیست؟',
+  'rust-what': 'زبان Rust چیست؟',
   'rust-cargo': 'کاگو؛ جعبه‌ابزار رسمی',
   'rust-vars': 'متغیرها: let و let mut',
   'rust-types': 'انواع داده',
@@ -38,8 +39,11 @@ const RUST_TITLES: Record<string, string> = {
 }
 
 const POWERSHELL_TITLES: Record<string, string> = {
-  'ps-1': 'پاورشل چیست؟ اشیاء در برابر متن',
-  'ps-2': 'Get-Help و Get-Command، هنوز پیدا کردن',
+  'ps-0-terminal': 'ترمینال چیست و چرا؟',
+  'ps-0-cmd': 'پاورشل در برابر CMD',
+  'ps-1': 'اولین دستورها و خواندن خروجی',
+  'ps-2': 'کشف دستورها با Get-Command',
+  'ps-2-help': 'راهنمای داخلی: Get-Help',
   'ps-3': 'متغیرها و انواع داده',
   'ps-4': 'پوشه‌ها و فایل‌ها؛ دنیای Providerها',
   'ps-5': 'پروسه‌ها و سرویس‌ها',
@@ -77,6 +81,12 @@ const LINUX_TITLES: Record<string, string> = {
   permissions: 'دسترسی‌ها',
   procs: 'فرآیندها و بسته‌ها',
   quiz: 'آزمون و گواهی',
+  boot: 'فرآیند بوت',
+  kernel: 'هسته از نزدیک',
+  fsdisk: 'فایل‌سیستم و دیسک',
+  net: 'شبکه در لینوکس',
+  shell: 'اسکریپت‌نویسی Bash',
+  sec: 'امنیت و SSH',
 }
 
 const PY_TITLES = new Map(PYTHON_LESSONS.map((l) => [l.id, l.title]))

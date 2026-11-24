@@ -30,9 +30,17 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Read version
+      - name: Read and verify release version/tag
         id: version
-        run: echo "version=$(cat VERSION | tr -d '[:space:]')" >> "$GITHUB_OUTPUT"
+        shell: bash
+        run: |
+          VERSION_FILE="$(tr -d '[:space:]' < VERSION)"
+          PACKAGE_VERSION="$(node -p "require('./package.json').version")"
+          TAURI_VERSION="$(node -p "require('./src-tauri/tauri.conf.json').version")"
+          test "$VERSION_FILE" = "$PACKAGE_VERSION"
+          test "$VERSION_FILE" = "$TAURI_VERSION"
+          test "$GITHUB_REF_NAME" = "v$VERSION_FILE"
+          echo "version=$VERSION_FILE" >> "$GITHUB_OUTPUT"
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
@@ -40,10 +48,11 @@ jobs:
       - name: Generate Prisma client
         run: bunx prisma generate
 
-      - name: Typecheck + Lint (release gate)
+      - name: Typecheck + Lint + Regression tests (release gate)
         run: |
           bunx tsc --noEmit
           bun run lint
+          bun run test
 
       - name: Build web (standalone)
         run: bun run build
@@ -176,7 +185,7 @@ jobs:
     name: Publish release
     runs-on: ubuntu-latest
     needs: [web, windows]
-    if: always()
+    if: always() && needs.web.result == 'success'
     steps:
       - name: Checkout
         uses: actions/checkout@v4

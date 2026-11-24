@@ -845,3 +845,20 @@ body {
 .boot-iran-pulse {
   animation: iran-pulse 1.8s ease-in-out infinite;
 }
+
+
+/* دسترس‌پذیری حرکتی: احترام سراسری به تنظیم کاهش حرکت سیستم‌عامل */
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

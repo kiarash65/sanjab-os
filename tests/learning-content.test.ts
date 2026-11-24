@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { NextRequest } from 'next/server'
 import { PYTHON_LESSONS, PY_PASS } from '../src/lib/academy/python-curriculum'
 import { TERMINAL_MISSIONS } from '../src/lib/os/academy-data'
@@ -10,6 +11,54 @@ function assert(condition: unknown, message: string): asserts condition {
 }
 
 const checks: Check[] = [
+  {
+    name: 'رجیستری مرکز یادگیری با شناسه‌های واقعی آکادمی‌ها همگام است',
+    run: () => {
+      const registry = readFileSync('src/lib/learning/lessons.ts', 'utf8')
+      const psSource = readFileSync('src/components/os/apps/powershell-academy.tsx', 'utf8')
+      const rustSource = readFileSync('src/components/os/apps/rust-academy.tsx', 'utf8')
+      const deepSource = readFileSync('src/components/os/academy/deep.tsx', 'utf8')
+      const aiSource = readFileSync('src/components/os/apps/ai-academy.tsx', 'utf8')
+
+      const between = (source: string, start: string, end: string): string => {
+        const from = source.indexOf(start)
+        const to = source.indexOf(end, from + start.length)
+        assert(from >= 0 && to > from, 'بازهٔ کد پیدا نشد: ' + start)
+        return source.slice(from, to)
+      }
+      const mapKeys = (name: string, next: string): string[] =>
+        Array.from(between(registry, 'const ' + name + ':', 'const ' + next + ':').matchAll(/^\s*'([^']+)'\s*:/gm), (m) => m[1]!)
+      const ids = (source: string, expression: RegExp): string[] =>
+        Array.from(source.matchAll(expression), (m) => m[1]!)
+      const sameSet = (label: string, actual: string[], expected: string[]) => {
+        const a = [...new Set(actual)].sort()
+        const e = [...new Set(expected)].sort()
+        assert(JSON.stringify(a) === JSON.stringify(e), label + ': رجیستری=' + e.join(', ') + '؛ آکادمی=' + a.join(', '))
+      }
+
+      const powershell = mapKeys('POWERSHELL_TITLES', 'AI_TITLES')
+      sameSet('PowerShell', powershell, ids(psSource, /\bid:\s*'(ps-[^']+)'/g))
+      assert(powershell.length === 15, 'تعداد درس‌های PowerShell باید ۱۵ باشد؛ فعلی: ' + powershell.length)
+
+      const rust = mapKeys('RUST_TITLES', 'POWERSHELL_TITLES')
+      sameSet('Rust', rust, ids(rustSource, /\bid:\s*'((?:rust-|own-|st-|conc-)[^']+)'/g))
+      assert(rust.length === 23, 'تعداد درس‌های Rust باید ۲۳ باشد؛ فعلی: ' + rust.length)
+
+      const ai = mapKeys('AI_TITLES', 'LINUX_TITLES')
+      const aiSections = between(aiSource, 'const SECTIONS: SectionDef[] = [', '/* ================================================================\n   داده‌های ثابت')
+      sameSet('هوش مصنوعی', ai, ids(aiSections, /\bid:\s*'([^']+)'/g))
+      assert(ai.length === 13, 'تعداد بخش‌های AI باید ۱۳ باشد؛ فعلی: ' + ai.length)
+
+      const linux = mapKeys('LINUX_TITLES', 'PY_TITLES')
+      const linuxCore = ['what', 'where', 'distros', 'install', 'terminal', 'permissions', 'procs', 'quiz']
+      const deepChapters = ids(
+        between(deepSource, 'export const DEEP_CHAPTERS: DeepChapterDef[] = [', 'export const DEEP_IDS'),
+        /\bid:\s*'([^']+)'/g,
+      )
+      sameSet('Linux', linux, [...linuxCore, ...deepChapters])
+      assert(linux.length === 14, 'تعداد فصل‌ها و آزمون Linux باید ۱۴ باشد؛ فعلی: ' + linux.length)
+    },
+  },
   {
     name: 'شناسه‌های ۲۶ گام پایتون یکتا و پایدارند',
     run: () => {

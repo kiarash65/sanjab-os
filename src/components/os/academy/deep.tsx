@@ -5,8 +5,8 @@
 /* هر فصل انیمیشن تعاملی اختصاصی دارد.                                 */
 /* ------------------------------------------------------------------ */
 
-import { useEffect, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
 import type { BookOpen } from 'lucide-react'
 import {
   Check,
@@ -178,15 +178,39 @@ function H3({ children, color }: { children: React.ReactNode; color: string }) {
 
 function useStepper(length: number, ms: number) {
   const [step, setStep] = useState(0)
-  const ref = useRef(0)
+  const reduceMotion = useReducedMotion()
+
   useEffect(() => {
-    const t = setInterval(() => {
-      ref.current = (ref.current + 1) % length
-      setStep(ref.current)
-    }, ms)
-    return () => clearInterval(t)
-  }, [length, ms])
-  return [step, () => setStep((s) => (s + 1) % length)] as const
+    if (reduceMotion || length <= 1) return
+
+    let timer: ReturnType<typeof window.setInterval> | undefined
+    const stop = () => {
+      if (timer !== undefined) {
+        window.clearInterval(timer)
+        timer = undefined
+      }
+    }
+    const start = () => {
+      if (timer === undefined && !document.hidden) {
+        timer = window.setInterval(() => {
+          setStep((current) => (current + 1) % length)
+        }, ms)
+      }
+    }
+    const onVisibilityChange = () => {
+      if (document.hidden) stop()
+      else start()
+    }
+
+    start()
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    return () => {
+      stop()
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+    }
+  }, [length, ms, reduceMotion])
+
+  return [step, () => setStep((current) => (current + 1) % length)] as const
 }
 
 const StepBtn = ({ onClick, label }: { onClick: () => void; label: string }) => (

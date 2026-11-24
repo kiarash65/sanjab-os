@@ -1,7 +1,7 @@
 name: CI
 
 # CI صادقانه: تایپ‌چک سخت + لینت + بیلد + سنسِ نسخه + چک پیکربندی دسکتاپ.
-# تست‌های unit هنوز author نشده‌اند (docs/DEPENDENCIES.md) — به محض اضافه‌شدن، job جدا می‌گیرند.
+# آزمون‌های رگرسیون محتوا و API در job اصلی اجرا می‌شوند؛ smoke/E2E واقعی هنوز باید جداگانه تکمیل شود.
 on:
   push:
     branches:
@@ -33,7 +33,7 @@ jobs:
       - name: Generate Prisma client
         run: bunx prisma generate
 
-      - name: Version consistency (VERSION / package.json / brand.ts)
+      - name: Version consistency (VERSION / package.json)
         run: |
           V_FILE=$(tr -d ' \n' < VERSION)
           V_PKG=$(node -p "require('./package.json').version")

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import {
   AlertTriangle,
   Award,
@@ -185,7 +185,12 @@ type ViewId = 'home' | 'cheats' | (typeof CHAPTERS)[number]['id']
 
 function CountUp({ to, suffix = '' }: { to: number; suffix?: string }) {
   const [v, setV] = useState(0)
+  const reduceMotion = useReducedMotion()
   useEffect(() => {
+    if (reduceMotion) {
+      setV(to)
+      return
+    }
     const start = performance.now()
     const dur = 900
     let raf = 0
@@ -196,7 +201,7 @@ function CountUp({ to, suffix = '' }: { to: number; suffix?: string }) {
     }
     raf = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(raf)
-  }, [to])
+  }, [to, reduceMotion])
   return (
     <span dir="ltr" className="tabular-nums">
       {fa(v)}
@@ -1289,6 +1294,7 @@ const CHEAT_SECTIONS: ReaderSection[] = [
 ]
 
 export default function LinuxAcademyApp() {
+  const reduceMotion = useReducedMotion()
   const [progress, setProgress] = useState<AcademyProgress>(EMPTY_PROGRESS)
   const [view, setView] = useState<ViewId>('home')
   const [installOpen, setInstallOpen] = useState<string>(INSTALL_METHODS[0].id)
@@ -1469,10 +1475,10 @@ export default function LinuxAcademyApp() {
           <AnimatePresence mode="wait">
             <motion.div
               key={view}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.16 }}
+              initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+              animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+              exit={reduceMotion ? undefined : { opacity: 0, y: -8 }}
+              transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 320, damping: 32 }}
               className="reading-shell mx-auto"
             >
               {/* ---------------- خانه ---------------- */}
@@ -1483,7 +1489,7 @@ export default function LinuxAcademyApp() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" aria-hidden />
                     <div className="absolute bottom-3 right-4 left-4">
                       <p className="text-sm font-black text-white sm:text-base">سفرت را همین‌جا شروع کن، پنگوئن معلم صبور است!</p>
-                      <p className="mt-0.5 text-[11px] leading-4 text-zinc-300">۱۴ فصل کوتاه، یک ترمینال امن برای تمرین، انیمیشن‌های زندهٔ هسته، آزمون و گواهی پایانی؛ همه‌چیز آفلاین و بامزه.</p>
+                      <p className="mt-0.5 text-[11px] leading-4 text-zinc-300">۱۴ فصل آموزشی، یک ترمینال امن برای تمرین، انیمیشن‌های تعاملی هسته، آزمون و گواهی پایانی؛ همه‌چیز در همین محیط آموزشی.</p>
                     </div>
                   </div>
 
@@ -1790,13 +1796,13 @@ export default function LinuxAcademyApp() {
                     <div>
                       <SectionTitle icon={Cpu} color={SUNJOB_PALETTE.teal}>فرآیندها: هر برنامه یک شماره دارد</SectionTitle>
                       <p className="mb-2">
-                        هر برنامهٔ در حال اجرا یک <b className="text-zinc-100">PID</b> دارد. با <code dir="ltr" className="rounded bg-zinc-950 px-1 font-mono text-[10.5px] text-emerald-300">ps aux</code> لیستشان را می‌بینی، با <code dir="ltr" className="rounded bg-zinc-950 px-1 font-mono text-[10.5px] text-emerald-300">htop</code> زنده و رنگی، و با <code dir="ltr" className="rounded bg-zinc-950 px-1 font-mono text-[10.5px] text-rose-300">kill -9 PID</code> پایانی بی‌رحمانه!
+                        هر برنامهٔ در حال اجرا یک <b className="text-zinc-100">PID</b> دارد. با <code dir="ltr" className="rounded bg-zinc-950 px-1 font-mono text-[10.5px] text-emerald-300">ps aux</code> فهرست فرایندها را می‌بینی و با <code dir="ltr" className="rounded bg-zinc-950 px-1 font-mono text-[10.5px] text-emerald-300">htop</code> وضعیتشان را زنده بررسی می‌کنی. برای پایان‌دادن، ابتدا <code dir="ltr" className="rounded bg-zinc-950 px-1 font-mono text-[10.5px] text-rose-300">kill PID</code> را به‌کار ببر؛ این دستور معمولاً درخواست پایان عادی (SIGTERM) می‌فرستد. <code dir="ltr" className="rounded bg-zinc-950 px-1 font-mono text-[10.5px] text-rose-300">kill -KILL PID</code> یا <code dir="ltr" className="rounded bg-zinc-950 px-1 font-mono text-[10.5px] text-rose-300">kill -9 PID</code> را فقط وقتی استفاده کن که فرایند به درخواست عادی پاسخ نمی‌دهد؛ این سیگنال فرصت پاک‌سازی عادی را از برنامه می‌گیرد.
                       </p>
                       <TerminalBox
                         lines={[
                           '$ ps aux',
                           'USER   PID %CPU %MEM   COMMAND',
-                          'pengo    1  0.0  0.1   systemd (بویسِ همهٔ فرآیندها)',
+                          'root     1  0.0  0.1   systemd (مدیر سرویس‌ها و فرایندها)',
                           'pengo  412  0.3  1.2   firefox',
                           'pengo  777  9.9 99.0   chrome (همیشه)',
                           'pengo 1024  0.1  0.2   sanjabak-daemon (فندق‌شکن)',
